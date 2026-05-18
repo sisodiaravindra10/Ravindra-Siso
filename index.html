@@ -1,0 +1,1519 @@
+<!doctype html>
+<!--
+  Dithered Portrait Hero — vanilla HTML/CSS/JS prototype.
+
+  HOW TO RUN
+    1. Save your portrait JPG at: ./portrait.jpg  (same folder as this file)
+    2. Serve over HTTP (file:// taints the canvas and getImageData throws):
+         cd /Users/zop.dev/rav && python3 -m http.server 8000
+    3. Open: http://localhost:8000/dithered-hero.html
+
+  TUNING
+    Scroll to the TUNING KNOBS block in <script> — adjust CELL_PX (dot
+    density), CONTRAST (mid crush), PULSE_AMPLITUDE / PULSE_PERIOD_MS
+    (liveness). All other code reads from these constants.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>MY. DITHERED. VISION.</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    :root {
+      --bg: #B4B2F3;            /* lavender — animates through scroll phases */
+      --fg: #000000;            /* animates through scroll phases */
+      --jodhpur: #5C85B8;       /* Jodhpur indigo — used in Story chapter 01, stable */
+      --lavender-fixed: #B4B2F3;/* never animates; for elements that must stay lavender */
+      --mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+      --sans: "Inter", "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--sans);
+      overflow-x: hidden;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      height: 100svh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* ---------- TOP NAV ---------- */
+    .nav {
+      display: flex;
+      gap: 8px;
+      padding: 18px 24px;
+      z-index: 3;
+      position: relative;
+    }
+    .nav a {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-decoration: none;
+      color: var(--fg);
+      padding: 8px 14px;
+      border: 1px solid var(--fg);
+      border-radius: 0;
+      background: transparent;
+      transition: background 120ms ease, color 120ms ease;
+    }
+    .nav a:hover { background: var(--fg); color: var(--bg); }
+    .nav .spacer { flex: 1; }
+    .nav .meta {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.16em;
+      align-self: center;
+      opacity: 0.7;
+    }
+
+    /* ---------- MAIN AREA ---------- */
+    .main {
+      position: relative;
+      overflow: visible;
+    }
+
+    /* ---------- CASCADING CARD STACK ----------
+       Every section that participates becomes sticky at viewport top with a
+       depth-based z-index; scale + border-radius are scrub-driven elsewhere. */
+    .stack-card {
+      position: sticky !important;
+      top: 0 !important;
+      will-change: transform, border-radius;
+      transform-origin: top center;
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    /* ---------- SIDEBAR (rotated, Photoshop-mockup style) ---------- */
+    .sidebar {
+      position: absolute;
+      left: 22px;
+      bottom: 5vh;
+      transform-origin: left bottom;
+      transform: rotate(-90deg) translateY(-100%);
+      display: flex;
+      gap: 28px;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      white-space: nowrap;
+      z-index: 4;
+      pointer-events: none;
+      color: var(--fg);
+    }
+
+    /* ---------- CANVAS (the dithered portrait, fills the hero) ---------- */
+    .canvas-wrap {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    canvas.dither {
+      display: block;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      -ms-interpolation-mode: nearest-neighbor;
+    }
+
+    /* ---------- HEADLINE (knockout: lavender on top of dither) ---------- */
+    .headline {
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: center;
+      padding: 0 8vw;
+      pointer-events: none;
+    }
+    .headline span {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: clamp(3rem, 12vw, 14rem);
+      letter-spacing: calc(-0.05em - 3px);
+      line-height: 0.9;
+      color: var(--bg);
+      text-align: center;
+      /* Subtle drop-shadow keeps the lavender word legible against light dither regions */
+      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+    }
+    .headline em {
+      font-style: italic;
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-weight: 400;
+      letter-spacing: calc(-0.055em - 3px);
+    }
+
+    /* =====================================================================
+       SECTION — Story (juanmora-style chapter narrative)
+       ===================================================================== */
+    .story { display: block; }
+    .chapter {
+      position: relative;
+      min-height: 70svh;
+      padding: 96px 6vw;
+      display: grid;
+      align-items: center;
+      overflow: hidden;
+    }
+    .chapter.chapter-photo { min-height: 100svh; align-items: end; }
+    .chapter-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
+      pointer-events: none;
+    }
+    .chapter-overlay {
+      position: relative;
+      z-index: 1;
+      max-width: 640px;
+    }
+    .chapter-title {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-weight: 400;
+      font-size: clamp(2.6rem, 7.5vw, 7rem);
+      letter-spacing: calc(-0.04em - 3px);
+      line-height: 0.94;
+      margin: 0 0 22px;
+    }
+    /* Display-sized heading variant for the photo chapters' giant wordmarks. */
+    .chapter-title-huge {
+      font-size: clamp(3.2rem, 13vw, 14rem);
+      letter-spacing: calc(-0.05em - 4px);
+      line-height: 0.9;
+      margin: 0;
+    }
+    .chapter-title em {
+      font-style: italic;
+    }
+    .chapter-copy {
+      font-family: var(--sans);
+      font-size: clamp(1rem, 1.2vw, 1.15rem);
+      line-height: 1.55;
+      max-width: 48ch;
+      margin: 0;
+    }
+    .chapter-copy em {
+      font-style: italic;
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-size: 1.08em;
+    }
+
+    /* Small editorial caption that sits offset on a photo chapter */
+    .chapter-aside {
+      position: absolute;
+      left: 6vw;
+      top: 18vh;
+      z-index: 2;
+      margin: 0;
+      max-width: 22ch;
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-size: clamp(1.05rem, 1.6vw, 1.55rem);
+      line-height: 1.25;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      opacity: 0.78;
+    }
+    .chapter-aside em {
+      font-style: italic;
+      opacity: 0.7;
+    }
+    /* Right-aligned variant used when the main wordmark sits on the left */
+    .chapter-aside-right {
+      left: auto;
+      right: 16vw;
+      text-align: right;
+    }
+    /* Second stanza of an aside, sits below the first with breathing room */
+    .chapter-aside-2 {
+      top: 26vh;
+      max-width: 28ch;
+    }
+    @media (max-width: 900px) {
+      .chapter-aside { top: 10vh; font-size: 1rem; }
+      .chapter-aside-2 { top: 26vh; }
+    }
+
+    /* --- Chapter variant: Jodhpur (photo + indigo backdrop, right-aligned wordmark) --- */
+    .chapter-jodhpur {
+      background: var(--jodhpur);
+      color: var(--lavender-fixed); /* lavender text on indigo, doesn't follow phase shift */
+    }
+    .chapter-jodhpur .chapter-overlay {
+      align-self: center;
+      justify-self: end;
+      text-align: right;
+      max-width: none;
+    }
+
+    /* --- Chapter variant: Bike (photo + warm sand bg, left-aligned wordmark) --- */
+    .chapter-bike {
+      background: #E8D5B0;
+      color: var(--fg);
+    }
+    .chapter-bike .chapter-canvas {
+      opacity: 0.55;
+      mix-blend-mode: multiply;
+    }
+    .chapter-bike .chapter-overlay {
+      align-self: center;
+      justify-self: start;
+      text-align: left;
+      max-width: none;
+    }
+    .chapter-bike .chapter-title em {
+      color: var(--fg);
+      opacity: 0.55;
+    }
+    .chapter-bike-cta { min-height: 60svh; }
+
+    /* --- Text-only chapters --- */
+    .chapter-text { background: var(--bg); color: var(--fg); }
+    .chapter-text .chapter-overlay { max-width: 720px; }
+
+    @media (max-width: 900px) {
+      .chapter { padding: 64px 5vw; min-height: 60svh; }
+      .chapter.chapter-photo { min-height: 80svh; }
+      .chapter-bike-cta { min-height: 50svh; }
+      .chapter-jodhpur .chapter-overlay { justify-self: start; text-align: left; }
+    }
+
+    /* =====================================================================
+       SECTIONS 02 / 03 / 04 — Work, About, Contact
+       ===================================================================== */
+    .fold {
+      position: relative;
+      min-height: 100svh;
+      padding: 96px 6vw 80px;
+    }
+    .fold-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: end;
+      gap: 32px;
+      margin-bottom: 56px;
+    }
+    .fold-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      color: var(--fg);
+      opacity: 0.85;
+      display: flex;
+      gap: 14px;
+      align-items: center;
+    }
+    .fold-label::before {
+      content: "";
+      display: inline-block;
+      width: 8px; height: 8px;
+      background: var(--fg);
+    }
+    .fold-title {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(3rem, 9vw, 9.5rem);
+      letter-spacing: calc(-0.045em - 3px);
+      line-height: 0.92;
+      margin: 0;
+    }
+    .fold-kicker {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      opacity: 0.8;
+      text-align: right;
+      max-width: 220px;
+      line-height: 1.6;
+    }
+
+    /* ---------- Floating dithered hover-preview ---------- */
+    .preview {
+      position: fixed;
+      top: 0; left: 0;
+      z-index: 50;
+      width: 320px;
+      background: var(--bg);
+      border: 1px solid var(--fg);
+      padding: 8px 8px 10px;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-9999px, -9999px);
+      transition: opacity 180ms ease;
+      display: grid;
+      gap: 8px;
+      will-change: transform;
+    }
+    .preview.visible { opacity: 1; }
+    .preview-frame {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--bg);
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--fg);
+      border: 1px solid var(--fg);
+    }
+    .preview-frame canvas,
+    .preview-frame img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .preview-frame img.fallback {
+      filter: grayscale(1) contrast(1.6) brightness(0.95);
+    }
+    .preview-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      color: var(--fg);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .preview-label .dot {
+      display: inline-block;
+      width: 6px; height: 6px;
+      background: var(--fg);
+      align-self: center;
+    }
+    @media (hover: none), (max-width: 900px) {
+      .preview { display: none; }
+    }
+
+    /* ---------- 02 · WORK ---------- */
+    .work-list {
+      display: grid;
+      gap: 0;
+      border-top: 1px solid var(--fg);
+    }
+    .work-row {
+      display: grid;
+      grid-template-columns: 56px 1.4fr 1fr 1fr 80px;
+      gap: 24px;
+      align-items: baseline;
+      padding: 26px 0;
+      border-bottom: 1px solid var(--fg);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      color: var(--fg);
+      text-decoration: none;
+      transition: padding-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .work-row:hover { padding-left: 12px; }
+    .work-row .num { font-variant-numeric: tabular-nums; opacity: 0.7; }
+    .work-row .title {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 2.6vw, 2.3rem);
+      letter-spacing: -0.035em;
+      line-height: 1;
+    }
+    .work-row .role,
+    .work-row .year {
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      opacity: 0.78;
+    }
+    .work-row .arrow {
+      justify-self: end;
+      font-size: 18px;
+      transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .work-row:hover .arrow { transform: translateX(6px); }
+
+    /* ---------- 03 · ABOUT ---------- */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 80px;
+      align-items: start;
+    }
+    .about-copy {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-weight: 400;
+      font-size: clamp(1.4rem, 2.4vw, 2.2rem);
+      line-height: 1.22;
+      letter-spacing: -0.025em;
+      max-width: 28ch;
+    }
+    .contact-lead {
+      max-width: 32ch;
+      margin: 0 0 56px;
+    }
+    .about-copy em {
+      font-style: italic;
+      color: var(--fg);
+      opacity: 0.7;
+    }
+    .about-meta {
+      display: grid;
+      gap: 28px;
+    }
+    .about-meta h3 {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      margin: 0 0 10px;
+      opacity: 0.75;
+    }
+    .about-meta ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 4px;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+    }
+    .about-meta li {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px dashed rgba(0, 0, 0, 0.25);
+    }
+    .about-meta li span:last-child { opacity: 0.7; }
+
+    /* ---------- 04 · CONTACT ---------- */
+    .contact-fold {
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 56px;
+    }
+    .contact-cta {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(2.6rem, 7.4vw, 7.5rem);
+      line-height: 0.9;
+      letter-spacing: -0.045em;
+      margin: 24px 0 0;
+    }
+    .contact-cta a {
+      color: var(--fg);
+      text-decoration: none;
+      padding-bottom: 12px;
+      position: relative;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    /* Static solid baseline underline */
+    .contact-cta a::before {
+      content: "";
+      position: absolute;
+      left: 0; right: 0;
+      bottom: 0;
+      height: 2px;
+      background: var(--fg);
+    }
+    /* Per-character lift on hover — no stacking, no clipping */
+    .contact-cta a .char {
+      display: inline-block;
+      transform: translateY(0);
+      transition: transform 0.5s cubic-bezier(0.5, 0, 0.2, 1),
+                  font-style 0.5s ease;
+      transition-delay: calc(var(--i) * 18ms);
+      will-change: transform;
+    }
+    .contact-cta a:hover .char,
+    .contact-cta a:focus-visible .char {
+      transform: translateY(-0.12em);
+      transition-delay: calc(var(--i) * 22ms);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .contact-cta a .char { transition: none; }
+      .contact-cta a:hover .char { transform: none; }
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .contact-cell span em {
+      font-style: italic;
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-size: 1.05em;
+    }
+    .contact-cell {
+      padding: 22px 20px 22px 0;
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: 0.04em;
+      display: grid;
+      gap: 6px;
+    }
+    .contact-cell h4 {
+      margin: 0;
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      opacity: 0.7;
+      text-transform: uppercase;
+    }
+    .contact-cell a { color: var(--fg); text-decoration: none; }
+    .contact-cell a:hover { text-decoration: underline; }
+    .colophon {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 12px;
+      align-items: end;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.18em;
+      opacity: 0.75;
+    }
+    .colophon .center { text-align: center; }
+    .colophon .right  { text-align: right; }
+
+    /* ---------- RESPONSIVE: stack the new folds on narrow ---------- */
+    @media (max-width: 900px) {
+      .fold { padding: 64px 5vw 56px; }
+      .fold-head { grid-template-columns: 1fr; gap: 16px; margin-bottom: 36px; }
+      .fold-kicker { text-align: left; }
+      .work-row {
+        grid-template-columns: 38px 1fr 60px;
+        gap: 14px;
+      }
+      .work-row .role,
+      .work-row .year { display: none; }
+      .about-grid { grid-template-columns: 1fr; gap: 36px; }
+      .contact-grid { grid-template-columns: 1fr; gap: 28px 0; }
+      .contact-cell { padding: 0; }
+      .contact-cta { font-size: clamp(1.6rem, 6.4vw, 3.2rem); letter-spacing: -0.045em; }
+      .contact-cta a { white-space: nowrap; }
+      .colophon { grid-template-columns: 1fr; text-align: left; gap: 4px; }
+      .colophon .center, .colophon .right { text-align: left; }
+    }
+
+    /* ---------- RESPONSIVE: scale type on narrow viewports ---------- */
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .nav {
+        padding: 12px 14px;
+        gap: 5px;
+        flex-wrap: wrap;
+      }
+      .nav a {
+        padding: 6px 10px;
+        font-size: 10px;
+        letter-spacing: 0.08em;
+        white-space: nowrap;
+      }
+      .nav .meta { display: none; }
+      .headline { padding: 0 4vw; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <nav class="nav">
+      <a href="#projects">[ PROJECTS ]</a>
+      <a href="#experiments">[ EXPERIMENTS ]</a>
+      <a href="#contact">[ CONTACT ]</a>
+      <span class="spacer"></span>
+      <span class="meta">RAVINDRA PRATAP SINGH</span>
+    </nav>
+
+    <section class="main">
+      <div class="canvas-wrap" id="canvasWrap">
+        <canvas class="dither" id="dither" aria-label="Dithered portrait"></canvas>
+      </div>
+
+<h1 class="headline">
+        <span><em>Ravindra Sisodia</em></span>
+      </h1>
+
+      <div class="sidebar" aria-hidden="true">
+        <span>+ SMART_OBJECTS</span>
+        <span>7_ORIGINAL_STYLES</span>
+      </div>
+    </section>
+  </div>
+
+  <!-- ============================= STORY ============================= -->
+  <section class="story" id="story" aria-label="Story">
+
+    <!-- 01 · JODHPUR — giant right-aligned wordmark over dithered fort -->
+    <article class="chapter chapter-photo chapter-jodhpur">
+      <canvas class="chapter-canvas" data-src="./story-jodhpur.jpg" aria-hidden="true"></canvas>
+      <p class="chapter-aside">Jodhpur<br/><em>Rajasthan.</em></p>
+      <p class="chapter-aside chapter-aside-2">I’m a designer-engineer<br/>who builds brands and the<br/><em>interfaces they live inside.</em></p>
+      <div class="chapter-overlay">
+        <h3 class="chapter-title chapter-title-huge">the place<br/>where i grew<br/><em>with design.</em></h3>
+      </div>
+    </article>
+
+    <!-- 06 · BIKE RIDES — short CTA-style chapter, left-aligned giant heading -->
+    <article class="chapter chapter-photo chapter-bike chapter-bike-cta">
+      <canvas class="chapter-canvas" data-src="./story-bike.jpg" aria-hidden="true"></canvas>
+      <p class="chapter-aside chapter-aside-right">the only thing<br/>that empties<br/><em>my head.</em></p>
+      <div class="chapter-overlay">
+        <h3 class="chapter-title chapter-title-huge">Pixels by day,<br/>petrol <em>by dusk.</em></h3>
+      </div>
+    </article>
+
+  </section>
+
+  <!-- ============================= 02 · WORK ============================= -->
+  <section class="fold" id="projects">
+    <header class="fold-head">
+      <h2 class="fold-title">Selected <em>work,</em><br/>across rooms.</h2>
+      <p class="fold-kicker">
+        Eight shown. Fifty more in the archive, <em>2018 — 2026.</em>
+      </p>
+    </header>
+
+    <div class="work-list">
+      <a href="https://zop-dev-website-v3.vercel.app/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://zop-dev-website-v3.vercel.app/" data-label="01 · ZOP.DEV — WEB / 2026">
+        <span class="num">01</span>
+        <span class="title">Zop.Dev — Marketing Site</span>
+        <span class="role">Brand · Web</span>
+        <span class="year">2026</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://screenroot.com/work/ceat-tyre-website-design/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://screenroot.com/work/ceat-tyre-website-design/" data-label="02 · CEAT TYRES — CASE / 2023">
+        <span class="num">02</span>
+        <span class="title">CEAT Tyres — Website</span>
+        <span class="role">Case · Web</span>
+        <span class="year">2023</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://screenroot.com/work/yes-bank-app-ui-design/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://screenroot.com/work/yes-bank-app-ui-design/" data-label="03 · YES BANK — MOBILE / 2023">
+        <span class="num">03</span>
+        <span class="title">YES Bank — App UI</span>
+        <span class="role">Case · Product</span>
+        <span class="year">2023</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://us.strandls.com/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://us.strandls.com/" data-label="04 · STRAND LIFE SCIENCES / 2024">
+        <span class="num">04</span>
+        <span class="title">Strand Life Sciences</span>
+        <span class="role">Web · Marketing</span>
+        <span class="year">2024</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://evermortalesco.com/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://evermortalesco.com/" data-thumb="./project-openstreet.jpg" data-label="05 · OPENSTREET — EVERMORTAL / 2024">
+        <span class="num">05</span>
+        <span class="title">Openstreet — Evermortal Esco</span>
+        <span class="role">Studio · Web</span>
+        <span class="year">2024</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://vocautomotive.com/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://vocautomotive.com/" data-label="06 · VOC AUTOMOTIVE / 2025">
+        <span class="num">06</span>
+        <span class="title">VOC Automotive</span>
+        <span class="role">Web · Marketing</span>
+        <span class="year">2025</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://federate.one/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://federate.one/" data-thumb="./project-federate.jpg" data-label="07 · FEDERATE / 2025">
+        <span class="num">07</span>
+        <span class="title">Federate</span>
+        <span class="role">Identity · Web</span>
+        <span class="year">2025</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://screenroot.com/work/tata-capital-website-design/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://screenroot.com/work/tata-capital-website-design/" data-label="08 · TATA CAPITAL — CASE / 2022">
+        <span class="num">08</span>
+        <span class="title">Tata Capital — Website</span>
+        <span class="role">Case · Web</span>
+        <span class="year">2022</span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- ============================= 03 · CONTACT ============================= -->
+  <section class="fold contact-fold" id="contact">
+    <header class="fold-head">
+      <h2 class="fold-title">Pitch me<br/>something <em>impossible.</em></h2>
+      <p class="fold-kicker">
+        Inbox open. Reply within 24 hours, most days. Slower on Sundays — that’s a feature.
+      </p>
+    </header>
+
+    <p class="contact-cta">
+      <a href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a>
+    </p>
+
+    <div class="contact-grid">
+      <div class="contact-cell">
+        <h4>EMAIL</h4>
+        <a href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a>
+      </div>
+      <div class="contact-cell">
+        <h4>BASED IN</h4>
+        <span>Bengaluru, IN · UTC+5:30</span>
+      </div>
+      <div class="contact-cell">
+        <h4>SOCIAL</h4>
+        <a href="https://www.instagram.com/ravindrasiso/" target="_blank" rel="noopener">@ravindrasiso</a>
+        <a href="https://www.linkedin.com/in/ravindra-sisodia/" target="_blank" rel="noopener">linkedin / ravindra-sisodia</a>
+      </div>
+      <div class="contact-cell">
+        <h4>CURRENTLY</h4>
+        <span>Becoming an <em>AI engineer</em> who can also ship the design. Looking for the next app or site to build end-to-end.</span>
+      </div>
+    </div>
+
+    <div class="colophon">
+      <span>© 2026 · RAVINDRA PRATAP SINGH</span>
+    </div>
+  </section>
+
+  <!-- Floating preview panel — populated on .work-row hover -->
+  <div class="preview" id="preview" aria-hidden="true">
+    <div class="preview-frame" id="previewFrame">— preview</div>
+    <div class="preview-label">
+      <span id="previewLabel">— hover a project</span>
+      <span class="dot"></span>
+    </div>
+  </div>
+
+<!-- GSAP + ScrollTrigger for scroll-driven effects -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js"></script>
+
+<script>
+/* =====================================================================
+   DITHERED PORTRAIT — vanilla canvas, ordered Bayer 8x8
+   ---------------------------------------------------------------------
+   PIPELINE
+     1. Load ./portrait.jpg into an offscreen <img>. If that fails, paint
+        a procedural radial-gradient fallback so the page still renders.
+     2. On every animation frame:
+        a. drawImage(src, 0, 0, offW, offH)  — browser bilinear downscale
+           to the LOW-RES backing store (offW x offH).
+        b. getImageData -> per-pixel luminance (Rec. 709)
+        c. Apply CONTRAST + BRIGHTNESS
+        d. Compare against Bayer 8x8 threshold + sine-wave pulseOffset
+        e. Write either opaque black or transparent (lavender body
+           shows through). One color in the canvas = no edge seams.
+        f. putImageData
+     3. Visible canvas is the SAME element — its CSS size is much bigger
+        than its backing store, scaled up with `image-rendering: pixelated`
+        for crisp square dots regardless of devicePixelRatio.
+   ===================================================================== */
+
+/* ---------- TUNING KNOBS ---------- */
+const CELL_PX         = 1.21;     // CSS px per dither cell. Lower = denser/finer dots. Sane: 1–6.
+const CONTRAST        = 1.07;  // Luminance multiplier around midgray. >1 crushes mids → cleaner shapes.
+const BRIGHTNESS      = -8;    // -40..+40 added to luminance pre-threshold. Negative = darker portrait.
+const PULSE_AMPLITUDE = 14;    // 0..40. Threshold sway in luminance units. 0 = fully static.
+const PULSE_PERIOD_MS = 4200;  // Sine period in ms. ~4s feels alive without being anxious.
+const PORTRAIT_SRC    = "./portrait.jpg";
+
+/* ---------- BAYER 8x8 (values 0..63) ---------- */
+const BAYER8 = new Uint8Array([
+   0, 32,  8, 40,  2, 34, 10, 42,
+  48, 16, 56, 24, 50, 18, 58, 26,
+  12, 44,  4, 36, 14, 46,  6, 38,
+  60, 28, 52, 20, 62, 30, 54, 22,
+   3, 35, 11, 43,  1, 33,  9, 41,
+  51, 19, 59, 27, 49, 17, 57, 25,
+  15, 47,  7, 39, 13, 45,  5, 37,
+  63, 31, 55, 23, 61, 29, 53, 21,
+]);
+const BAYER_SCALE = 255 / 64; // map 0..63 -> 0..~255
+
+/* ---------- ELEMENTS ---------- */
+const canvas = document.getElementById("dither");
+const wrap   = document.getElementById("canvasWrap");
+const ctx    = canvas.getContext("2d", { willReadFrequently: true, alpha: true });
+
+/* ---------- SOURCE IMAGE ---------- */
+const srcImg = new Image();
+srcImg.crossOrigin = "anonymous";
+let imgReady = false;
+let fallbackCanvas = null; // built lazily if portrait load fails
+
+srcImg.onload = () => {
+  imgReady = true;
+  layoutCanvas();
+};
+srcImg.onerror = () => {
+  console.warn(
+    `[dithered-hero] portrait not found at "${PORTRAIT_SRC}". ` +
+    `Drop the JPG next to this HTML and refresh. Showing procedural fallback.`
+  );
+  fallbackCanvas = buildFallback(600, 800);
+  imgReady = true;
+  layoutCanvas();
+};
+srcImg.src = PORTRAIT_SRC;
+
+/* Procedural fallback — a soft radial-gradient blob that dithers nicely. */
+function buildFallback(w, h) {
+  const c = document.createElement("canvas");
+  c.width = w; c.height = h;
+  const g = c.getContext("2d");
+  g.fillStyle = "#fff";
+  g.fillRect(0, 0, w, h);
+  // Two overlapping radial gradients to suggest a "head + shoulders" silhouette.
+  const head = g.createRadialGradient(w * 0.5, h * 0.36, 10, w * 0.5, h * 0.36, h * 0.32);
+  head.addColorStop(0, "#111");
+  head.addColorStop(0.55, "#666");
+  head.addColorStop(1, "#fff");
+  g.fillStyle = head;
+  g.fillRect(0, 0, w, h);
+  const body = g.createRadialGradient(w * 0.5, h * 1.05, 20, w * 0.5, h * 1.05, h * 0.7);
+  body.addColorStop(0, "#000");
+  body.addColorStop(0.7, "#888");
+  body.addColorStop(1, "rgba(255,255,255,0)");
+  g.fillStyle = body;
+  g.fillRect(0, 0, w, h);
+  return c;
+}
+
+/* ---------- LAYOUT ----------
+   Sets the canvas backing-store size to floor(cssSize / CELL_PX), so that
+   one Bayer cell maps to exactly CELL_PX CSS pixels after `image-rendering: pixelated`
+   scales it up. DPR is intentionally ignored: see the file header comment. */
+let offW = 0, offH = 0;
+let imageData = null;
+let pixelBuf = null; // typed view onto imageData.data for fast writes
+
+function layoutCanvas() {
+  const rect = wrap.getBoundingClientRect();
+  const newW = Math.max(1, Math.floor(rect.width  / CELL_PX));
+  const newH = Math.max(1, Math.floor(rect.height / CELL_PX));
+  if (newW === offW && newH === offH) return;
+  offW = newW; offH = newH;
+  canvas.width  = offW;
+  canvas.height = offH;
+  // Reallocate the ImageData buffer for direct writes.
+  imageData = ctx.createImageData(offW, offH);
+  pixelBuf  = imageData.data; // Uint8ClampedArray, length = offW*offH*4
+}
+
+/* ---------- RESIZE (ResizeObserver + rAF coalesce, no window listener) ---------- */
+let resizePending = false;
+new ResizeObserver(() => {
+  if (resizePending) return;
+  resizePending = true;
+  requestAnimationFrame(() => {
+    resizePending = false;
+    layoutCanvas();
+  });
+}).observe(wrap);
+
+/* ---------- DITHER FRAME ----------
+   Reads luminance from the freshly drawImage'd low-res buffer, then writes
+   straight back into `imageData` as either opaque black or transparent. */
+function ditherFrame(pulseOffset) {
+  // Step 1: re-sample the source (or fallback) into the low-res canvas.
+  ctx.clearRect(0, 0, offW, offH);
+  const sourceForDraw = fallbackCanvas || srcImg;
+  // Object-fit: cover behavior — fit by width, crop vertically if needed.
+  const srcW = sourceForDraw.naturalWidth  || sourceForDraw.width;
+  const srcH = sourceForDraw.naturalHeight || sourceForDraw.height;
+  const targetAspect = offW / offH;
+  const srcAspect    = srcW / srcH;
+  let sx, sy, sw, sh;
+  if (srcAspect > targetAspect) {
+    // Source wider than target — crop horizontally, keep full height.
+    sh = srcH;
+    sw = srcH * targetAspect;
+    sx = (srcW - sw) / 2;
+    sy = 0;
+  } else {
+    // Source taller than target — crop vertically, bias slightly toward
+    // the top so faces (which sit in the upper third) stay in frame.
+    sw = srcW;
+    sh = srcW / targetAspect;
+    sx = 0;
+    sy = Math.max(0, (srcH - sh) * 0.25);
+  }
+  ctx.drawImage(sourceForDraw, sx, sy, sw, sh, 0, 0, offW, offH);
+
+  // Step 2: read pixels.
+  const src = ctx.getImageData(0, 0, offW, offH).data;
+  const dst = pixelBuf;
+
+  // Step 3: dither into dst.
+  let i = 0;
+  for (let y = 0; y < offH; y++) {
+    const byRow = (y & 7) << 3; // (y % 8) * 8
+    for (let x = 0; x < offW; x++) {
+      // Rec.709 luminance (kept as multiply-add; integer would be ~2% faster).
+      let L = 0.2126 * src[i] + 0.7152 * src[i + 1] + 0.0722 * src[i + 2];
+      // CONTRAST around midgray + BRIGHTNESS.
+      L = (L - 128) * CONTRAST + 128 + BRIGHTNESS;
+      // Threshold from Bayer matrix + pulse.
+      const t = (BAYER8[byRow + (x & 7)] + 0.5) * BAYER_SCALE + pulseOffset;
+      if (L > t) {
+        // light → background (transparent so the lavender body shows through)
+        dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 0;
+      } else {
+        // dark → opaque black dot
+        dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 255;
+      }
+      i += 4;
+    }
+  }
+
+  ctx.putImageData(imageData, 0, 0);
+}
+
+/* ---------- RENDER LOOP ---------- */
+const TWO_PI = Math.PI * 2;
+function tick(now) {
+  if (imgReady && offW && offH) {
+    const phase = (now % PULSE_PERIOD_MS) / PULSE_PERIOD_MS;
+    const pulseOffset = Math.sin(phase * TWO_PI) * PULSE_AMPLITUDE;
+    ditherFrame(pulseOffset);
+  }
+  requestAnimationFrame(tick);
+}
+requestAnimationFrame(tick);
+
+/* =====================================================================
+   HOVER PREVIEWS — dithered live screenshots of each project
+   ---------------------------------------------------------------------
+   - Uses microlink.io's free /screenshot endpoint to grab a hero shot
+     of each project URL.
+   - Pipes the loaded image through the SAME Bayer 8x8 dither used by
+     the hero, into a small offscreen canvas, then displays that next
+     to the cursor.
+   - Caches per URL (Map) so re-hovers are instant.
+   - If CORS prevents getImageData (canvas tainted), falls back to a
+     filtered grayscale <img> so the panel still says something.
+   ===================================================================== */
+
+const PREVIEW_W = 320; // matches CSS panel width
+const PREVIEW_H = 180; // 16:9
+const PREVIEW_CELL = 2; // dither cell px (same scale as the hero)
+const PREVIEW_CONTRAST = 1.22;
+const PREVIEW_BRIGHTNESS = -10;
+
+const screenshotUrl = (rawUrl) =>
+  `https://api.microlink.io/?url=${encodeURIComponent(rawUrl)}` +
+  `&screenshot=true&embed=screenshot.url&viewport.width=1280&viewport.height=720&meta=false`;
+
+const previewCache = new Map(); // rawUrl -> { state, canvas?, fallbackSrc?, waiters: [] }
+
+function ditherImageToCanvas(image, cellPx) {
+  // Render image into a low-res canvas (cellPx CSS per dither cell)
+  const oW = Math.floor(PREVIEW_W / cellPx);
+  const oH = Math.floor(PREVIEW_H / cellPx);
+  const c = document.createElement("canvas");
+  c.width = oW; c.height = oH;
+  const g = c.getContext("2d", { willReadFrequently: true });
+  // Cover-fit the image into oW × oH
+  const sw = image.naturalWidth || image.width;
+  const sh = image.naturalHeight || image.height;
+  const targetAspect = oW / oH;
+  const srcAspect = sw / sh;
+  let sx, sy, drawW, drawH;
+  if (srcAspect > targetAspect) {
+    drawH = sh; drawW = sh * targetAspect;
+    sx = (sw - drawW) / 2; sy = 0;
+  } else {
+    drawW = sw; drawH = sw / targetAspect;
+    sx = 0; sy = 0; // bias to top — hero usually sits up top
+  }
+  g.drawImage(image, sx, sy, drawW, drawH, 0, 0, oW, oH);
+  let src;
+  try {
+    src = g.getImageData(0, 0, oW, oH).data;
+  } catch (e) {
+    return null; // tainted — caller falls back to filtered <img>
+  }
+  const out = g.createImageData(oW, oH);
+  const dst = out.data;
+  for (let y = 0, i = 0; y < oH; y++) {
+    const r = (y & 7) << 3;
+    for (let x = 0; x < oW; x++, i += 4) {
+      let L = 0.2126 * src[i] + 0.7152 * src[i + 1] + 0.0722 * src[i + 2];
+      L = (L - 128) * PREVIEW_CONTRAST + 128 + PREVIEW_BRIGHTNESS;
+      const t = (BAYER8[r + (x & 7)] + 0.5) * BAYER_SCALE;
+      if (L > t) {
+        dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 0;
+      } else {
+        dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 255;
+      }
+    }
+  }
+  g.putImageData(out, 0, 0);
+  return c;
+}
+
+function loadPreview(rawUrl, localOverride) {
+  // Cache key prefers the local override (so two rows pointing at the same
+  // URL with different thumbs don't collide).
+  const cacheKey = localOverride || rawUrl;
+  if (previewCache.has(cacheKey)) return previewCache.get(cacheKey);
+  const slot = { state: "loading", canvas: null, fallbackSrc: null, waiters: [] };
+  previewCache.set(cacheKey, slot);
+
+  // Primary source: local override if provided, else the microlink screenshot.
+  // If the primary fails, retry once with the microlink URL as a fallback.
+  const primary  = localOverride || screenshotUrl(rawUrl);
+  const fallback = localOverride ? screenshotUrl(rawUrl) : null;
+
+  const tryLoad = (src, isRetry) => {
+    const img = new Image();
+    if (!localOverride || isRetry) img.crossOrigin = "anonymous";
+    img.onload = () => {
+      const c = ditherImageToCanvas(img, PREVIEW_CELL);
+      if (c) {
+        slot.canvas = c;
+        slot.state = "ready";
+      } else {
+        slot.fallbackSrc = src;
+        slot.state = "fallback";
+      }
+      slot.waiters.forEach(fn => fn());
+      slot.waiters = [];
+    };
+    img.onerror = () => {
+      if (!isRetry && fallback) {
+        console.warn(`[preview] local thumb ${primary} missing — falling back to microlink.`);
+        tryLoad(fallback, true);
+      } else {
+        slot.state = "error";
+        slot.waiters.forEach(fn => fn());
+        slot.waiters = [];
+      }
+    };
+    img.src = src;
+  };
+  tryLoad(primary, false);
+  return slot;
+}
+
+const previewEl    = document.getElementById("preview");
+const previewFrame = document.getElementById("previewFrame");
+const previewLabel = document.getElementById("previewLabel");
+let mouseX = 0, mouseY = 0;
+
+document.addEventListener("mousemove", (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+  if (previewEl.classList.contains("visible")) positionPreview();
+});
+
+function positionPreview() {
+  const pad = 24;
+  const pw = previewEl.offsetWidth;
+  const ph = previewEl.offsetHeight;
+  let x = mouseX + pad;
+  let y = mouseY + pad;
+  if (x + pw > window.innerWidth - 8) x = mouseX - pad - pw;
+  if (y + ph > window.innerHeight - 8) y = mouseY - pad - ph;
+  if (x < 8) x = 8;
+  if (y < 8) y = 8;
+  previewEl.style.transform = `translate(${x}px, ${y}px)`;
+}
+
+function paintPreviewSlot(slot) {
+  previewFrame.innerHTML = "";
+  if (slot.state === "ready") {
+    // Clone the cached canvas so the cached one stays clean.
+    const src = slot.canvas;
+    const c = document.createElement("canvas");
+    c.width = src.width; c.height = src.height;
+    c.getContext("2d").drawImage(src, 0, 0);
+    previewFrame.appendChild(c);
+  } else if (slot.state === "fallback") {
+    const im = document.createElement("img");
+    im.src = slot.fallbackSrc;
+    im.className = "fallback";
+    previewFrame.appendChild(im);
+  } else if (slot.state === "error") {
+    previewFrame.textContent = "— preview unavailable —";
+  } else {
+    previewFrame.textContent = "loading…";
+  }
+}
+
+document.querySelectorAll(".work-row").forEach(row => {
+  const url   = row.dataset.href;
+  const thumb = row.dataset.thumb || null;
+  const label = row.dataset.label || "";
+  if (!url) return;
+
+  row.addEventListener("mouseenter", () => {
+    previewLabel.textContent = label;
+    const slot = loadPreview(url, thumb);
+    paintPreviewSlot(slot);
+    if (slot.state === "loading") {
+      slot.waiters.push(() => {
+        if (previewEl.classList.contains("visible") &&
+            previewLabel.textContent === label) {
+          paintPreviewSlot(slot);
+        }
+      });
+    }
+    previewEl.classList.add("visible");
+    positionPreview();
+  });
+  row.addEventListener("mouseleave", () => {
+    previewEl.classList.remove("visible");
+  });
+});
+
+/* =====================================================================
+   STORY CHAPTERS — LIVE dither for the Jodhpur + Bike photo chapters
+   ---------------------------------------------------------------------
+   Same Bayer 8x8 + ambient sine-wave pulse as the hero. Each chapter
+   runs its own rAF loop tied to the page's clock.
+   ===================================================================== */
+function attachChapterDither(canvas, imageSrc, opts = {}) {
+  const cellPx        = opts.cellPx        ?? 1.21;
+  const contrast      = opts.contrast      ?? 1.04;
+  const brightness    = opts.brightness    ?? -4;
+  const pulseAmp      = opts.pulseAmp      ?? PULSE_AMPLITUDE;
+  const pulsePeriodMs = opts.pulsePeriodMs ?? PULSE_PERIOD_MS;
+
+  const ctx = canvas.getContext("2d", { willReadFrequently: true, alpha: true });
+  const img = new Image();
+  img.crossOrigin = "anonymous";
+  let ready = false;
+  let oW = 0, oH = 0;
+  let srcBuf = null;       // typed array of the source pixels at current oW/oH (refreshed on resize)
+  let outImageData = null; // reusable ImageData for output writes
+
+  function layout() {
+    const rect = canvas.getBoundingClientRect();
+    const newW = Math.max(1, Math.floor(rect.width  / cellPx));
+    const newH = Math.max(1, Math.floor(rect.height / cellPx));
+    if (newW === oW && newH === oH) return;
+    oW = newW; oH = newH;
+    canvas.width = oW; canvas.height = oH;
+    outImageData = ctx.createImageData(oW, oH);
+    srcBuf = null; // force re-sample on next render
+  }
+
+  function resample() {
+    // Cover-fit the source image into the low-res buffer once. Then the rAF
+    // loop only re-thresholds against the cached srcBuf — no per-frame image
+    // re-scaling, so the pulse loop stays cheap.
+    if (!oW || !oH || !ready) return;
+    const sw = img.naturalWidth  || img.width;
+    const sh = img.naturalHeight || img.height;
+    const targetAspect = oW / oH;
+    const srcAspect    = sw / sh;
+    let sx, sy, drawW, drawH;
+    if (srcAspect > targetAspect) {
+      drawH = sh; drawW = sh * targetAspect;
+      sx = (sw - drawW) / 2; sy = 0;
+    } else {
+      drawW = sw; drawH = sw / targetAspect;
+      sx = 0; sy = Math.max(0, (sh - drawH) * 0.2);
+    }
+    ctx.clearRect(0, 0, oW, oH);
+    ctx.drawImage(img, sx, sy, drawW, drawH, 0, 0, oW, oH);
+    try { srcBuf = ctx.getImageData(0, 0, oW, oH).data; }
+    catch (e) { srcBuf = null; }
+  }
+
+  function render(pulseOffset) {
+    if (!srcBuf || !outImageData) resample();
+    if (!srcBuf || !outImageData) return;
+    const src = srcBuf;
+    const dst = outImageData.data;
+    for (let y = 0, i = 0; y < oH; y++) {
+      const r = (y & 7) << 3;
+      for (let x = 0; x < oW; x++, i += 4) {
+        let L = 0.2126 * src[i] + 0.7152 * src[i + 1] + 0.0722 * src[i + 2];
+        L = (L - 128) * contrast + 128 + brightness;
+        const t = (BAYER8[r + (x & 7)] + 0.5) * BAYER_SCALE + pulseOffset;
+        if (L > t) {
+          dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 0;
+        } else {
+          dst[i] = 0; dst[i + 1] = 0; dst[i + 2] = 0; dst[i + 3] = 255;
+        }
+      }
+    }
+    ctx.putImageData(outImageData, 0, 0);
+  }
+
+  img.onload  = () => { ready = true; resample(); };
+  img.onerror = () => console.warn(`[story dither] failed to load ${imageSrc} — save it next to the HTML.`);
+  img.src = imageSrc;
+
+  let pending = false;
+  new ResizeObserver(() => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => { pending = false; layout(); });
+  }).observe(canvas);
+  layout();
+
+  /* Ambient pulse loop — same sine pattern as the hero. */
+  const TWO_PI = Math.PI * 2;
+  function tick(now) {
+    if (ready && oW && oH) {
+      const phase = (now % pulsePeriodMs) / pulsePeriodMs;
+      render(Math.sin(phase * TWO_PI) * pulseAmp);
+    }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+}
+
+document.querySelectorAll(".chapter-canvas").forEach((c) => {
+  const src = c.dataset.src;
+  if (src) attachChapterDither(c, src);
+});
+
+/* Pre-warm all project screenshots as soon as the Work fold enters view.
+   First hovers can take 10–30s while microlink renders the page; pre-fetching
+   means the cached canvas is usually ready by the time the user hovers. */
+const projectsSection = document.getElementById("projects");
+if (projectsSection && "IntersectionObserver" in window) {
+  const io = new IntersectionObserver((entries) => {
+    if (entries.some(e => e.isIntersecting)) {
+      document.querySelectorAll(".work-row").forEach(row => {
+        if (row.dataset.href) loadPreview(row.dataset.href, row.dataset.thumb || null);
+      });
+      io.disconnect();
+    }
+  }, { rootMargin: "200px" });
+  io.observe(projectsSection);
+}
+
+/* =====================================================================
+   GSAP — scroll-driven effects
+   ---------------------------------------------------------------------
+   1. Hero dither density scrubs CELL_PX from 4 → 1 as you leave the hero.
+   2. Page bg + fg phase-shift: lavender → indigo → near-black → lavender.
+   3. Story chapter canvases "print" via clip-path from top to bottom.
+   4. (Desktop only) Cursor magnet on work-rows + scroll-velocity skew on
+      display headings.
+   ===================================================================== */
+if (window.gsap && window.ScrollTrigger) {
+  gsap.registerPlugin(ScrollTrigger);
+
+  /* ---- (0) Lenis smooth scroll — drives ScrollTrigger updates ---- */
+  if (window.Lenis) {
+    const lenis = new Lenis({
+      duration: 1.05,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      smoothWheel: true,
+      smoothTouch: false,
+      wheelMultiplier: 1,
+      touchMultiplier: 1.2,
+    });
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add((time) => lenis.raf(time * 1000));
+    gsap.ticker.lagSmoothing(0);
+    window.__lenis = lenis;
+  }
+
+  /* ---- (2) Cascading card-stack — applied to every major section ----
+     Each section becomes position:sticky at the viewport top with a
+     depth-based z-index. As the *next* section scrolls into view, the
+     current one scrubs to a smaller scale + border-radius so it reads
+     like a card receding into a deck. Sticky avoids the layout-collapse
+     flash that GSAP pin caused at the hero→jodhpur boundary. */
+  (function setupCardStack() {
+    const sections = [
+      document.querySelector("section.main"),
+      document.querySelector(".chapter-jodhpur"),
+      document.querySelector(".chapter-bike"),
+    ].filter(Boolean);
+    if (sections.length === 0) return;
+
+    sections.forEach((sec, i) => {
+      sec.classList.add("stack-card");
+      sec.style.zIndex = String(i + 1);
+
+      const next = sections[i + 1];
+      if (!next) return;
+
+      const targetScale  = Math.max(0.82, 0.95 - i * 0.022);
+      const targetRadius = 22;
+      const targetY      = -8 - i * 5;
+      gsap.fromTo(sec,
+        { scale: 1, borderRadius: 0, y: 0 },
+        {
+          scale: targetScale,
+          borderRadius: targetRadius,
+          y: targetY,
+          ease: "none",
+          scrollTrigger: {
+            trigger: next,
+            start: "top bottom",
+            end: "top top",
+            scrub: 0.5,
+          },
+        }
+      );
+    });
+  })();
+
+  /* ---- (2b) Parallax on the top three photo sections — desktop only ----
+     Background (dither canvas) drifts up slower than scroll; the headline
+     drifts the opposite way, giving each section depth while it's sticky.
+     Skipped on touch / narrow viewports — the sticky+pinned image jitters
+     against momentum scroll on iOS / Android. */
+  gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => {
+    setupParallax();
+  });
+  function setupParallax() {
+    const layers = [
+      { sec: "section.main",      bg: "#dither", fg: ".headline", fgMode: "grow-down" },
+      { sec: ".chapter-jodhpur",  bg: ".chapter-jodhpur .chapter-canvas", fg: ".chapter-jodhpur .chapter-overlay", aside: ".chapter-jodhpur .chapter-aside" },
+      { sec: ".chapter-bike",     bg: ".chapter-bike .chapter-canvas",    fg: ".chapter-bike .chapter-overlay",    aside: ".chapter-bike .chapter-aside" },
+    ];
+    layers.forEach(({ sec, bg, fg, fgMode, aside }) => {
+      const section = document.querySelector(sec);
+      if (!section) return;
+      const trig = {
+        trigger: section,
+        start: "top top",
+        end: "bottom top",
+        scrub: 0.6,
+      };
+      const bgEl = bg && document.querySelector(bg);
+      const fgEl = fg && document.querySelector(fg);
+      const asideEl = aside && document.querySelector(aside);
+      if (bgEl) gsap.fromTo(bgEl,
+        { yPercent: -8, scale: 1.22 },
+        { yPercent: 8,  scale: 1.22, ease: "none", transformOrigin: "center center", scrollTrigger: trig }
+      );
+      if (fgEl) {
+        if (fgMode === "grow-down") {
+          gsap.fromTo(fgEl,
+            { yPercent: 0, scale: 1 },
+            { yPercent: 55, scale: 1.85, ease: "none", transformOrigin: "center center", scrollTrigger: trig }
+          );
+        } else {
+          gsap.fromTo(fgEl, { yPercent: 6 }, { yPercent: -10, ease: "none", scrollTrigger: trig });
+        }
+      }
+      if (asideEl) gsap.fromTo(asideEl, { yPercent: 14 }, { yPercent: -14, ease: "none", scrollTrigger: trig });
+    });
+  }
+
+  /* ---- (3) Story canvases "print" via clip-path ----
+     Each .chapter-canvas reveals top → bottom as the chapter scrolls into view. */
+  document.querySelectorAll(".chapter-canvas").forEach((canvas) => {
+    const chapter = canvas.closest(".chapter");
+    gsap.fromTo(canvas,
+      { clipPath: "inset(0 0 100% 0)" },
+      {
+        clipPath: "inset(0 0 0% 0)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: chapter,
+          start: "top bottom",
+          end: "top center",
+          scrub: 0.8
+        }
+      }
+    );
+  });
+
+  /* ---- (4) Cursor-magnet + scroll-velocity skew — desktop only ---- */
+  gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => {
+    /* 4a — Cursor magnet on work-rows.
+       Rows close to cursor Y bend horizontally toward cursor X. */
+    const rows = gsap.utils.toArray(".work-row");
+    const rowSetters = rows.map(r => gsap.quickTo(r, "x", { duration: 0.6, ease: "power3.out" }));
+
+    const onMouseMove = (e) => {
+      rows.forEach((row, idx) => {
+        const rect = row.getBoundingClientRect();
+        // Skip rows fully off-screen — keep them at rest.
+        if (rect.bottom < 0 || rect.top > window.innerHeight) {
+          rowSetters[idx](0);
+          return;
+        }
+        const centerY  = rect.top + rect.height / 2;
+        const distY    = Math.abs(e.clientY - centerY);
+        const strength = Math.max(0, 1 - distY / 280);    // 0 when far, 1 when on the row
+        const xRatio   = (e.clientX / window.innerWidth) - 0.5; // -0.5..0.5
+        rowSetters[idx](xRatio * 60 * strength);
+      });
+    };
+    document.addEventListener("mousemove", onMouseMove);
+
+    /* 4b — Scroll-velocity skew on big headings.
+       Reads ScrollTrigger.getVelocity() every frame and skews via quickTo. */
+    const titles = gsap.utils.toArray(".fold-title, .chapter-title, .headline span");
+    const setSkew = gsap.quickTo(titles, "skewX", { duration: 0.6, ease: "power3.out" });
+    const onTick = () => {
+      const v = ScrollTrigger.getVelocity() / -300;
+      setSkew(gsap.utils.clamp(-7, 7, v));
+    };
+    gsap.ticker.add(onTick);
+
+    /* matchMedia cleanup runs when the query stops matching (resize to mobile). */
+    return () => {
+      document.removeEventListener("mousemove", onMouseMove);
+      gsap.ticker.remove(onTick);
+      rowSetters.forEach(set => set(0));
+      setSkew(0);
+    };
+  });
+}
+
+/* ------------------------------------------------------------------
+   CONTACT CTA — per-character span wrap for hover-staggered lift.
+   ------------------------------------------------------------------ */
+document.querySelectorAll(".contact-cta a").forEach((link) => {
+  const text = link.textContent;
+  link.setAttribute("aria-label", text);
+  link.textContent = "";
+  let visibleIndex = 0;
+  for (const ch of text) {
+    if (ch === " ") {
+      link.appendChild(document.createTextNode(" "));
+      continue;
+    }
+    const span = document.createElement("span");
+    span.className = "char";
+    span.setAttribute("aria-hidden", "true");
+    span.style.setProperty("--i", visibleIndex++);
+    span.textContent = ch;
+    link.appendChild(span);
+  }
+});
+</script>
+</body>
+</html>
