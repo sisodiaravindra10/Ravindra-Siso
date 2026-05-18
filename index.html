@@ -76,6 +76,68 @@
       opacity: 0.7;
     }
 
+    /* ---------- BOOT LOADER (full-screen halftone with counter) ---------- */
+    .loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: var(--bg);
+      color: var(--fg);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      pointer-events: auto;
+    }
+    /* Halftone grain layer — same Bayer-dot vibe as the rest of the site */
+    .loader-grain {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, var(--fg) 1.4px, transparent 1.6px);
+      background-size: 6px 6px;
+      opacity: 0.42;
+      pointer-events: none;
+      animation: loader-grain-shift 4.2s linear infinite;
+    }
+    @keyframes loader-grain-shift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 6px 6px; }
+    }
+    .loader-num {
+      position: relative;
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(12rem, 32vw, 28rem);
+      line-height: 0.85;
+      letter-spacing: -0.06em;
+      text-align: center;
+      mix-blend-mode: difference;
+      color: #fff;
+      user-select: none;
+    }
+    .loader-meta {
+      position: absolute;
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.22em;
+      line-height: 1.5;
+      opacity: 0.75;
+    }
+    .loader-meta-tl { top: 22px; left: 22px; }
+    .loader-meta-br { bottom: 22px; right: 22px; text-align: right; }
+
+    /* Hero shell starts hidden; the loader's JS reveal animates it in */
+    .shell {
+      opacity: 0;
+      transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+    }
+    .shell.is-ready { opacity: 1; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .loader-grain { animation: none; }
+      .shell { transition: none; }
+    }
+
     /* ---------- MAIN AREA ---------- */
     .main {
       position: relative;
@@ -140,10 +202,13 @@
       padding: 0 8vw;
       pointer-events: none;
     }
+    @media (min-width: 901px) {
+      .headline { align-items: end; padding-bottom: 18vh; }
+    }
     .headline span {
       font-family: var(--sans);
       font-weight: 800;
-      font-size: clamp(3rem, 12vw, 14rem);
+      font-size: clamp(3rem, 14.5vw, 17rem);
       letter-spacing: calc(-0.05em - 3px);
       line-height: 0.9;
       color: var(--bg);
@@ -197,7 +262,7 @@
     }
     /* Display-sized heading variant for the photo chapters' giant wordmarks. */
     .chapter-title-huge {
-      font-size: clamp(3.2rem, 13vw, 14rem);
+      font-size: clamp(2.98rem, 12.1vw, 13rem);
       letter-spacing: calc(-0.05em - 4px);
       line-height: 0.9;
       margin: 0;
@@ -638,6 +703,14 @@
   </style>
 </head>
 <body>
+  <!-- Halftone-filled boot loader. Removed after the count completes. -->
+  <div class="loader" id="loader" aria-hidden="true">
+    <div class="loader-grain"></div>
+    <div class="loader-meta loader-meta-tl">LOADING<br/>RAVINDRA · STUDIO</div>
+    <div class="loader-meta loader-meta-br">DITHERED<br/>IN BAYER_8×8</div>
+    <div class="loader-num" id="loaderNum">00</div>
+  </div>
+
   <div class="shell">
     <nav class="nav">
       <a href="#projects">[ PROJECTS ]</a>
@@ -838,7 +911,7 @@
    ===================================================================== */
 
 /* ---------- TUNING KNOBS ---------- */
-const CELL_PX         = 1.21;     // CSS px per dither cell. Lower = denser/finer dots. Sane: 1–6.
+const CELL_PX         = 1.33;     // CSS px per dither cell. Lower = denser/finer dots. Sane: 1–6.
 const CONTRAST        = 1.07;  // Luminance multiplier around midgray. >1 crushes mids → cleaner shapes.
 const BRIGHTNESS      = -8;    // -40..+40 added to luminance pre-threshold. Negative = darker portrait.
 const PULSE_AMPLITUDE = 14;    // 0..40. Threshold sway in luminance units. 0 = fully static.
@@ -1202,7 +1275,7 @@ document.querySelectorAll(".work-row").forEach(row => {
    runs its own rAF loop tied to the page's clock.
    ===================================================================== */
 function attachChapterDither(canvas, imageSrc, opts = {}) {
-  const cellPx        = opts.cellPx        ?? 1.21;
+  const cellPx        = opts.cellPx        ?? 1.33;
   const contrast      = opts.contrast      ?? 1.04;
   const brightness    = opts.brightness    ?? -4;
   const pulseAmp      = opts.pulseAmp      ?? PULSE_AMPLITUDE;
@@ -1325,6 +1398,56 @@ if (projectsSection && "IntersectionObserver" in window) {
    4. (Desktop only) Cursor magnet on work-rows + scroll-velocity skew on
       display headings.
    ===================================================================== */
+/* ---- Boot loader: count 00 → 99, then fade out + reveal the shell ---- */
+/* Pre-position the hero wordmark off-screen below so it can slide up after the loader. */
+if (window.gsap) {
+  gsap.set(".headline", { yPercent: 100, opacity: 0 });
+}
+
+(function bootLoader() {
+  const loader = document.getElementById("loader");
+  const numEl  = document.getElementById("loaderNum");
+  const shell  = document.querySelector(".shell");
+  if (!loader || !numEl || !shell) return;
+
+  const DURATION = 2600;  // ms total counter run
+  const start = performance.now();
+  const ease = (t) => 1 - Math.pow(1 - t, 1.6);
+
+  function tick(now) {
+    const p = Math.min(1, (now - start) / DURATION);
+    const v = Math.floor(ease(p) * 99);
+    numEl.textContent = v.toString().padStart(2, "0");
+    if (p < 1) {
+      requestAnimationFrame(tick);
+    } else {
+      numEl.textContent = "99";
+      // brief hold, then fade out the loader and reveal the shell
+      setTimeout(() => {
+        loader.style.transition = "opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1)";
+        loader.style.opacity = "0";
+        shell.classList.add("is-ready");
+        // Slide the hero wordmark up from the bottom as the shell fades in
+        if (window.gsap) {
+          gsap.to(".headline", {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1.15,
+            delay: 0.25,
+            ease: "power3.out",
+            onComplete: () => {
+              window.__heroEntryDone = true;
+              if (window.__activateHeroParallax) window.__activateHeroParallax();
+            },
+          });
+        }
+        setTimeout(() => loader.remove(), 800);
+      }, 220);
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+
 if (window.gsap && window.ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger);
 
@@ -1396,11 +1519,11 @@ if (window.gsap && window.ScrollTrigger) {
   });
   function setupParallax() {
     const layers = [
-      { sec: "section.main",      bg: "#dither", fg: ".headline", fgMode: "grow-down" },
+      { sec: "section.main",      bg: "#dither", fg: ".headline", fgMode: "grow-down", deferFg: true },
       { sec: ".chapter-jodhpur",  bg: ".chapter-jodhpur .chapter-canvas", fg: ".chapter-jodhpur .chapter-overlay", aside: ".chapter-jodhpur .chapter-aside" },
       { sec: ".chapter-bike",     bg: ".chapter-bike .chapter-canvas",    fg: ".chapter-bike .chapter-overlay",    aside: ".chapter-bike .chapter-aside" },
     ];
-    layers.forEach(({ sec, bg, fg, fgMode, aside }) => {
+    layers.forEach(({ sec, bg, fg, fgMode, aside, deferFg }) => {
       const section = document.querySelector(sec);
       if (!section) return;
       const trig = {
@@ -1417,13 +1540,24 @@ if (window.gsap && window.ScrollTrigger) {
         { yPercent: 8,  scale: 1.22, ease: "none", transformOrigin: "center center", scrollTrigger: trig }
       );
       if (fgEl) {
-        if (fgMode === "grow-down") {
-          gsap.fromTo(fgEl,
-            { yPercent: 0, scale: 1 },
-            { yPercent: 55, scale: 1.85, ease: "none", transformOrigin: "center center", scrollTrigger: trig }
-          );
+        const registerFg = () => {
+          if (fgMode === "grow-down") {
+            gsap.fromTo(fgEl,
+              { yPercent: 0, scale: 1 },
+              { yPercent: 55, scale: 1.85, ease: "none", transformOrigin: "center center", scrollTrigger: trig }
+            );
+          } else {
+            gsap.fromTo(fgEl, { yPercent: 6 }, { yPercent: -10, ease: "none", scrollTrigger: trig });
+          }
+        };
+        if (deferFg) {
+          // Wait for the hero entry animation to finish before letting parallax
+          // grab .headline — otherwise gsap.fromTo's immediateRender snaps it to
+          // yPercent:0 and the slide-up never plays.
+          if (window.__heroEntryDone) registerFg();
+          else window.__activateHeroParallax = registerFg;
         } else {
-          gsap.fromTo(fgEl, { yPercent: 6 }, { yPercent: -10, ease: "none", scrollTrigger: trig });
+          registerFg();
         }
       }
       if (asideEl) gsap.fromTo(asideEl, { yPercent: 14 }, { yPercent: -14, ease: "none", scrollTrigger: trig });
