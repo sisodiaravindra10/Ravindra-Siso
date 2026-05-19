@@ -88,32 +88,37 @@
       overflow: hidden;
       pointer-events: auto;
     }
-    /* Halftone grain layer — same Bayer-dot vibe as the rest of the site */
-    .loader-grain {
+    /* Halftone layer — real Bayer 8×8 dither of a procedural moving blob,
+       same algorithm as the hero portrait but without an underlying photo. */
+    .loader-canvas {
       position: absolute;
       inset: 0;
-      background-image: radial-gradient(circle, var(--fg) 1.4px, transparent 1.6px);
-      background-size: 6px 6px;
-      opacity: 0.42;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: -moz-crisp-edges;
+      image-rendering: crisp-edges;
       pointer-events: none;
-      animation: loader-grain-shift 4.2s linear infinite;
-    }
-    @keyframes loader-grain-shift {
-      0%   { background-position: 0 0; }
-      100% { background-position: 6px 6px; }
     }
     .loader-num {
       position: relative;
       font-family: "Instrument Serif", "Times New Roman", Times, serif;
       font-style: italic;
       font-weight: 400;
-      font-size: clamp(12rem, 32vw, 28rem);
+      font-size: 18px;             /* starting size; JS animates this up to 132px */
       line-height: 0.85;
       letter-spacing: -0.06em;
       text-align: center;
       mix-blend-mode: difference;
       color: #fff;
       user-select: none;
+      transform: scale(1);
+      transform-origin: center center;
+      transition: font-size 0.05s linear, transform 0.85s cubic-bezier(0.5, 0, 0.1, 1);
+      will-change: font-size, transform;
+    }
+    .loader-num.is-final {
+      transform: scale(2.7);
     }
     .loader-meta {
       position: absolute;
@@ -134,7 +139,6 @@
     .shell.is-ready { opacity: 1; }
 
     @media (prefers-reduced-motion: reduce) {
-      .loader-grain { animation: none; }
       .shell { transition: none; }
     }
 
@@ -314,8 +318,8 @@
       max-width: 28ch;
     }
     @media (max-width: 900px) {
-      .chapter-aside { top: 10vh; font-size: 1rem; }
-      .chapter-aside-2 { top: 26vh; }
+      .chapter-aside { top: 8vh; font-size: 1rem; }
+      .chapter-aside-2 { top: 18vh; }
     }
 
     /* --- Chapter variant: Jodhpur (photo + indigo backdrop, right-aligned wordmark) --- */
@@ -356,10 +360,17 @@
     .chapter-text .chapter-overlay { max-width: 720px; }
 
     @media (max-width: 900px) {
-      .chapter { padding: 64px 5vw; min-height: 60svh; }
-      .chapter.chapter-photo { min-height: 80svh; }
-      .chapter-bike-cta { min-height: 50svh; }
+      .chapter { padding: 64px 5vw; min-height: 100svh; }
+      .chapter.chapter-photo { min-height: 100svh; }
+      .chapter-bike-cta { min-height: 100svh; }
+      /* Mobile: anchor headings to the bottom so the small asides up top don't collide */
+      .chapter-jodhpur .chapter-overlay,
+      .chapter-bike .chapter-overlay {
+        align-self: end;
+        padding-bottom: 8vh;
+      }
       .chapter-jodhpur .chapter-overlay { justify-self: start; text-align: left; }
+      .chapter-title-huge { font-size: clamp(2.6rem, 11vw, 6rem); letter-spacing: -0.04em; }
     }
 
     /* =====================================================================
@@ -578,6 +589,7 @@
       display: grid;
       grid-template-rows: auto 1fr auto;
       gap: 56px;
+      background: #F3B2B2;
     }
     .contact-cta {
       font-family: "Instrument Serif", "Times New Roman", Times, serif;
@@ -699,13 +711,22 @@
       }
       .nav .meta { display: none; }
       .headline { padding: 0 4vw; }
+      .headline span { font-size: clamp(2.4rem, 11vw, 5.2rem); letter-spacing: -0.04em; }
+      .headline em { letter-spacing: -0.045em; }
+      /* Drop the cascade on mobile — sticky + scrub on touch causes jitter */
+      .stack-card {
+        position: relative !important;
+        top: auto !important;
+        transform: none !important;
+        border-radius: 0 !important;
+      }
     }
   </style>
 </head>
 <body>
   <!-- Halftone-filled boot loader. Removed after the count completes. -->
   <div class="loader" id="loader" aria-hidden="true">
-    <div class="loader-grain"></div>
+    <canvas class="loader-canvas" id="loaderCanvas"></canvas>
     <div class="loader-meta loader-meta-tl">LOADING<br/>RAVINDRA · STUDIO</div>
     <div class="loader-meta loader-meta-br">DITHERED<br/>IN BAYER_8×8</div>
     <div class="loader-num" id="loaderNum">00</div>
@@ -765,7 +786,7 @@
     <header class="fold-head">
       <h2 class="fold-title">Selected <em>work,</em><br/>across rooms.</h2>
       <p class="fold-kicker">
-        Eight shown. Fifty more in the archive, <em>2018 — 2026.</em>
+        Thirteen shown. Forty more in the archive, <em>2018 — 2026.</em>
       </p>
     </header>
 
@@ -834,6 +855,46 @@
         <span class="year">2022</span>
         <span class="arrow">→</span>
       </a>
+      <a href="https://zop-night-tetris-cloud.vercel.app/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://zop-night-tetris-cloud.vercel.app/" data-label="09 · ZOPNIGHT — TETRIS CLOUD / 2026">
+        <span class="num">09</span>
+        <span class="title">ZopNight — Tetris Cloud</span>
+        <span class="role">Concept · Web</span>
+        <span class="year">2026</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://zop-branding-launch-plan.vercel.app/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://zop-branding-launch-plan.vercel.app/" data-label="10 · ZOP.DEV — LAUNCH PLAN / 2026">
+        <span class="num">10</span>
+        <span class="title">Zop.Dev — Brand Launch Plan</span>
+        <span class="role">Brand · Strategy</span>
+        <span class="year">2026</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://lyke-eosin.vercel.app/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://lyke-eosin.vercel.app/" data-label="11 · LYKE / 2026">
+        <span class="num">11</span>
+        <span class="title">Lyke</span>
+        <span class="role">Product · Web</span>
+        <span class="year">2026</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://contrast-check-v1.vercel.app/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://contrast-check-v1.vercel.app/" data-label="12 · CONTRAST CHECK / 2025">
+        <span class="num">12</span>
+        <span class="title">Contrast Check</span>
+        <span class="role">Tool · Web</span>
+        <span class="year">2025</span>
+        <span class="arrow">→</span>
+      </a>
+      <a href="https://zop-dev-brandkit-v1.vercel.app/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://zop-dev-brandkit-v1.vercel.app/" data-label="13 · ZOP.DEV — BRAND KIT / 2026">
+        <span class="num">13</span>
+        <span class="title">Zop.Dev — Brand Kit</span>
+        <span class="role">Brand · Identity</span>
+        <span class="year">2026</span>
+        <span class="arrow">→</span>
+      </a>
     </div>
   </section>
 
@@ -861,8 +922,10 @@
       </div>
       <div class="contact-cell">
         <h4>SOCIAL</h4>
-        <a href="https://www.instagram.com/ravindrasiso/" target="_blank" rel="noopener">@ravindrasiso</a>
+        <a href="https://www.instagram.com/ravindrasiso/" target="_blank" rel="noopener">instagram / @ravindrasiso</a>
         <a href="https://www.linkedin.com/in/ravindra-sisodia/" target="_blank" rel="noopener">linkedin / ravindra-sisodia</a>
+        <a href="https://dribbble.com/sisodiaravindra" target="_blank" rel="noopener">dribbble / sisodiaravindra</a>
+        <a href="https://www.behance.net/ravindrasisodia" target="_blank" rel="noopener">behance / ravindrasisodia</a>
       </div>
       <div class="contact-cell">
         <h4>CURRENTLY</h4>
@@ -912,7 +975,7 @@
 
 /* ---------- TUNING KNOBS ---------- */
 const CELL_PX         = 1.33;     // CSS px per dither cell. Lower = denser/finer dots. Sane: 1–6.
-const CONTRAST        = 1.07;  // Luminance multiplier around midgray. >1 crushes mids → cleaner shapes.
+const CONTRAST        = 1.24;  // Luminance multiplier around midgray. >1 crushes mids → cleaner shapes.
 const BRIGHTNESS      = -8;    // -40..+40 added to luminance pre-threshold. Negative = darker portrait.
 const PULSE_AMPLITUDE = 14;    // 0..40. Threshold sway in luminance units. 0 = fully static.
 const PULSE_PERIOD_MS = 4200;  // Sine period in ms. ~4s feels alive without being anxious.
@@ -1276,10 +1339,15 @@ document.querySelectorAll(".work-row").forEach(row => {
    ===================================================================== */
 function attachChapterDither(canvas, imageSrc, opts = {}) {
   const cellPx        = opts.cellPx        ?? 1.33;
-  const contrast      = opts.contrast      ?? 1.04;
+  const contrast      = opts.contrast      ?? 1.20;
   const brightness    = opts.brightness    ?? -4;
   const pulseAmp      = opts.pulseAmp      ?? PULSE_AMPLITUDE;
   const pulsePeriodMs = opts.pulsePeriodMs ?? PULSE_PERIOD_MS;
+  // Horizontal crop bias when the source is wider than the target (0 = left
+  // edge, 0.5 = center, 1 = right edge). Lets us pull a subject into frame
+  // when the natural center-crop misses it (e.g. the bike rider sitting on
+  // the right side of a wide source on a tall mobile canvas).
+  const cropX         = opts.cropX         ?? 0.5;
 
   const ctx = canvas.getContext("2d", { willReadFrequently: true, alpha: true });
   const img = new Image();
@@ -1312,7 +1380,7 @@ function attachChapterDither(canvas, imageSrc, opts = {}) {
     let sx, sy, drawW, drawH;
     if (srcAspect > targetAspect) {
       drawH = sh; drawW = sh * targetAspect;
-      sx = (sw - drawW) / 2; sy = 0;
+      sx = (sw - drawW) * cropX; sy = 0;
     } else {
       drawW = sw; drawH = sw / targetAspect;
       sx = 0; sy = Math.max(0, (sh - drawH) * 0.2);
@@ -1370,7 +1438,12 @@ function attachChapterDither(canvas, imageSrc, opts = {}) {
 
 document.querySelectorAll(".chapter-canvas").forEach((c) => {
   const src = c.dataset.src;
-  if (src) attachChapterDither(c, src);
+  if (!src) return;
+  const opts = {};
+  // Bike rider sits on the right of a 1800×830 source; center-cropping a
+  // tall mobile canvas would lose it. Pull the crop window toward the right.
+  if (c.closest(".chapter-bike")) opts.cropX = 0.82;
+  attachChapterDither(c, src, opts);
 });
 
 /* Pre-warm all project screenshots as soon as the Work fold enters view.
@@ -1404,6 +1477,75 @@ if (window.gsap) {
   gsap.set(".headline", { yPercent: 100, opacity: 0 });
 }
 
+/* Procedural Bayer-8×8 halftone for the loader — same dither algorithm as the
+   hero portrait, driven by a moving radial blob instead of an image. Gives the
+   loader the exact same visual texture as the rest of the site. */
+(function setupLoaderDither() {
+  const canvas = document.getElementById("loaderCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true, alpha: true });
+  const LOADER_CELL = 2;             // CSS px per dither cell (chunkier than hero)
+  const LOADER_BAYER_SCALE = 255 / 64;
+  let oW = 0, oH = 0;
+  let imageData = null;
+
+  function layout() {
+    const r = canvas.getBoundingClientRect();
+    const newW = Math.max(1, Math.floor(r.width  / LOADER_CELL));
+    const newH = Math.max(1, Math.floor(r.height / LOADER_CELL));
+    if (newW === oW && newH === oH) return;
+    oW = newW; oH = newH;
+    canvas.width = oW; canvas.height = oH;
+    imageData = ctx.createImageData(oW, oH);
+  }
+
+  function frame(now) {
+    if (!imageData) return;
+    const data = imageData.data;
+    // Soft moving cloud — two sine waves crossed with two drifting hot-spots.
+    // Keeps the dither uniformly textured everywhere (no vignette / dead zones).
+    const t  = now * 0.001;
+    const cx1 = oW * (0.5 + Math.sin(t * 0.45) * 0.30);
+    const cy1 = oH * (0.5 + Math.cos(t * 0.38) * 0.30);
+    const cx2 = oW * (0.5 + Math.cos(t * 0.31) * 0.32);
+    const cy2 = oH * (0.5 + Math.sin(t * 0.27) * 0.32);
+    const r1  = Math.min(oW, oH) * 0.65;
+    const r2  = Math.min(oW, oH) * 0.55;
+    const pulse = Math.sin(t * 1.4) * 14;       // ambient threshold sway
+
+    let i = 0;
+    for (let y = 0; y < oH; y++) {
+      const byRow = (y & 7) << 3;
+      const wavY = Math.sin((y / oH) * Math.PI * 2 - t * 0.9) * 18;
+      for (let x = 0; x < oW; x++) {
+        const dx1 = x - cx1, dy1 = y - cy1;
+        const dx2 = x - cx2, dy2 = y - cy2;
+        const f1 = Math.max(0, 1 - Math.sqrt(dx1*dx1 + dy1*dy1) / r1);
+        const f2 = Math.max(0, 1 - Math.sqrt(dx2*dx2 + dy2*dy2) / r2);
+        const wavX = Math.sin((x / oW) * Math.PI * 3 + t * 1.1) * 22;
+        // Base brightness 128 keeps the field active everywhere — the hot
+        // spots add ~80 on top, threshold flips them to lighter halftone.
+        const L = 128 + wavX + wavY + f1 * 70 + f2 * 60;
+        const t8 = (BAYER8[byRow + (x & 7)] + 0.5) * LOADER_BAYER_SCALE + pulse;
+        if (L > t8) { data[i] = 0; data[i+1] = 0; data[i+2] = 0; data[i+3] = 0; }
+        else        { data[i] = 0; data[i+1] = 0; data[i+2] = 0; data[i+3] = 255; }
+        i += 4;
+      }
+    }
+    ctx.putImageData(imageData, 0, 0);
+  }
+
+  let raf;
+  function tick(now) {
+    frame(now);
+    raf = requestAnimationFrame(tick);
+  }
+  layout();
+  new ResizeObserver(() => layout()).observe(canvas);
+  raf = requestAnimationFrame(tick);
+  window.__stopLoaderDither = () => cancelAnimationFrame(raf);
+})();
+
 (function bootLoader() {
   const loader = document.getElementById("loader");
   const numEl  = document.getElementById("loaderNum");
@@ -1418,16 +1560,20 @@ if (window.gsap) {
     const p = Math.min(1, (now - start) / DURATION);
     const v = Math.floor(ease(p) * 99);
     numEl.textContent = v.toString().padStart(2, "0");
+    // Font-size grows from 18px (start) to 132px (by the time we hit 99).
+    // The 100% lock-in then adds scale(2.7) on top via .is-final.
+    numEl.style.fontSize = (18 + p * 114).toFixed(1) + "px";
     if (p < 1) {
       requestAnimationFrame(tick);
     } else {
-      numEl.textContent = "99";
-      // brief hold, then fade out the loader and reveal the shell
+      // FINAL FRAME: snap to 100 and explode the digits.
+      numEl.textContent = "100";
+      numEl.classList.add("is-final");          // CSS scales it to 2.7×
+      // Short hold while the explode plays, then fade the loader and reveal the shell.
       setTimeout(() => {
-        loader.style.transition = "opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1)";
+        loader.style.transition = "opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1)";
         loader.style.opacity = "0";
         shell.classList.add("is-ready");
-        // Slide the hero wordmark up from the bottom as the shell fades in
         if (window.gsap) {
           gsap.to(".headline", {
             yPercent: 0,
@@ -1441,8 +1587,11 @@ if (window.gsap) {
             },
           });
         }
-        setTimeout(() => loader.remove(), 800);
-      }, 220);
+        setTimeout(() => {
+          if (window.__stopLoaderDither) window.__stopLoaderDither();
+          loader.remove();
+        }, 1000);
+      }, 650);                                   // hold long enough to see "100" lock in
     }
   }
   requestAnimationFrame(tick);
@@ -1473,7 +1622,8 @@ if (window.gsap && window.ScrollTrigger) {
      current one scrubs to a smaller scale + border-radius so it reads
      like a card receding into a deck. Sticky avoids the layout-collapse
      flash that GSAP pin caused at the hero→jodhpur boundary. */
-  (function setupCardStack() {
+  gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => setupCardStack());
+  function setupCardStack() {
     const sections = [
       document.querySelector("section.main"),
       document.querySelector(".chapter-jodhpur"),
@@ -1507,7 +1657,7 @@ if (window.gsap && window.ScrollTrigger) {
         }
       );
     });
-  })();
+  }
 
   /* ---- (2b) Parallax on the top three photo sections — desktop only ----
      Background (dither canvas) drifts up slower than scroll; the headline
