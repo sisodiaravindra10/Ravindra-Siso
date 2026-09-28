@@ -17,7 +17,8 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MY. DITHERED. VISION.</title>
+  <title>Ravindra Sisodia, designer and AI engineer</title>
+  <meta name="description" content="Ravindra Sisodia, designer and AI engineer. Three Mac apps in the Product Hunt top 10: Chit, Crew and Notchling.">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; }
@@ -70,7 +71,7 @@
     .nav .spacer { flex: 1; }
     .nav .meta {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.16em;
       align-self: center;
       opacity: 0.7;
@@ -123,7 +124,7 @@
     .loader-meta {
       position: absolute;
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.22em;
       line-height: 1.5;
       opacity: 0.75;
@@ -170,7 +171,7 @@
       display: flex;
       gap: 28px;
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.18em;
       white-space: nowrap;
       z-index: 4;
@@ -230,7 +231,7 @@
     /* =====================================================================
        SECTION — Story (juanmora-style chapter narrative)
        ===================================================================== */
-    .story { display: block; }
+    .story { display: block; position: relative; z-index: 2; }
     .chapter {
       position: relative;
       min-height: 70svh;
@@ -253,7 +254,7 @@
     }
     .chapter-overlay {
       position: relative;
-      z-index: 1;
+      z-index: 2;
       max-width: 640px;
     }
     .chapter-title {
@@ -292,7 +293,7 @@
       position: absolute;
       left: 6vw;
       top: 18vh;
-      z-index: 2;
+      z-index: 3;
       margin: 0;
       max-width: 22ch;
       font-family: "Instrument Serif", "Times New Roman", Times, serif;
@@ -300,12 +301,10 @@
       line-height: 1.25;
       letter-spacing: -0.01em;
       color: var(--fg);
-      opacity: 0.78;
+      padding: 10px 14px;
     }
-    .chapter-aside em {
-      font-style: italic;
-      opacity: 0.7;
-    }
+    .chapter-aside em { font-style: italic; }
+
     /* Right-aligned variant used when the main wordmark sits on the left */
     .chapter-aside-right {
       left: auto;
@@ -350,8 +349,7 @@
       max-width: none;
     }
     .chapter-bike .chapter-title em {
-      color: var(--fg);
-      opacity: 0.55;
+      color: #4A3F2C;
     }
     .chapter-bike-cta { min-height: 60svh; }
 
@@ -360,9 +358,9 @@
     .chapter-text .chapter-overlay { max-width: 720px; }
 
     @media (max-width: 900px) {
-      .chapter { padding: 64px 5vw; min-height: 100svh; }
-      .chapter.chapter-photo { min-height: 100svh; }
-      .chapter-bike-cta { min-height: 100svh; }
+      .chapter { padding: 64px 5vw; min-height: 64svh; }
+      .chapter.chapter-photo { min-height: 64svh; }
+      .chapter-bike-cta { min-height: 56svh; }
       /* Mobile: anchor headings to the bottom so the small asides up top don't collide */
       .chapter-jodhpur .chapter-overlay,
       .chapter-bike .chapter-overlay {
@@ -371,6 +369,52 @@
       }
       .chapter-jodhpur .chapter-overlay { justify-self: start; text-align: left; }
       .chapter-title-huge { font-size: clamp(2.6rem, 11vw, 6rem); letter-spacing: -0.04em; }
+    }
+
+    /* ---------- Story band: photo on top, untouched; every word on a solid band below ---------- */
+    .story { display: grid; grid-template-columns: 1fr; position: relative; z-index: 2; }
+    .story .chapter.chapter-photo {
+      min-height: 0;
+      padding: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      align-items: stretch;
+    }
+    .chapter-media { position: relative; overflow: hidden; height: 56svh; }
+    .chapter-band {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 32px;
+      padding: 36px 4vw 44px;
+    }
+    .chapter-jodhpur .chapter-band { background: #16203A; color: var(--lavender-fixed); }
+    .chapter-bike .chapter-band    { background: #E8D5B0; color: #0B0B0E; }
+    .chapter-notes { display: grid; gap: 14px; min-width: 0; flex: 0 1 auto; }
+    .story .chapter-aside {
+      position: static;
+      font-size: clamp(0.95rem, 1.2vw, 1.2rem);
+      line-height: 1.35;
+      max-width: 26ch;
+      padding: 0;
+      color: inherit;
+      opacity: 1;
+    }
+    .story .chapter-aside-right { text-align: right; }
+    .story .chapter-overlay { max-width: none; padding: 0; align-self: end; }
+    .story .chapter-jodhpur .chapter-overlay { text-align: right; }
+    .story .chapter-bike .chapter-overlay { text-align: left; }
+    .story .chapter-title-huge { font-size: clamp(2.2rem, 4.3vw, 5.2rem); letter-spacing: calc(-0.05em - 2px); white-space: nowrap; }
+    @media (min-width: 901px) {
+      .story { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 900px) {
+      .chapter-media { height: 40svh; }
+      .chapter-band { flex-direction: column; align-items: flex-start; gap: 20px; padding: 28px 5vw 36px; }
+      .story .chapter-overlay,
+      .story .chapter-jodhpur .chapter-overlay,
+      .story .chapter-aside-right { text-align: left; align-self: auto; }
+      .story .chapter-title-huge { font-size: clamp(2.4rem, 11vw, 5rem); letter-spacing: -0.04em; }
     }
 
     /* =====================================================================
@@ -390,10 +434,10 @@
     }
     .fold-label {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.22em;
       color: var(--fg);
-      opacity: 0.85;
+      opacity: 1;
       display: flex;
       gap: 14px;
       align-items: center;
@@ -415,9 +459,9 @@
     }
     .fold-kicker {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.18em;
-      opacity: 0.8;
+      opacity: 0.95;
       text-align: right;
       max-width: 220px;
       line-height: 1.6;
@@ -450,7 +494,7 @@
       display: grid;
       place-items: center;
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.2em;
       color: var(--fg);
       border: 1px solid var(--fg);
@@ -470,7 +514,7 @@
     }
     .preview-label {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.18em;
       color: var(--fg);
       display: flex;
@@ -485,6 +529,295 @@
     }
     @media (hover: none), (max-width: 900px) {
       .preview { display: none; }
+    }
+
+    /* ---------- HERO proof line (links down to the launches fold) ---------- */
+    .hero-proof {
+      position: absolute;
+      left: 50%;
+      bottom: 6vh;
+      transform: translateX(-50%);
+      z-index: 3;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 44px;
+      padding: 0 16px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--lavender-fixed);
+      background: #0B0B0E;
+      border: 1px solid #0B0B0E;
+      transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1), color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-proof:hover { background: var(--lavender-fixed); color: #0B0B0E; }
+    .hero-proof:focus-visible { outline: 2px solid #0B0B0E; outline-offset: 3px; }
+
+    /* ---------- LAUNCHES (ink field, lavender prints) ---------- */
+    .launches {
+      --fg: var(--lavender-fixed);
+      background: #121115;
+      color: var(--lavender-fixed);
+      min-height: auto;
+      padding-bottom: 120px;
+    }
+    .launches ::selection { background: var(--lavender-fixed); color: #121115; }
+    .launch-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 56px;
+      border-top: 1px solid rgba(180, 178, 243, 0.28);
+    }
+    .launch {
+      position: relative;
+      display: grid;
+      align-content: start;
+      gap: 14px;
+      padding: 32px 0 8px;
+    }
+    /* Column rules sit in the middle of each gap, so every plate is the same width. */
+    .launch + .launch::before {
+      content: "";
+      position: absolute;
+      top: 0; bottom: 0;
+      left: -28px;
+      width: 1px;
+      background: rgba(180, 178, 243, 0.28);
+    }
+    .launch-plate {
+      position: relative;
+      aspect-ratio: 4 / 3;
+      background: var(--lavender-fixed);
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+    .launch-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .launch-rank {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      margin: 0;
+    }
+    .launch-num {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-style: italic;
+      font-size: clamp(4.5rem, 8vw, 8.5rem);
+      line-height: 0.82;
+      letter-spacing: -0.05em;
+      font-variant-numeric: tabular-nums;
+    }
+    .launch-when,
+    .launch-stack,
+    .launch-stats {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      line-height: 1.6;
+    }
+    .launch-when { padding-bottom: 6px; }
+    .launch-name {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.9rem, 2.8vw, 2.6rem);
+      letter-spacing: -0.035em;
+      line-height: 1;
+      margin: 12px 0 0;
+    }
+    .launch-tag {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+    .launch-what {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      max-width: 44ch;
+      opacity: 0.92;
+    }
+    .launch-stack {
+      list-style: none;
+      margin: 6px 0 0;
+      padding: 0;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .launch-stack li {
+      padding: 4px 8px;
+      border: 1px solid rgba(180, 178, 243, 0.4);
+    }
+    .launch-stats { margin: 0; font-variant-numeric: tabular-nums; }
+    .launch-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 6px 0 0;
+    }
+    .launch-links a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 0 14px;
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-decoration: none;
+      color: var(--lavender-fixed);
+      border: 1px solid var(--lavender-fixed);
+      transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1), color 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .launch-links a:hover { background: var(--lavender-fixed); color: #121115; }
+    .launch-links a:focus-visible { outline: 2px solid var(--lavender-fixed); outline-offset: 3px; }
+    @media (max-width: 900px) {
+      .launch-grid { grid-template-columns: 1fr; }
+      .launch {
+        padding: 32px 0 24px;
+        border-bottom: 1px solid rgba(180, 178, 243, 0.28);
+      }
+      .launch + .launch::before { display: none; }
+      .hero-proof { font-size: 11px; letter-spacing: 0.08em; padding: 8px 12px; bottom: 5vh; white-space: normal; text-align: center; justify-content: center; width: max-content; max-width: calc(100vw - 32px); }
+    }
+
+    /* ---------- LAUNCHES, how they get built ---------- */
+    .build {
+      margin-top: 120px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(180, 178, 243, 0.28);
+    }
+    .build-lead {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-size: clamp(2rem, 4.2vw, 4rem);
+      line-height: 1.02;
+      letter-spacing: -0.035em;
+      max-width: 22ch;
+      margin: 24px 0 64px;
+    }
+    .build-lead em { font-style: italic; }
+    .build-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 40px;
+    }
+    .build-item h3 {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 400;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin: 0 0 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--lavender-fixed);
+    }
+    .build-item p {
+      margin: 0;
+      font-family: var(--sans);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      opacity: 0.92;
+    }
+    .build-item a {
+      color: var(--lavender-fixed);
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      opacity: 1;
+    }
+    @media (max-width: 900px) {
+      .build { margin-top: 72px; }
+      .build-lead { margin-bottom: 40px; }
+      .build-grid { grid-template-columns: 1fr; gap: 32px; }
+    }
+    @media (min-width: 901px) and (max-width: 1200px) {
+      .build-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+
+    /* ---------- 02 · WORK, featured rows with a dithered plate ---------- */
+    .feature-list { border-top: 1px solid var(--fg); }
+    .feature-row {
+      display: grid;
+      grid-template-columns: 56px 1fr minmax(0, 40%) 40px;
+      gap: 24px;
+      align-items: center;
+      padding: 28px 0;
+      border-bottom: 1px solid var(--fg);
+      color: var(--fg);
+      text-decoration: none;
+      transition: padding-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .feature-row:hover { padding-left: 12px; }
+    .feature-row .num {
+      font-family: var(--mono);
+      font-size: 12px;
+      font-variant-numeric: tabular-nums;
+      opacity: 0.7;
+      align-self: start;
+      padding-top: 10px;
+    }
+    .feature-text { display: grid; gap: 14px; align-self: start; padding-top: 4px; }
+    .feature-row .title {
+      font-family: "Instrument Serif", "Times New Roman", Times, serif;
+      font-style: italic;
+      font-size: clamp(2rem, 4vw, 3.8rem);
+      letter-spacing: -0.04em;
+      line-height: 0.95;
+    }
+    .feature-meta {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      opacity: 0.9;
+    }
+    .feature-plate {
+      position: relative;
+      display: block;
+      aspect-ratio: 16 / 10;
+      border: 1px solid var(--fg);
+      overflow: hidden;
+    }
+    .feature-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+    }
+    .feature-row .arrow {
+      justify-self: end;
+      font-size: 18px;
+      transition: transform 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .feature-row:hover .arrow { transform: translateX(6px); }
+    .feature-row:focus-visible, .work-row:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
+    .work-more {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      opacity: 0.85;
+      margin: 72px 0 16px;
+    }
+    @media (max-width: 900px) {
+      .feature-row { grid-template-columns: 38px 1fr; gap: 14px; }
+      .feature-plate { grid-column: 1 / -1; }
+      .feature-row .arrow { display: none; }
     }
 
     /* ---------- 02 · WORK ---------- */
@@ -521,7 +854,7 @@
     .work-row .year {
       letter-spacing: 0.16em;
       text-transform: uppercase;
-      opacity: 0.78;
+      opacity: 0.9;
     }
     .work-row .arrow {
       justify-self: end;
@@ -560,7 +893,7 @@
     }
     .about-meta h3 {
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.22em;
       margin: 0 0 10px;
       opacity: 0.75;
@@ -655,9 +988,9 @@
     }
     .contact-cell h4 {
       margin: 0;
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.22em;
-      opacity: 0.7;
+      opacity: 0.9;
       text-transform: uppercase;
     }
     .contact-cell a { color: var(--fg); text-decoration: none; }
@@ -668,9 +1001,9 @@
       gap: 12px;
       align-items: end;
       font-family: var(--mono);
-      font-size: 10px;
+      font-size: 11px;
       letter-spacing: 0.18em;
-      opacity: 0.75;
+      opacity: 0.9;
     }
     .colophon .center { text-align: center; }
     .colophon .right  { text-align: right; }
@@ -705,7 +1038,7 @@
       }
       .nav a {
         padding: 6px 10px;
-        font-size: 10px;
+        font-size: 11px;
         letter-spacing: 0.08em;
         white-space: nowrap;
       }
@@ -735,7 +1068,7 @@
   <div class="shell">
     <nav class="nav">
       <a href="#projects">[ PROJECTS ]</a>
-      <a href="#experiments">[ EXPERIMENTS ]</a>
+      <a href="#launches">[ LAUNCHES ]</a>
       <a href="#contact">[ CONTACT ]</a>
       <span class="spacer"></span>
       <span class="meta">RAVINDRA PRATAP SINGH</span>
@@ -750,6 +1083,8 @@
         <span><em>Ravindra Sisodia</em></span>
       </h1>
 
+      <a class="hero-proof" href="#launches">Designer + AI engineer. 3 Product Hunt top 10s <span aria-hidden="true">↓</span></a>
+
       <div class="sidebar" aria-hidden="true">
         <span>+ SMART_OBJECTS</span>
         <span>7_ORIGINAL_STYLES</span>
@@ -762,23 +1097,133 @@
 
     <!-- 01 · JODHPUR — giant right-aligned wordmark over dithered fort -->
     <article class="chapter chapter-photo chapter-jodhpur">
-      <canvas class="chapter-canvas" data-src="./story-jodhpur.jpg" aria-hidden="true"></canvas>
-      <p class="chapter-aside">Jodhpur<br/><em>Rajasthan.</em></p>
-      <p class="chapter-aside chapter-aside-2">I’m a designer-engineer<br/>who builds brands and the<br/><em>interfaces they live inside.</em></p>
-      <div class="chapter-overlay">
-        <h3 class="chapter-title chapter-title-huge">the place<br/>where i grew<br/><em>with design.</em></h3>
+      <div class="chapter-media" role="img" aria-label="Mehrangarh Fort above the blue city of Jodhpur">
+        <canvas class="chapter-canvas" data-src="./story-jodhpur.jpg" aria-hidden="true"></canvas>
+      </div>
+      <div class="chapter-band">
+        <div class="chapter-notes">
+          <p class="chapter-aside">Jodhpur,<br/><em>Rajasthan.</em></p>
+          <p class="chapter-aside chapter-aside-2">I’m a designer and AI engineer.<br/>I build brands, and the<br/><em>apps they live inside.</em></p>
+        </div>
+        <div class="chapter-overlay">
+          <h3 class="chapter-title chapter-title-huge">the place<br/>where i grew<br/><em>with design.</em></h3>
+        </div>
       </div>
     </article>
 
     <!-- 06 · BIKE RIDES — short CTA-style chapter, left-aligned giant heading -->
     <article class="chapter chapter-photo chapter-bike chapter-bike-cta">
-      <canvas class="chapter-canvas" data-src="./story-bike.jpg" aria-hidden="true"></canvas>
-      <p class="chapter-aside chapter-aside-right">the only thing<br/>that empties<br/><em>my head.</em></p>
-      <div class="chapter-overlay">
-        <h3 class="chapter-title chapter-title-huge">Pixels by day,<br/>petrol <em>by dusk.</em></h3>
+      <div class="chapter-media" role="img" aria-label="My Royal Enfield parked above a hillside tea estate, helmet on the mirror">
+        <canvas class="chapter-canvas" data-src="./story-bike.jpg" aria-hidden="true"></canvas>
+      </div>
+      <div class="chapter-band">
+        <div class="chapter-overlay">
+          <h3 class="chapter-title chapter-title-huge">Pixels by day,<br/>petrol <em>by dusk.</em></h3>
+        </div>
+        <div class="chapter-notes">
+          <p class="chapter-aside chapter-aside-right">the only thing<br/>that empties<br/><em>my head.</em></p>
+        </div>
       </div>
     </article>
 
+  </section>
+
+  <!-- ============================= LAUNCHES ============================= -->
+  <section class="fold launches" id="launches" aria-labelledby="launches-title">
+    <header class="fold-head">
+      <h2 class="fold-title" id="launches-title">Three launches,<br/><em>three top tens.</em></h2>
+      <p class="fold-kicker">
+        Mac apps I designed, engineered and shipped on Product Hunt in seven weeks, built with Claude Code.
+      </p>
+    </header>
+
+    <div class="launch-grid">
+      <article class="launch">
+        <div class="launch-plate" role="img" aria-label="Chit's receipt window listing a day of Claude Code work by project">
+          <canvas class="launch-canvas" data-src="./img/launch-chit.png" aria-hidden="true"></canvas>
+        </div>
+        <p class="launch-rank">
+          <span class="launch-num">#3</span>
+          <span class="launch-when">Product of the day<br/>Sep 26, 2026</span>
+        </p>
+        <h3 class="launch-name">Chit</h3>
+        <p class="launch-tag">A printed receipt of your day in Claude Code.</p>
+        <p class="launch-what">Parses the session transcripts Claude Code writes to disk and prints what you shipped, grouped by project and ready to paste.</p>
+        <ul class="launch-stack">
+          <li>Swift</li><li>Transcript parsing</li><li>777 KB, no network</li>
+        </ul>
+        <p class="launch-stats">226 points · #26 of the week</p>
+        <p class="launch-links">
+          <a href="https://chit.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
+          <a href="https://www.producthunt.com/products/chit-2" target="_blank" rel="noopener">Product Hunt ↗</a>
+        </p>
+      </article>
+
+      <article class="launch">
+        <div class="launch-plate" role="img" aria-label="Crew's pixel monsters walking across the frame">
+          <canvas class="launch-canvas" data-live="crew" aria-hidden="true"></canvas>
+        </div>
+        <p class="launch-rank">
+          <span class="launch-num">#7</span>
+          <span class="launch-when">Product of the day<br/>Aug 7, 2026</span>
+        </p>
+        <h3 class="launch-name">Crew</h3>
+        <p class="launch-tag">A tiny crew of monsters for your Claude Code agents.</p>
+        <p class="launch-what">Listens to Claude Code hook events and gives every running chat and subagent its own pixel monster along the bottom of your screen.</p>
+        <ul class="launch-stack">
+          <li>SwiftUI</li><li>Claude Code hooks</li><li>Multi-agent tracking</li>
+        </ul>
+        <p class="launch-stats">141 points · #45 of the week</p>
+        <p class="launch-links">
+          <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Site ↗</a>
+          <a href="https://www.producthunt.com/products/crew-a-tiny-crew-for-claude-code" target="_blank" rel="noopener">Product Hunt ↗</a>
+        </p>
+      </article>
+
+      <article class="launch">
+        <div class="launch-plate" role="img" aria-label="Notchling's face in the MacBook notch, its eyes following your cursor">
+          <canvas class="launch-canvas" data-live="notchling" aria-hidden="true"></canvas>
+        </div>
+        <p class="launch-rank">
+          <span class="launch-num">#8</span>
+          <span class="launch-when">Product of the day<br/>Sep 1, 2026</span>
+        </p>
+        <h3 class="launch-name">Notchling</h3>
+        <p class="launch-tag">A little creature that lives in your MacBook notch.</p>
+        <p class="launch-what">Follows your cursor, dozes when you go idle, and carries any file you drop into its mouth. Live weather, drawn frame by frame.</p>
+        <ul class="launch-stack">
+          <li>SwiftUI</li><li>Canvas + TimelineView</li><li>Drag and drop</li>
+        </ul>
+        <p class="launch-stats">138 points · #53 of the week · PH newsletter</p>
+        <p class="launch-links">
+          <a href="https://notchling.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
+          <a href="https://www.producthunt.com/products/notchling-lives-in-your-notch" target="_blank" rel="noopener">Product Hunt ↗</a>
+        </p>
+      </article>
+    </div>
+
+    <div class="build">
+      <p class="fold-label">How they get built</p>
+      <p class="build-lead">The launches are the output. The system behind them is the <em>real work.</em></p>
+      <div class="build-grid">
+        <div class="build-item">
+          <h3>My own design skill</h3>
+          <p><a href="https://rav-skill.zopcloud.zop.dev" target="_blank" rel="noopener">/rav</a> is a Claude Code skill with a core spec and eight reference playbooks for layout, motion, color and copy. It carries my taste into every build, this page included.</p>
+        </div>
+        <div class="build-item">
+          <h3>Hooks, not polling</h3>
+          <p>Crew wires Claude Code's UserPromptSubmit, Stop, PreToolUse and SubagentStop events into one shell script, so every chat and subagent appears the moment it starts.</p>
+        </div>
+        <div class="build-item">
+          <h3>Agents that review agents</h3>
+          <p>Notchling's weather scenes went through an eight-agent panel: one subagent per screenshot plus a coherence judge, scoring against a written brief before release.</p>
+        </div>
+        <div class="build-item">
+          <h3>Transcripts as data</h3>
+          <p>Chit and my daily worklog read Claude Code's own session transcripts, so the record of what I shipped writes itself every evening.</p>
+        </div>
+      </div>
+    </div>
   </section>
 
   <!-- ============================= 02 · WORK ============================= -->
@@ -786,113 +1231,121 @@
     <header class="fold-head">
       <h2 class="fold-title">Selected <em>work,</em><br/>across rooms.</h2>
       <p class="fold-kicker">
-        Thirteen shown. Forty more in the archive, <em>2018 — 2026.</em>
+        Thirteen shown. Forty more in the archive, <em>2018 to 2026.</em>
       </p>
     </header>
 
-    <div class="work-list">
-      <a href="https://zop-dev-website-v3.vercel.app/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://zop-dev-website-v3.vercel.app/" data-label="01 · ZOP.DEV — WEB / 2026">
+    <div class="feature-list">
+      <a href="https://zop-dev-website-v3.vercel.app/" target="_blank" rel="noopener" class="feature-row">
         <span class="num">01</span>
-        <span class="title">Zop.Dev — Marketing Site</span>
-        <span class="role">Brand · Web</span>
-        <span class="year">2026</span>
+        <span class="feature-text">
+          <span class="title">Zop.Dev · Marketing Site</span>
+          <span class="feature-meta">Brand · Web · 2026</span>
+        </span>
+        <span class="feature-plate"><canvas class="feature-canvas" data-src="./img/work-zopdev-site.png" aria-hidden="true"></canvas></span>
         <span class="arrow">→</span>
       </a>
-      <a href="https://screenroot.com/work/ceat-tyre-website-design/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://screenroot.com/work/ceat-tyre-website-design/" data-label="02 · CEAT TYRES — CASE / 2023">
+      <a href="https://zop-dev-brandkit-v1.vercel.app/" target="_blank" rel="noopener" class="feature-row">
         <span class="num">02</span>
-        <span class="title">CEAT Tyres — Website</span>
-        <span class="role">Case · Web</span>
-        <span class="year">2023</span>
+        <span class="feature-text">
+          <span class="title">Zop.Dev · Brand Kit</span>
+          <span class="feature-meta">Brand · Identity · 2026</span>
+        </span>
+        <span class="feature-plate"><canvas class="feature-canvas" data-src="./img/work-zopdev-brandkit.png" aria-hidden="true"></canvas></span>
         <span class="arrow">→</span>
       </a>
-      <a href="https://screenroot.com/work/yes-bank-app-ui-design/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://screenroot.com/work/yes-bank-app-ui-design/" data-label="03 · YES BANK — MOBILE / 2023">
+      <a href="https://screenroot.com/work/yes-bank-app-ui-design/" target="_blank" rel="noopener" class="feature-row">
         <span class="num">03</span>
-        <span class="title">YES Bank — App UI</span>
-        <span class="role">Case · Product</span>
-        <span class="year">2023</span>
+        <span class="feature-text">
+          <span class="title">YES Bank · App UI</span>
+          <span class="feature-meta">Case · Product · 2023</span>
+        </span>
+        <span class="feature-plate"><canvas class="feature-canvas" data-src="./img/work-yesbank.png" aria-hidden="true"></canvas></span>
         <span class="arrow">→</span>
       </a>
-      <a href="https://us.strandls.com/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://us.strandls.com/" data-label="04 · STRAND LIFE SCIENCES / 2024">
+      <a href="https://screenroot.com/work/ceat-tyre-website-design/" target="_blank" rel="noopener" class="feature-row">
         <span class="num">04</span>
+        <span class="feature-text">
+          <span class="title">CEAT Tyres · Website</span>
+          <span class="feature-meta">Case · Web · 2023</span>
+        </span>
+        <span class="feature-plate"><canvas class="feature-canvas" data-src="./img/work-ceat.png" aria-hidden="true"></canvas></span>
+        <span class="arrow">→</span>
+      </a>
+    </div>
+
+    <p class="work-more">More work</p>
+    <div class="work-list">
+      <a href="https://us.strandls.com/" target="_blank" rel="noopener" class="work-row"
+         data-href="https://us.strandls.com/" data-label="05 · STRAND LIFE SCIENCES / 2024">
+        <span class="num">05</span>
         <span class="title">Strand Life Sciences</span>
         <span class="role">Web · Marketing</span>
         <span class="year">2024</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://evermortalesco.com/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://evermortalesco.com/" data-thumb="./project-openstreet.jpg" data-label="05 · OPENSTREET — EVERMORTAL / 2024">
-        <span class="num">05</span>
-        <span class="title">Openstreet — Evermortal Esco</span>
+         data-href="https://evermortalesco.com/" data-thumb="./project-openstreet.jpg" data-label="06 · OPENSTREET · EVERMORTAL / 2024">
+        <span class="num">06</span>
+        <span class="title">Openstreet · Evermortal Esco</span>
         <span class="role">Studio · Web</span>
         <span class="year">2024</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://vocautomotive.com/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://vocautomotive.com/" data-label="06 · VOC AUTOMOTIVE / 2025">
-        <span class="num">06</span>
+         data-href="https://vocautomotive.com/" data-label="07 · VOC AUTOMOTIVE / 2025">
+        <span class="num">07</span>
         <span class="title">VOC Automotive</span>
         <span class="role">Web · Marketing</span>
         <span class="year">2025</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://federate.one/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://federate.one/" data-thumb="./project-federate.jpg" data-label="07 · FEDERATE / 2025">
-        <span class="num">07</span>
+         data-href="https://federate.one/" data-thumb="./project-federate.jpg" data-label="08 · FEDERATE / 2025">
+        <span class="num">08</span>
         <span class="title">Federate</span>
         <span class="role">Identity · Web</span>
         <span class="year">2025</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://screenroot.com/work/tata-capital-website-design/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://screenroot.com/work/tata-capital-website-design/" data-label="08 · TATA CAPITAL — CASE / 2022">
-        <span class="num">08</span>
-        <span class="title">Tata Capital — Website</span>
+         data-href="https://screenroot.com/work/tata-capital-website-design/" data-label="09 · TATA CAPITAL · CASE / 2022">
+        <span class="num">09</span>
+        <span class="title">Tata Capital · Website</span>
         <span class="role">Case · Web</span>
         <span class="year">2022</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://zop-night-tetris-cloud.vercel.app/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://zop-night-tetris-cloud.vercel.app/" data-label="09 · ZOPNIGHT — TETRIS CLOUD / 2026">
-        <span class="num">09</span>
-        <span class="title">ZopNight — Tetris Cloud</span>
+         data-href="https://zop-night-tetris-cloud.vercel.app/" data-label="10 · ZOPNIGHT · TETRIS CLOUD / 2026">
+        <span class="num">10</span>
+        <span class="title">ZopNight · Tetris Cloud</span>
         <span class="role">Concept · Web</span>
         <span class="year">2026</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://zop-branding-launch-plan.vercel.app/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://zop-branding-launch-plan.vercel.app/" data-label="10 · ZOP.DEV — LAUNCH PLAN / 2026">
-        <span class="num">10</span>
-        <span class="title">Zop.Dev — Brand Launch Plan</span>
+         data-href="https://zop-branding-launch-plan.vercel.app/" data-label="11 · ZOP.DEV · LAUNCH PLAN / 2026">
+        <span class="num">11</span>
+        <span class="title">Zop.Dev · Brand Launch Plan</span>
         <span class="role">Brand · Strategy</span>
         <span class="year">2026</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://lyke-eosin.vercel.app/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://lyke-eosin.vercel.app/" data-label="11 · LYKE / 2026">
-        <span class="num">11</span>
+         data-href="https://lyke-eosin.vercel.app/" data-label="12 · LYKE / 2026">
+        <span class="num">12</span>
         <span class="title">Lyke</span>
         <span class="role">Product · Web</span>
         <span class="year">2026</span>
         <span class="arrow">→</span>
       </a>
       <a href="https://contrast-check-v1.vercel.app/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://contrast-check-v1.vercel.app/" data-label="12 · CONTRAST CHECK / 2025">
-        <span class="num">12</span>
+         data-href="https://contrast-check-v1.vercel.app/" data-label="13 · CONTRAST CHECK / 2025">
+        <span class="num">13</span>
         <span class="title">Contrast Check</span>
         <span class="role">Tool · Web</span>
         <span class="year">2025</span>
-        <span class="arrow">→</span>
-      </a>
-      <a href="https://zop-dev-brandkit-v1.vercel.app/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://zop-dev-brandkit-v1.vercel.app/" data-label="13 · ZOP.DEV — BRAND KIT / 2026">
-        <span class="num">13</span>
-        <span class="title">Zop.Dev — Brand Kit</span>
-        <span class="role">Brand · Identity</span>
-        <span class="year">2026</span>
         <span class="arrow">→</span>
       </a>
     </div>
@@ -903,7 +1356,7 @@
     <header class="fold-head">
       <h2 class="fold-title">Pitch me<br/>something <em>impossible.</em></h2>
       <p class="fold-kicker">
-        Inbox open. Reply within 24 hours, most days. Slower on Sundays — that’s a feature.
+        Inbox open. Reply within 24 hours, most days. Slower on Sundays. That’s a feature.
       </p>
     </header>
 
@@ -929,7 +1382,7 @@
       </div>
       <div class="contact-cell">
         <h4>CURRENTLY</h4>
-        <span>Becoming an <em>AI engineer</em> who can also ship the design. Looking for the next app or site to build end-to-end.</span>
+        <span>An <em>AI engineer</em> who also ships the design. Three Mac apps launched, looking for the next one to build end-to-end.</span>
       </div>
     </div>
 
@@ -940,9 +1393,9 @@
 
   <!-- Floating preview panel — populated on .work-row hover -->
   <div class="preview" id="preview" aria-hidden="true">
-    <div class="preview-frame" id="previewFrame">— preview</div>
+    <div class="preview-frame" id="previewFrame">preview</div>
     <div class="preview-label">
-      <span id="previewLabel">— hover a project</span>
+      <span id="previewLabel">hover a project</span>
       <span class="dot"></span>
     </div>
   </div>
@@ -1424,10 +1877,18 @@ function attachChapterDither(canvas, imageSrc, opts = {}) {
   }).observe(canvas);
   layout();
 
+  /* Pause the pulse while the canvas is offscreen. */
+  let onScreen = true;
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((entries) => {
+      onScreen = entries[entries.length - 1].isIntersecting;
+    }, { rootMargin: "100px" }).observe(canvas);
+  }
+
   /* Ambient pulse loop — same sine pattern as the hero. */
   const TWO_PI = Math.PI * 2;
   function tick(now) {
-    if (ready && oW && oH) {
+    if (ready && oW && oH && onScreen) {
       const phase = (now % pulsePeriodMs) / pulsePeriodMs;
       render(Math.sin(phase * TWO_PI) * pulseAmp);
     }
@@ -1442,8 +1903,147 @@ document.querySelectorAll(".chapter-canvas").forEach((c) => {
   const opts = {};
   // Bike rider sits on the right of a 1800×830 source; center-cropping a
   // tall mobile canvas would lose it. Pull the crop window toward the right.
-  if (c.closest(".chapter-bike")) opts.cropX = 0.82;
+  if (c.closest(".chapter-bike")) opts.cropX = 0.9;
+  // Mehrangarh sits on the right half of the frame too.
+  if (c.closest(".chapter-jodhpur")) opts.cropX = 0.8;
   attachChapterDither(c, src, opts);
+});
+
+/* Launch plates: same Bayer print as the story, a little brighter so the
+   light app backgrounds drop out and only the product reads as ink. */
+document.querySelectorAll(".launch-canvas, .feature-canvas").forEach((c) => {
+  if (c.dataset.src) attachChapterDither(c, c.dataset.src, { brightness: 24, pulseAmp: 6 });
+});
+
+
+/* =====================================================================
+   LIVE LAUNCH PLATES
+   Same Bayer print as the story, but the source is drawn every frame
+   instead of loaded once: Notchling watches the cursor and dozes when
+   you go idle, Crew's creatures walk on their real sprite frames.
+   ===================================================================== */
+const pointer = { x: -1, y: -1, movedAt: performance.now() };
+window.addEventListener("pointermove", (e) => {
+  pointer.x = e.clientX; pointer.y = e.clientY; pointer.movedAt = performance.now();
+}, { passive: true });
+const REDUCED_MOTION = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function attachLiveDither(canvas, draw, opts = {}) {
+  const cellPx     = opts.cellPx     ?? 1.33;
+  const contrast   = opts.contrast   ?? 1.2;
+  const brightness = opts.brightness ?? 24;
+  const ctx = canvas.getContext("2d", { alpha: true });
+  const src = document.createElement("canvas");
+  const sctx = src.getContext("2d", { willReadFrequently: true });
+  let oW = 0, oH = 0, out = null, onScreen = false;
+
+  function layout() {
+    const r = canvas.getBoundingClientRect();
+    const w = Math.max(1, Math.floor(r.width / cellPx));
+    const h = Math.max(1, Math.floor(r.height / cellPx));
+    if (w === oW && h === oH) return;
+    oW = w; oH = h;
+    canvas.width = src.width = oW; canvas.height = src.height = oH;
+    out = ctx.createImageData(oW, oH);
+  }
+  function frame(now) {
+    if (!oW || !oH) return;
+    sctx.imageSmoothingEnabled = false;
+    draw(sctx, oW, oH, now, canvas.getBoundingClientRect());
+    const px = sctx.getImageData(0, 0, oW, oH).data;
+    const dst = out.data;
+    for (let y = 0, i = 0; y < oH; y++) {
+      const r = (y & 7) << 3;
+      for (let x = 0; x < oW; x++, i += 4) {
+        let L = 0.2126 * px[i] + 0.7152 * px[i + 1] + 0.0722 * px[i + 2];
+        L = (L - 128) * contrast + 128 + brightness;
+        dst[i + 3] = L > (BAYER8[r + (x & 7)] + 0.5) * BAYER_SCALE ? 0 : 255;
+      }
+    }
+    ctx.putImageData(out, 0, 0);
+  }
+  new ResizeObserver(() => { layout(); frame(performance.now()); }).observe(canvas);
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver((es) => { onScreen = es[es.length - 1].isIntersecting; }, { rootMargin: "100px" }).observe(canvas);
+  }
+  layout();
+  if (REDUCED_MOTION) { frame(0); return; }
+  (function tick(now) {
+    if (onScreen) frame(now);
+    requestAnimationFrame(tick);
+  })(performance.now());
+}
+
+function roundRect(c, x, y, w, h, rt, rb) {
+  c.beginPath();
+  c.moveTo(x + rt, y);
+  c.lineTo(x + w - rt, y); c.quadraticCurveTo(x + w, y, x + w, y + rt);
+  c.lineTo(x + w, y + h - rb); c.quadraticCurveTo(x + w, y + h, x + w - rb, y + h);
+  c.lineTo(x + rb, y + h); c.quadraticCurveTo(x, y + h, x, y + h - rb);
+  c.lineTo(x, y + rt); c.quadraticCurveTo(x, y, x + rt, y);
+  c.closePath();
+}
+
+/* Notchling: eyes track the pointer, blink every few seconds, lids drop after 6s idle. */
+function drawNotchling() {
+  let nextBlink = performance.now() + 2500, lid = 0;
+  return (c, w, h, now, rect) => {
+    c.fillStyle = "#EDECEA"; c.fillRect(0, 0, w, h);
+    const nw = w * 0.58, nh = h * 0.37, nx = (w - nw) / 2, ny = h * 0.26;
+    c.fillStyle = "#000"; roundRect(c, nx, ny, nw, nh, h * 0.03, h * 0.11); c.fill();
+
+    const idle = now - pointer.movedAt > 6000;
+    let blink = 0;
+    if (now > nextBlink) { blink = 1; if (now > nextBlink + 150) nextBlink = now + 2500 + Math.random() * 3500; }
+    lid += ((idle ? 0.62 : blink) - lid) * (idle ? 0.04 : 0.5);
+
+    const er = w * 0.045;
+    [0.43, 0.57].forEach((fx) => {
+      const ex = w * fx, ey = ny + nh * 0.52;
+      let dx = 0, dy = 0.25;
+      if (pointer.x >= 0 && rect.width) {
+        const px = (pointer.x - rect.left) / rect.width * w;
+        const py = (pointer.y - rect.top) / rect.height * h;
+        const d = Math.hypot(px - ex, py - ey) || 1;
+        const k = Math.min(1, d / (w * 0.35));
+        dx = (px - ex) / d * k; dy = (py - ey) / d * k;
+      }
+      c.fillStyle = "#D8D8D8"; c.beginPath(); c.arc(ex, ey, er, 0, Math.PI * 2); c.fill();
+      c.fillStyle = "#000"; c.beginPath();
+      c.arc(ex + dx * er * 0.42, ey + dy * er * 0.42, er * 0.46, 0, Math.PI * 2); c.fill();
+      if (lid > 0.01) { c.fillStyle = "#000"; c.fillRect(ex - er - 1, ey - er - 1, er * 2 + 2, (er * 2 + 2) * lid); }
+    });
+  };
+}
+
+/* Crew: five creatures walk left to right on their idle/walk frames, wrapping around. */
+function drawCrew() {
+  const names = ["ember", "breeze", "sprout", "puddle", "spark"];
+  const sprites = names.map((n) => {
+    const a = new Image(); a.src = `./img/${n}.png`;
+    const b = new Image(); b.src = `./img/${n}-walk.png`;
+    return [a, b];
+  });
+  const speed = [0.050, 0.041, 0.046, 0.036, 0.055];   // plate widths per second
+  return (c, w, h, now) => {
+    c.fillStyle = "#EDECEA"; c.fillRect(0, 0, w, h);
+    c.fillStyle = "#6B6B70"; c.fillRect(0, Math.round(h * 0.74), w, 1);
+    const mh = h * 0.2, mw = mh * 640 / 440, span = w + mw;
+    sprites.forEach(([idle, walk], i) => {
+      const t = now / 1000;
+      const x = ((i / names.length) * span + t * speed[i] * w) % span - mw;
+      const step = Math.floor(t * 4 + i) % 2;
+      const img = step ? walk : idle;
+      if (!img.complete || !img.naturalWidth) return;
+      c.drawImage(img, Math.round(x), Math.round(h * 0.74 - mh - (step ? 1 : 0)), Math.round(mw), Math.round(mh));
+    });
+  };
+}
+
+document.querySelectorAll('.launch-canvas[data-live]').forEach((cv) => {
+  const kind = cv.dataset.live;
+  if (kind === "notchling") attachLiveDither(cv, drawNotchling());
+  if (kind === "crew") attachLiveDither(cv, drawCrew(), { brightness: 18 });
 });
 
 /* Pre-warm all project screenshots as soon as the Work fold enters view.
@@ -1624,19 +2224,19 @@ if (window.gsap && window.ScrollTrigger) {
      flash that GSAP pin caused at the hero→jodhpur boundary. */
   gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => setupCardStack());
   function setupCardStack() {
+    // The story chapters now sit side by side, so only the hero recedes,
+    // scrubbed by the story band scrolling up over it.
     const sections = [
       document.querySelector("section.main"),
-      document.querySelector(".chapter-jodhpur"),
-      document.querySelector(".chapter-bike"),
+      document.querySelector(".story"),
     ].filter(Boolean);
     if (sections.length === 0) return;
 
     sections.forEach((sec, i) => {
-      sec.classList.add("stack-card");
-      sec.style.zIndex = String(i + 1);
-
       const next = sections[i + 1];
       if (!next) return;
+      sec.classList.add("stack-card");
+      sec.style.zIndex = String(i + 1);
 
       const targetScale  = Math.max(0.82, 0.95 - i * 0.022);
       const targetRadius = 22;
@@ -1670,10 +2270,10 @@ if (window.gsap && window.ScrollTrigger) {
   function setupParallax() {
     const layers = [
       { sec: "section.main",      bg: "#dither", fg: ".headline", fgMode: "grow-down", deferFg: true },
-      { sec: ".chapter-jodhpur",  bg: ".chapter-jodhpur .chapter-canvas", fg: ".chapter-jodhpur .chapter-overlay", aside: ".chapter-jodhpur .chapter-aside" },
-      { sec: ".chapter-bike",     bg: ".chapter-bike .chapter-canvas",    fg: ".chapter-bike .chapter-overlay",    aside: ".chapter-bike .chapter-aside" },
+      { sec: ".chapter-jodhpur",  bg: ".chapter-jodhpur .chapter-canvas", gentle: true },
+      { sec: ".chapter-bike",     bg: ".chapter-bike .chapter-canvas",    gentle: true },
     ];
-    layers.forEach(({ sec, bg, fg, fgMode, aside, deferFg }) => {
+    layers.forEach(({ sec, bg, fg, fgMode, aside, deferFg, gentle }) => {
       const section = document.querySelector(sec);
       if (!section) return;
       const trig = {
@@ -1685,9 +2285,11 @@ if (window.gsap && window.ScrollTrigger) {
       const bgEl = bg && document.querySelector(bg);
       const fgEl = fg && document.querySelector(fg);
       const asideEl = aside && document.querySelector(aside);
+      // Story photos drift less so the fort and the bike never leave the frame.
+      const drift = gentle ? 3 : 8, zoom = gentle ? 1.08 : 1.22;
       if (bgEl) gsap.fromTo(bgEl,
-        { yPercent: -8, scale: 1.22 },
-        { yPercent: 8,  scale: 1.22, ease: "none", transformOrigin: "center center", scrollTrigger: trig }
+        { yPercent: -drift, scale: zoom },
+        { yPercent: drift,  scale: zoom, ease: "none", transformOrigin: "center center", scrollTrigger: trig }
       );
       if (fgEl) {
         const registerFg = () => {
@@ -1733,6 +2335,25 @@ if (window.gsap && window.ScrollTrigger) {
     );
   });
 
+  /* ---- (3b) Launch plates print top to bottom as each column arrives ---- */
+  gsap.matchMedia().add("(prefers-reduced-motion: no-preference)", () => {
+    document.querySelectorAll(".launch-canvas, .feature-canvas").forEach((canvas) => {
+      gsap.fromTo(canvas,
+        { clipPath: "inset(0 0 100% 0)" },
+        {
+          clipPath: "inset(0 0 0% 0)",
+          ease: "none",
+          scrollTrigger: {
+            trigger: canvas.closest(".launch, .feature-row"),
+            start: "top 90%",
+            end: "top 45%",
+            scrub: 0.8
+          }
+        }
+      );
+    });
+  });
+
   /* ---- (4) Cursor-magnet + scroll-velocity skew — desktop only ---- */
   gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => {
     /* 4a — Cursor magnet on work-rows.
@@ -1761,8 +2382,10 @@ if (window.gsap && window.ScrollTrigger) {
        Reads ScrollTrigger.getVelocity() every frame and skews via quickTo. */
     const titles = gsap.utils.toArray(".fold-title, .chapter-title, .headline span");
     const setSkew = gsap.quickTo(titles, "skewX", { duration: 0.6, ease: "power3.out" });
+    // getVelocity lives on instances, not the static ScrollTrigger object.
+    const velocityST = ScrollTrigger.create({ start: 0, end: "max" });
     const onTick = () => {
-      const v = ScrollTrigger.getVelocity() / -300;
+      const v = velocityST.getVelocity() / -300;
       setSkew(gsap.utils.clamp(-7, 7, v));
     };
     gsap.ticker.add(onTick);
@@ -1771,6 +2394,7 @@ if (window.gsap && window.ScrollTrigger) {
     return () => {
       document.removeEventListener("mousemove", onMouseMove);
       gsap.ticker.remove(onTick);
+      velocityST.kill();
       rowSetters.forEach(set => set(0));
       setSkew(0);
     };
