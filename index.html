@@ -205,10 +205,6 @@
       font-family: "Instrument Serif", "Times New Roman", Times, serif;
       font-weight: 400;
       letter-spacing: calc(-0.055em - 3px);
-      /* Ink outline painted behind the lavender fill, so every letter separates
-         from the dither without covering the portrait. */
-      -webkit-text-stroke: 0.07em #0B0B0E;
-      paint-order: stroke fill;
     }
 
     /* =====================================================================
@@ -1026,9 +1022,9 @@
         white-space: nowrap;
       }
       .nav .meta { display: none; }
-      .headline { padding: 0 4vw 16svh; align-items: end; }
-      .headline span { font-size: clamp(2.6rem, 13vw, 5.6rem); letter-spacing: -0.04em; }
-      .headline em { letter-spacing: -0.045em; -webkit-text-stroke-width: 0.09em; }
+      .headline { padding: 0 4vw; }
+      .headline span { font-size: clamp(2.4rem, 11vw, 5.2rem); letter-spacing: -0.04em; }
+      .headline em { letter-spacing: -0.045em; }
       /* Drop the cascade on mobile — sticky + scrub on touch causes jitter */
       .stack-card {
         position: relative !important;
