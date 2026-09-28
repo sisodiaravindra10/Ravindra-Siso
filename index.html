@@ -18,6 +18,9 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ravindra Sisodia, designer and AI engineer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <meta name="description" content="Ravindra Sisodia, designer and AI engineer. Three Mac apps in the Product Hunt top 10: Chit, Crew and Notchling.">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
@@ -77,60 +80,36 @@
       opacity: 0.7;
     }
 
-    /* ---------- BOOT LOADER (full-screen halftone with counter) ---------- */
+    /* ---------- BOOT LOADER (name reveal) ---------- */
     .loader {
       position: fixed;
       inset: 0;
       z-index: 9999;
       background: var(--bg);
-      color: var(--fg);
+      color: #0B0B0E;
       display: grid;
       place-items: center;
-      overflow: hidden;
-      pointer-events: auto;
+      transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    /* Halftone layer — real Bayer 8×8 dither of a procedural moving blob,
-       same algorithm as the hero portrait but without an underlying photo. */
-    .loader-canvas {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      image-rendering: pixelated;
-      image-rendering: -moz-crisp-edges;
-      image-rendering: crisp-edges;
-      pointer-events: none;
-    }
-    .loader-num {
-      position: relative;
+    .loader.is-done { opacity: 0; pointer-events: none; }
+    .loader-name {
       font-family: "Instrument Serif", "Times New Roman", Times, serif;
       font-style: italic;
-      font-weight: 400;
-      font-size: 18px;             /* starting size; JS animates this up to 132px */
-      line-height: 0.85;
-      letter-spacing: -0.06em;
-      text-align: center;
-      mix-blend-mode: difference;
-      color: #fff;
-      user-select: none;
-      transform: scale(1);
-      transform-origin: center center;
-      transition: font-size 0.05s linear, transform 0.85s cubic-bezier(0.5, 0, 0.1, 1);
-      will-change: font-size, transform;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+      overflow: hidden;
+      padding: 0.1em 0 0.18em;   /* room for italic descenders */
     }
-    .loader-num.is-final {
-      transform: scale(2.7);
+    .loader-name .ch {
+      display: inline-block;
+      transform: translateY(110%);
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+      transition-delay: calc(var(--i) * 32ms);
     }
-    .loader-meta {
-      position: absolute;
-      font-family: var(--mono);
-      font-size: 11px;
-      letter-spacing: 0.22em;
-      line-height: 1.5;
-      opacity: 0.75;
+    .loader.is-rising .loader-name .ch { transform: none; }
+    @media (prefers-reduced-motion: reduce) {
+      .loader-name .ch { transform: none; transition: none; }
     }
-    .loader-meta-tl { top: 22px; left: 22px; }
-    .loader-meta-br { bottom: 22px; right: 22px; text-align: right; }
 
     /* Hero shell starts hidden; the loader's JS reveal animates it in */
     .shell {
@@ -226,6 +205,10 @@
       font-family: "Instrument Serif", "Times New Roman", Times, serif;
       font-weight: 400;
       letter-spacing: calc(-0.055em - 3px);
+      /* Ink outline painted behind the lavender fill, so every letter separates
+         from the dither without covering the portrait. */
+      -webkit-text-stroke: 0.07em #0B0B0E;
+      paint-order: stroke fill;
     }
 
     /* =====================================================================
@@ -1043,9 +1026,9 @@
         white-space: nowrap;
       }
       .nav .meta { display: none; }
-      .headline { padding: 0 4vw; }
-      .headline span { font-size: clamp(2.4rem, 11vw, 5.2rem); letter-spacing: -0.04em; }
-      .headline em { letter-spacing: -0.045em; }
+      .headline { padding: 0 4vw 16svh; align-items: end; }
+      .headline span { font-size: clamp(2.6rem, 13vw, 5.6rem); letter-spacing: -0.04em; }
+      .headline em { letter-spacing: -0.045em; -webkit-text-stroke-width: 0.09em; }
       /* Drop the cascade on mobile — sticky + scrub on touch causes jitter */
       .stack-card {
         position: relative !important;
@@ -1057,12 +1040,9 @@
   </style>
 </head>
 <body>
-  <!-- Halftone-filled boot loader. Removed after the count completes. -->
+  <!-- Boot loader: the name's letters rise into place, then the cover fades. -->
   <div class="loader" id="loader" aria-hidden="true">
-    <canvas class="loader-canvas" id="loaderCanvas"></canvas>
-    <div class="loader-meta loader-meta-tl">LOADING<br/>RAVINDRA · STUDIO</div>
-    <div class="loader-meta loader-meta-br">DITHERED<br/>IN BAYER_8×8</div>
-    <div class="loader-num" id="loaderNum">00</div>
+    <span class="loader-name" id="loaderName">Ravindra Sisodia</span>
   </div>
 
   <div class="shell">
@@ -2077,124 +2057,56 @@ if (window.gsap) {
   gsap.set(".headline", { yPercent: 100, opacity: 0 });
 }
 
-/* Procedural Bayer-8×8 halftone for the loader — same dither algorithm as the
-   hero portrait, driven by a moving radial blob instead of an image. Gives the
-   loader the exact same visual texture as the rest of the site. */
-(function setupLoaderDither() {
-  const canvas = document.getElementById("loaderCanvas");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d", { willReadFrequently: true, alpha: true });
-  const LOADER_CELL = 2;             // CSS px per dither cell (chunkier than hero)
-  const LOADER_BAYER_SCALE = 255 / 64;
-  let oW = 0, oH = 0;
-  let imageData = null;
 
-  function layout() {
-    const r = canvas.getBoundingClientRect();
-    const newW = Math.max(1, Math.floor(r.width  / LOADER_CELL));
-    const newH = Math.max(1, Math.floor(r.height / LOADER_CELL));
-    if (newW === oW && newH === oH) return;
-    oW = newW; oH = newH;
-    canvas.width = oW; canvas.height = oH;
-    imageData = ctx.createImageData(oW, oH);
-  }
-
-  function frame(now) {
-    if (!imageData) return;
-    const data = imageData.data;
-    // Soft moving cloud — two sine waves crossed with two drifting hot-spots.
-    // Keeps the dither uniformly textured everywhere (no vignette / dead zones).
-    const t  = now * 0.001;
-    const cx1 = oW * (0.5 + Math.sin(t * 0.45) * 0.30);
-    const cy1 = oH * (0.5 + Math.cos(t * 0.38) * 0.30);
-    const cx2 = oW * (0.5 + Math.cos(t * 0.31) * 0.32);
-    const cy2 = oH * (0.5 + Math.sin(t * 0.27) * 0.32);
-    const r1  = Math.min(oW, oH) * 0.65;
-    const r2  = Math.min(oW, oH) * 0.55;
-    const pulse = Math.sin(t * 1.4) * 14;       // ambient threshold sway
-
-    let i = 0;
-    for (let y = 0; y < oH; y++) {
-      const byRow = (y & 7) << 3;
-      const wavY = Math.sin((y / oH) * Math.PI * 2 - t * 0.9) * 18;
-      for (let x = 0; x < oW; x++) {
-        const dx1 = x - cx1, dy1 = y - cy1;
-        const dx2 = x - cx2, dy2 = y - cy2;
-        const f1 = Math.max(0, 1 - Math.sqrt(dx1*dx1 + dy1*dy1) / r1);
-        const f2 = Math.max(0, 1 - Math.sqrt(dx2*dx2 + dy2*dy2) / r2);
-        const wavX = Math.sin((x / oW) * Math.PI * 3 + t * 1.1) * 22;
-        // Base brightness 128 keeps the field active everywhere — the hot
-        // spots add ~80 on top, threshold flips them to lighter halftone.
-        const L = 128 + wavX + wavY + f1 * 70 + f2 * 60;
-        const t8 = (BAYER8[byRow + (x & 7)] + 0.5) * LOADER_BAYER_SCALE + pulse;
-        if (L > t8) { data[i] = 0; data[i+1] = 0; data[i+2] = 0; data[i+3] = 0; }
-        else        { data[i] = 0; data[i+1] = 0; data[i+2] = 0; data[i+3] = 255; }
-        i += 4;
-      }
-    }
-    ctx.putImageData(imageData, 0, 0);
-  }
-
-  let raf;
-  function tick(now) {
-    frame(now);
-    raf = requestAnimationFrame(tick);
-  }
-  layout();
-  new ResizeObserver(() => layout()).observe(canvas);
-  raf = requestAnimationFrame(tick);
-  window.__stopLoaderDither = () => cancelAnimationFrame(raf);
-})();
 
 (function bootLoader() {
   const loader = document.getElementById("loader");
-  const numEl  = document.getElementById("loaderNum");
+  const name   = document.getElementById("loaderName");
   const shell  = document.querySelector(".shell");
-  if (!loader || !numEl || !shell) return;
+  if (!loader || !shell) return;
 
-  const DURATION = 2600;  // ms total counter run
-  const start = performance.now();
-  const ease = (t) => 1 - Math.pow(1 - t, 1.6);
-
-  function tick(now) {
-    const p = Math.min(1, (now - start) / DURATION);
-    const v = Math.floor(ease(p) * 99);
-    numEl.textContent = v.toString().padStart(2, "0");
-    // Font-size grows from 18px (start) to 132px (by the time we hit 99).
-    // The 100% lock-in then adds scale(2.7) on top via .is-final.
-    numEl.style.fontSize = (18 + p * 114).toFixed(1) + "px";
-    if (p < 1) {
-      requestAnimationFrame(tick);
-    } else {
-      // FINAL FRAME: snap to 100 and explode the digits.
-      numEl.textContent = "100";
-      numEl.classList.add("is-final");          // CSS scales it to 2.7×
-      // Short hold while the explode plays, then fade the loader and reveal the shell.
-      setTimeout(() => {
-        loader.style.transition = "opacity 0.9s cubic-bezier(0.2, 0.7, 0.2, 1)";
-        loader.style.opacity = "0";
-        shell.classList.add("is-ready");
-        if (window.gsap) {
-          gsap.to(".headline", {
-            yPercent: 0,
-            opacity: 1,
-            duration: 1.15,
-            delay: 0.25,
-            ease: "power3.out",
-            onComplete: () => {
-              window.__heroEntryDone = true;
-              if (window.__activateHeroParallax) window.__activateHeroParallax();
-            },
-          });
-        }
-        setTimeout(() => {
-          if (window.__stopLoaderDither) window.__stopLoaderDither();
-          loader.remove();
-        }, 1000);
-      }, 650);                                   // hold long enough to see "100" lock in
-    }
+  // Split the name into letters that rise one by one.
+  if (name) {
+    const text = name.textContent;
+    name.setAttribute("aria-label", text);
+    name.innerHTML = [...text].map((c, i) =>
+      `<span class="ch" aria-hidden="true" style="--i:${i}">${c === " " ? "&nbsp;" : c}</span>`).join("");
+    requestAnimationFrame(() => requestAnimationFrame(() => loader.classList.add("is-rising")));
   }
-  requestAnimationFrame(tick);
+
+  // Hold until the letters have landed AND the page has loaded; never past MAX_MS.
+  const RISE_MS = 1050, MAX_MS = 1800;
+  const start = performance.now();
+  let finished = false;
+  function finish() {
+    if (finished) return;
+    finished = true;
+    const wait = Math.max(0, RISE_MS - (performance.now() - start));
+    setTimeout(() => {
+      loader.classList.add("is-done");
+      shell.classList.add("is-ready");
+      if (window.gsap) {
+        gsap.to(".headline", {
+          yPercent: 0,
+          opacity: 1,
+          duration: 0.9,
+          delay: 0.1,
+          ease: "power3.out",
+          onComplete: () => {
+            window.__heroEntryDone = true;
+            if (window.__activateHeroParallax) window.__activateHeroParallax();
+          },
+        });
+      }
+      setTimeout(() => loader.remove(), 450);
+    }, wait);
+  }
+  // Page load and web fonts both, so no font swap happens after the reveal.
+  const loaded = document.readyState === "complete"
+    ? Promise.resolve()
+    : new Promise((r) => window.addEventListener("load", r, { once: true }));
+  Promise.all([loaded, document.fonts ? document.fonts.ready : null]).then(finish);
+  setTimeout(finish, MAX_MS);
 })();
 
 if (window.gsap && window.ScrollTrigger) {
