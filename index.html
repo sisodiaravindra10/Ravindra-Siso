@@ -468,7 +468,7 @@
       pointer-events: none;
       opacity: 0;
       transform: translate(-9999px, -9999px);
-      transition: opacity 180ms ease;
+      transition: opacity 200ms cubic-bezier(0.16, 1, 0.3, 1);
       display: grid;
       gap: 8px;
       will-change: transform;
@@ -499,8 +499,13 @@
       image-rendering: crisp-edges;
     }
     .preview-frame img.fallback {
-      filter: grayscale(1) contrast(1.6) brightness(0.95);
+      object-fit: cover;
+      object-position: top center;
+      filter: grayscale(1) contrast(1.1);
+      mix-blend-mode: multiply;
+      animation: previewIn 200ms cubic-bezier(0.16, 1, 0.3, 1);
     }
+    @keyframes previewIn { from { opacity: 0; } }
     .preview-label {
       font-family: var(--mono);
       font-size: 11px;
@@ -760,7 +765,7 @@
       text-decoration: none;
       transition: padding-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .feature-row:hover { padding-left: 12px; }
+    .feature-row:hover { padding-left: 6px; }
     .feature-row .num {
       font-family: var(--mono);
       font-size: 12px;
@@ -840,7 +845,7 @@
       text-decoration: none;
       transition: padding-left 220ms cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .work-row:hover { padding-left: 12px; }
+    .work-row:hover { padding-left: 6px; }
     .work-row .num { font-variant-numeric: tabular-nums; opacity: 0.7; }
     .work-row .title {
       font-family: "Instrument Serif", "Times New Roman", Times, serif;
@@ -1676,14 +1681,9 @@ function loadPreview(rawUrl, localOverride) {
     const img = new Image();
     if (!localOverride || isRetry) img.crossOrigin = "anonymous";
     img.onload = () => {
-      const c = ditherImageToCanvas(img, PREVIEW_CELL);
-      if (c) {
-        slot.canvas = c;
-        slot.state = "ready";
-      } else {
-        slot.fallbackSrc = src;
-        slot.state = "fallback";
-      }
+      // Shown as a tinted image, not a 1-bit dither: the dot noise flashed on every row.
+      slot.fallbackSrc = src;
+      slot.state = "fallback";
       slot.waiters.forEach(fn => fn());
       slot.waiters = [];
     };
@@ -1739,15 +1739,17 @@ function paintPreviewSlot(slot) {
   } else if (slot.state === "fallback") {
     const im = document.createElement("img");
     im.src = slot.fallbackSrc;
+    im.alt = "";
     im.className = "fallback";
     previewFrame.appendChild(im);
   } else if (slot.state === "error") {
-    previewFrame.textContent = "— preview unavailable —";
+    previewFrame.textContent = "preview unavailable";
   } else {
     previewFrame.textContent = "loading…";
   }
 }
 
+let previewShowT = 0, previewHideT = 0;
 document.querySelectorAll(".work-row").forEach(row => {
   const url   = row.dataset.href;
   const thumb = row.dataset.thumb || null;
@@ -1755,22 +1757,27 @@ document.querySelectorAll(".work-row").forEach(row => {
   if (!url) return;
 
   row.addEventListener("mouseenter", () => {
+    clearTimeout(previewHideT);
     previewLabel.textContent = label;
     const slot = loadPreview(url, thumb);
     paintPreviewSlot(slot);
     if (slot.state === "loading") {
       slot.waiters.push(() => {
-        if (previewEl.classList.contains("visible") &&
-            previewLabel.textContent === label) {
+        // Still on this row? Repaint even if the panel's short show delay hasn't elapsed.
+        if (previewLabel.textContent === label) {
           paintPreviewSlot(slot);
         }
       });
     }
-    previewEl.classList.add("visible");
     positionPreview();
+    if (!previewEl.classList.contains("visible")) {
+      clearTimeout(previewShowT);
+      previewShowT = setTimeout(() => previewEl.classList.add("visible"), 120);
+    }
   });
   row.addEventListener("mouseleave", () => {
-    previewEl.classList.remove("visible");
+    clearTimeout(previewShowT);
+    previewHideT = setTimeout(() => previewEl.classList.remove("visible"), 140);
   });
 });
 
@@ -2278,28 +2285,6 @@ if (window.gsap && window.ScrollTrigger) {
 
   /* ---- (4) Cursor-magnet + scroll-velocity skew — desktop only ---- */
   gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => {
-    /* 4a — Cursor magnet on work-rows.
-       Rows close to cursor Y bend horizontally toward cursor X. */
-    const rows = gsap.utils.toArray(".work-row");
-    const rowSetters = rows.map(r => gsap.quickTo(r, "x", { duration: 0.6, ease: "power3.out" }));
-
-    const onMouseMove = (e) => {
-      rows.forEach((row, idx) => {
-        const rect = row.getBoundingClientRect();
-        // Skip rows fully off-screen — keep them at rest.
-        if (rect.bottom < 0 || rect.top > window.innerHeight) {
-          rowSetters[idx](0);
-          return;
-        }
-        const centerY  = rect.top + rect.height / 2;
-        const distY    = Math.abs(e.clientY - centerY);
-        const strength = Math.max(0, 1 - distY / 280);    // 0 when far, 1 when on the row
-        const xRatio   = (e.clientX / window.innerWidth) - 0.5; // -0.5..0.5
-        rowSetters[idx](xRatio * 60 * strength);
-      });
-    };
-    document.addEventListener("mousemove", onMouseMove);
-
     /* 4b — Scroll-velocity skew on big headings.
        Reads ScrollTrigger.getVelocity() every frame and skews via quickTo. */
     const titles = gsap.utils.toArray(".fold-title, .chapter-title, .headline span");
@@ -2314,10 +2299,8 @@ if (window.gsap && window.ScrollTrigger) {
 
     /* matchMedia cleanup runs when the query stops matching (resize to mobile). */
     return () => {
-      document.removeEventListener("mousemove", onMouseMove);
       gsap.ticker.remove(onTick);
       velocityST.kill();
-      rowSetters.forEach(set => set(0));
       setSkew(0);
     };
   });
