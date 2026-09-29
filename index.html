@@ -568,8 +568,8 @@
     }
     .launch {
       position: relative;
-      display: grid;
-      align-content: start;
+      display: flex;
+      flex-direction: column;
       gap: 14px;
       padding: 32px 0 8px;
     }
@@ -667,12 +667,15 @@
       padding: 4px 8px;
       border: 1px solid rgba(180, 178, 243, 0.4);
     }
-    .launch-stats { margin: 0; font-variant-numeric: tabular-nums; }
+    .launch-stats { margin: 0; font-variant-numeric: tabular-nums; min-height: 3.2em; }  /* two lines everywhere, so the rows line up */
+    /* Stats, site link and badge sit on one baseline across all three columns. */
+    .launch-foot { margin-top: auto; padding-top: 10px; display: grid; gap: 14px; }
     .launch-links {
       display: flex;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 6px 0 0;
+      align-items: center;
+      gap: 10px;
+      margin: 0;
     }
     .launch-links a {
       display: inline-flex;
@@ -697,7 +700,7 @@
       transition: opacity 150ms cubic-bezier(0.16, 1, 0.3, 1);
     }
     .launch-links a.launch-badge:hover { background: none; opacity: 0.85; }
-    .launch-badge img { display: block; width: 200px; height: auto; }
+    .launch-badge img { display: block; height: 44px; width: auto; }
     .launch-links a:focus-visible { outline: 2px solid var(--lavender-fixed); outline-offset: 3px; }
     @media (max-width: 900px) {
       .launch-grid { grid-template-columns: 1fr; }
@@ -1163,11 +1166,13 @@
         <ul class="launch-stack">
           <li>Swift</li><li>Transcript parsing</li><li>777 KB, no network</li>
         </ul>
-        <p class="launch-stats">226 points · #26 of the week</p>
-        <p class="launch-links">
-          <a href="https://chit.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
-          <a class="launch-badge" href="https://www.producthunt.com/products/chit-2" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=1254383&amp;theme=dark&amp;period=daily" alt="Chit, #3 Product of the Day on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
-        </p>
+        <div class="launch-foot">
+  <p class="launch-stats">226 points · #26 of the week</p>
+          <p class="launch-links">
+            <a href="https://chit.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
+            <a class="launch-badge" href="https://www.producthunt.com/products/chit-2" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=1254383&amp;theme=dark&amp;period=daily" alt="Chit, #3 Product of the Day on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
+          </p>
+        </div>
       </article>
 
       <article class="launch">
@@ -1184,11 +1189,13 @@
         <ul class="launch-stack">
           <li>SwiftUI</li><li>Claude Code hooks</li><li>Multi-agent tracking</li>
         </ul>
-        <p class="launch-stats">141 points · #45 of the week</p>
-        <p class="launch-links">
-          <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Site ↗</a>
-          <a class="launch-badge" href="https://www.producthunt.com/products/crew-a-tiny-crew-for-claude-code" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1216349&amp;theme=dark" alt="Crew, featured on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
-        </p>
+        <div class="launch-foot">
+  <p class="launch-stats">141 points · #45 of the week</p>
+          <p class="launch-links">
+            <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Site ↗</a>
+            <a class="launch-badge" href="https://www.producthunt.com/products/crew-a-tiny-crew-for-claude-code" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1216349&amp;theme=dark" alt="Crew, featured on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
+          </p>
+        </div>
       </article>
 
       <article class="launch">
@@ -1205,11 +1212,13 @@
         <ul class="launch-stack">
           <li>SwiftUI</li><li>Canvas + TimelineView</li><li>Drag and drop</li>
         </ul>
-        <p class="launch-stats">138 points · #53 of the week · PH newsletter</p>
-        <p class="launch-links">
-          <a href="https://notchling.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
-          <a class="launch-badge" href="https://www.producthunt.com/products/notchling-lives-in-your-notch" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1232843&amp;theme=dark" alt="Notchling, featured on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
-        </p>
+        <div class="launch-foot">
+  <p class="launch-stats">138 points · #53 of the week · PH newsletter</p>
+          <p class="launch-links">
+            <a href="https://notchling.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
+            <a class="launch-badge" href="https://www.producthunt.com/products/notchling-lives-in-your-notch" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1232843&amp;theme=dark" alt="Notchling, featured on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
+          </p>
+        </div>
       </article>
     </div>
 
