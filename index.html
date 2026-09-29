@@ -689,6 +689,15 @@
       transition: background 150ms cubic-bezier(0.16, 1, 0.3, 1), color 150ms cubic-bezier(0.16, 1, 0.3, 1);
     }
     .launch-links a:hover { background: var(--lavender-fixed); color: #121115; }
+    /* Official Product Hunt badge: the linked proof for each rank. */
+    .launch-links a.launch-badge {
+      padding: 0;
+      border: 0;
+      min-height: 44px;
+      transition: opacity 150ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .launch-links a.launch-badge:hover { background: none; opacity: 0.85; }
+    .launch-badge img { display: block; width: 200px; height: auto; }
     .launch-links a:focus-visible { outline: 2px solid var(--lavender-fixed); outline-offset: 3px; }
     @media (max-width: 900px) {
       .launch-grid { grid-template-columns: 1fr; }
@@ -1073,7 +1082,7 @@
       <a href="#projects">[ PROJECTS ]</a>
       <a href="#contact">[ CONTACT ]</a>
       <span class="spacer"></span>
-      <span class="meta">RAVINDRA PRATAP SINGH</span>
+      <span class="meta">RAVINDRA SISODIA</span>
     </nav>
 
     <section class="main">
@@ -1157,7 +1166,7 @@
         <p class="launch-stats">226 points · #26 of the week</p>
         <p class="launch-links">
           <a href="https://chit.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
-          <a href="https://www.producthunt.com/products/chit-2" target="_blank" rel="noopener">Product Hunt ↗</a>
+          <a class="launch-badge" href="https://www.producthunt.com/products/chit-2" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=1254383&amp;theme=dark&amp;period=daily" alt="Chit, #3 Product of the Day on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
         </p>
       </article>
 
@@ -1178,7 +1187,7 @@
         <p class="launch-stats">141 points · #45 of the week</p>
         <p class="launch-links">
           <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Site ↗</a>
-          <a href="https://www.producthunt.com/products/crew-a-tiny-crew-for-claude-code" target="_blank" rel="noopener">Product Hunt ↗</a>
+          <a class="launch-badge" href="https://www.producthunt.com/products/crew-a-tiny-crew-for-claude-code" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1216349&amp;theme=dark" alt="Crew, featured on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
         </p>
       </article>
 
@@ -1199,7 +1208,7 @@
         <p class="launch-stats">138 points · #53 of the week · PH newsletter</p>
         <p class="launch-links">
           <a href="https://notchling.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
-          <a href="https://www.producthunt.com/products/notchling-lives-in-your-notch" target="_blank" rel="noopener">Product Hunt ↗</a>
+          <a class="launch-badge" href="https://www.producthunt.com/products/notchling-lives-in-your-notch" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1232843&amp;theme=dark" alt="Notchling, featured on Product Hunt" width="200" height="43" loading="lazy" decoding="async"></a>
         </p>
       </article>
     </div>
@@ -1382,7 +1391,7 @@
     </div>
 
     <div class="colophon">
-      <span>© 2026 · RAVINDRA PRATAP SINGH</span>
+      <span>© 2026 · RAVINDRA SISODIA</span>
     </div>
   </section>
 
@@ -1425,7 +1434,7 @@
 const CELL_PX         = 1.33;     // CSS px per dither cell. Lower = denser/finer dots. Sane: 1–6.
 const CONTRAST        = 1.24;  // Luminance multiplier around midgray. >1 crushes mids → cleaner shapes.
 const BRIGHTNESS      = -8;    // -40..+40 added to luminance pre-threshold. Negative = darker portrait.
-const PULSE_AMPLITUDE = 14;    // 0..40. Threshold sway in luminance units. 0 = fully static.
+const PULSE_AMPLITUDE = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 14;    // 0..40. Threshold sway in luminance units. 0 = fully static.
 const PULSE_PERIOD_MS = 4200;  // Sine period in ms. ~4s feels alive without being anxious.
 const PORTRAIT_SRC    = "./portrait.jpg";
 
@@ -2130,7 +2139,7 @@ if (window.gsap && window.ScrollTrigger) {
   gsap.registerPlugin(ScrollTrigger);
 
   /* ---- (0) Lenis smooth scroll — drives ScrollTrigger updates ---- */
-  if (window.Lenis) {
+  if (window.Lenis && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     const lenis = new Lenis({
       duration: 1.05,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -2151,7 +2160,7 @@ if (window.gsap && window.ScrollTrigger) {
      current one scrubs to a smaller scale + border-radius so it reads
      like a card receding into a deck. Sticky avoids the layout-collapse
      flash that GSAP pin caused at the hero→jodhpur boundary. */
-  gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => setupCardStack());
+  gsap.matchMedia().add("(hover: hover) and (min-width: 901px) and (prefers-reduced-motion: no-preference)", () => setupCardStack());
   function setupCardStack() {
     // The story chapters now sit side by side, so only the hero recedes,
     // scrubbed by the story band scrolling up over it.
@@ -2193,7 +2202,7 @@ if (window.gsap && window.ScrollTrigger) {
      drifts the opposite way, giving each section depth while it's sticky.
      Skipped on touch / narrow viewports — the sticky+pinned image jitters
      against momentum scroll on iOS / Android. */
-  gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => {
+  gsap.matchMedia().add("(hover: hover) and (min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
     setupParallax();
   });
   function setupParallax() {
@@ -2284,7 +2293,7 @@ if (window.gsap && window.ScrollTrigger) {
   });
 
   /* ---- (4) Cursor-magnet + scroll-velocity skew — desktop only ---- */
-  gsap.matchMedia().add("(hover: hover) and (min-width: 901px)", () => {
+  gsap.matchMedia().add("(hover: hover) and (min-width: 901px) and (prefers-reduced-motion: no-preference)", () => {
     /* 4b — Scroll-velocity skew on big headings.
        Reads ScrollTrigger.getVelocity() every frame and skews via quickTo. */
     const titles = gsap.utils.toArray(".fold-title, .chapter-title, .headline span");
@@ -2328,5 +2337,6 @@ document.querySelectorAll(".contact-cta a").forEach((link) => {
   }
 });
 </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 </body>
 </html>
