@@ -1,0 +1,16 @@
+---
+// Inner pages end at the horizon: the one action, the real clock in Jodhpur, the name.
+import { site, hero } from '../data/site';
+---
+<footer class="foot" aria-label="Footer">
+  <div class="foot__row">
+    <a class="btn" href={`mailto:${site.email}`} data-fill>
+      <span class="btn__fill" aria-hidden="true"></span>
+      <span class="btn__label">{hero.cta}</span>
+      <span class="btn__arrow" aria-hidden="true">→</span>
+    </a>
+    <p class="foot__social">{site.socials.map((s) => <a class="link" href={s.href} rel="me noopener">{s.label}</a>)}</p>
+  </div>
+  <p class="mono foot__now" data-now>Right now in Jodhpur.</p>
+  <p class="mono foot__legal">© 2026 {site.name}. <a class="link" href="/">Home</a></p>
+</footer>

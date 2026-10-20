@@ -1,0 +1,9 @@
+---
+// The sun's place in the site's day: a dial and the clock. `landing` marks the disc the loader's sun flies to.
+interface Props { landing?: boolean }
+const { landing = false } = Astro.props;
+---
+<span class="sunline" title="The site's own day. Scroll the home page and the sun crosses Jodhpur.">
+  <span class="frame__dial" aria-hidden="true"><span class="frame__disc" data-frame-sun={landing ? '' : undefined}></span></span>
+  <span class="mono"><span data-clock>12:00</span> in a Jodhpur day</span>
+</span>

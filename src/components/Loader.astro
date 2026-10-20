@@ -1,0 +1,16 @@
+---
+// First load: the sun rises over a horizon line while the counter shows the real minutes before
+// today's sunrise in Jodhpur. The disc then flies to its slot on the frame (setLoaderExit).
+import { site } from '../data/site';
+---
+<div id="loader" role="status" aria-label="Loading">
+  <div class="loader__sky">
+    <span class="loader__sun" data-loader-sun aria-hidden="true"></span>
+    <span class="loader__horizon" aria-hidden="true"></span>
+  </div>
+  <div class="loader__inner">
+    <span class="loader__name" data-loader-out>{site.name}</span>
+    <span class="loader__count mono" data-loader-out data-loader-count>05:58</span>
+  </div>
+  <div class="loader__bar" data-loader-bar></div>
+</div>

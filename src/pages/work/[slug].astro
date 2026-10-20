@@ -1,0 +1,81 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import Footer from '../../components/Footer.astro';
+import SunLine from '../../components/SunLine.astro';
+import { cases, nextCase, workFor } from '../../data/site';
+
+export function getStaticPaths() {
+  return cases.map((c) => ({ params: { slug: c.slug }, props: { c } }));
+}
+const { c } = Astro.props;
+const next = nextCase(c.slug);
+const w = workFor(c.slug);
+const tall = !!c.hero && c.hero.width / c.hero.height < 1.6; // anything squarer than 16:10 stands beside the title
+---
+<Base title={c.title} description={c.summary} chapter="noon" state="0.5" current="/work/">
+  <article class={`case ${tall ? 'case--tall' : ''}`} aria-labelledby="case-title">
+    <div class="case__top">
+    <header class="case__head">
+      <p class="mono case__kicker"><a class="link case__back" href="/work/"><span class="case__back-arrow" aria-hidden="true">←</span> Work</a> <span aria-hidden="true">·</span> {w?.n} <SunLine /></p>
+      <h1 id="case-title" class="title title--xl" data-split="lines" data-intro>{c.title}</h1>
+      <p class="case__summary" data-reveal="sweep" data-intro data-delay="0.4">{c.summary}</p>
+      <dl class="case__meta mono" data-reveal="fade" data-intro data-delay="0.6">
+        <div><dt>Client</dt><dd>{c.client}</dd></div>
+        <div><dt>Year</dt><dd>{c.year}</dd></div>
+        <div><dt>Role</dt><dd>{c.role}</dd></div>
+      </dl>
+    </header>
+
+    {c.hero ? (
+      <figure class="case__hero" data-gl data-gl-instant style={`--ar: ${(c.hero.width / c.hero.height).toFixed(4)}`}>
+        <Image src={c.hero} alt={c.heroAlt ?? ''} widths={[720, 1200]} sizes="(max-width: 767px) 100vw, 80vw" loading="eager" fetchpriority="high" data-critical />
+      </figure>
+    ) : (
+      <figure class="case__hero case__hero--cover" data-gl="procedural" data-gl-instant data-seed={c.seed} data-colors="#17265C,#2E4CA6,#F0E9DC">
+        <div class="gl-fallback" role="img" aria-label={`Generative cover for ${c.title}`}></div>
+      </figure>
+    )}
+    </div>
+
+    <div class="case__body">
+      {c.sections.map((s) => (
+        <section class="case__section">
+          <h2 class="case__h" data-split="lines">{s.heading}</h2>
+          <p class="case__p" data-reveal="sweep">{s.text}</p>
+          {s.facts && (
+            <dl class="facts" data-reveal="fade">
+              {s.facts.map((f) => <div><dt class="mono">{f.n}</dt><dd>{f.label}</dd></div>)}
+            </dl>
+          )}
+        </section>
+      ))}
+
+      {c.figures && c.figures.length > 0 && (
+        <section class="case__figures" aria-label="Figures">
+          {c.figures.map((f) => (
+            <figure class="case__fig">
+              <div data-gl data-gl-duration="1.8" style={`--ar: ${(f.src.width / f.src.height).toFixed(4)}`}><Image src={f.src} alt={f.alt} widths={[640, 1000]} sizes="(max-width: 767px) 100vw, 60vw" loading="lazy" /></div>
+              <figcaption>{f.caption}</figcaption>
+            </figure>
+          ))}
+        </section>
+      )}
+
+      <section class="case__section case__outcome">
+        <h2 class="case__h" data-split="lines">Outcome</h2>
+        <p class="case__p case__p--big" data-reveal="sweep">{c.outcome}</p>
+        {c.links && (
+          <p class="case__links">{c.links.map((l) => <a class="link" href={l.href} rel="noopener">{l.label}</a>)}</p>
+        )}
+      </section>
+    </div>
+
+    <a class="next band" href={`/work/${next.slug}/`} data-cursor="Next">
+      <span class="mono next__kicker">Next</span>
+      <span class="next__title roll" data-text={next.title}><span>{next.title}</span></span>
+      <span class="next__arrow" aria-hidden="true">→</span>
+    </a>
+  </article>
+  <Footer />
+</Base>

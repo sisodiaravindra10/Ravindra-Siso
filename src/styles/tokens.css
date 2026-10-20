@@ -1,0 +1,99 @@
+/* DESIGN TOKENS: Suryanagari. Names are the engine's contract; values are this site's. */
+
+/* Archivo (google) */
+@font-face {
+  font-family: 'Archivo';
+  src: url('/fonts/archivo-100_900-normal.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+/* JetBrains Mono (google) */
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('/fonts/jetbrains-mono-100_800-normal.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  /* Jodhpur: the blue wall, chalk, the sun, the night */
+  --blue: #2E4CA6;
+  --chalk: #F3EEE4;
+  --chalk-2: #C3CCEA;
+  --sun: #FFB742;
+  --night: #0E1431;
+  --noon: #F0E9DC;
+  --indigo: #17265C;
+  --indigo-2: #4F5B86;
+
+  /* Role tokens (morning and afternoon chapters: the blue wall) */
+  --c-bg: var(--blue);
+  --c-fg: var(--chalk);
+  --c-muted: var(--chalk-2);
+  --c-line: rgb(243 238 228 / 0.18);
+  --c-accent: var(--sun);
+  --c-curtain: var(--night);
+  --c-shadow: rgb(14 20 49 / 0.55);
+
+  /* Type */
+  --f-display: 'Archivo', 'Archivo Fallback', system-ui, sans-serif;
+  --f-body: 'Archivo', system-ui, sans-serif;
+  --f-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+
+  --t-mega: clamp(3.4rem, 1rem + 10.6vw, 12rem);
+  --t-xl: clamp(2.25rem, 1.2rem + 4.4vw, 5.5rem);
+  --t-l: clamp(1.6rem, 1.2rem + 1.8vw, 2.75rem);
+  --t-m: clamp(1.2rem, 1.05rem + 0.6vw, 1.5rem);
+  --t-body: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --t-s: 0.875rem;
+  --t-xs: 0.75rem;
+
+  /* Space */
+  --u: clamp(0.5rem, 0.35rem + 0.6vw, 1rem);
+  --gutter: clamp(1rem, 0.6rem + 1.6vw, 2.5rem);
+  --cols: 12;
+
+  /* Shape: sandstone. No radius anywhere. */
+  --radius: 0px;
+
+  /* The sun (the driver writes these on <html>) */
+  --sun-x: -0.8;       /* -1 east (left) .. 1 west (right) */
+  --sun-alt: 0.25;     /* 0 horizon .. 1 noon */
+  --sh-len: 0.9;       /* projected shadow length, as a scaleY of the echo */
+  --sh-skew: 32deg;    /* projected shadow skew */
+  --sh-x: 0.06em;      /* hard shadow offset for small objects */
+  --sh-y: 0.05em;
+  --sun-pos: 12%;      /* the sun disc along the frame's horizon */
+  --warm: 0.6;
+
+  /* Layers */
+  --z-gl: 0;
+  --z-content: 1;
+  --z-header: 50;
+  --z-cursor: 80;
+  --z-curtain: 90;
+  --z-loader: 100;
+}
+
+/* Chapters: the sun's height decides the wall. The driver sets data-chapter on <html>. */
+html[data-chapter='noon'] {
+  --c-bg: var(--noon);
+  --c-fg: var(--indigo);
+  --c-muted: var(--indigo-2);
+  --c-line: rgb(23 38 92 / 0.16);
+  --c-shadow: rgb(23 38 92 / 0.28);
+}
+html[data-chapter='dusk'],
+html[data-chapter='night'],
+html[data-chapter='dawn'] {
+  --c-bg: var(--night);
+  --c-fg: var(--chalk);
+  --c-muted: var(--chalk-2);
+  --c-line: rgb(243 238 228 / 0.16);
+  --c-shadow: rgb(0 0 0 / 0.6);
+}

@@ -1,0 +1,140 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import SunLine from '../components/SunLine.astro';
+import { site, hero, launches, ships, works, story, contact } from '../data/site';
+const featured = works.filter((w) => w.featured);
+---
+<Base current="/">
+  <!-- MORNING: the wall, the name, the shadow, the portrait lit by the same sun -->
+  <section class="hero" aria-labelledby="name" data-chapter-at="morning">
+    <div class="hero__stage">
+      <div class="hero__grid">
+        <div class="hero__name">
+          <h1 id="name" class="name" data-split="lines" data-intro>
+            <span class="name__line">{site.first}</span>
+            <span class="name__line">{site.last}</span>
+          </h1>
+          <div class="name__echo" aria-hidden="true">
+            <span class="name__line">{site.first}</span>
+            <span class="name__line">{site.last}</span>
+          </div>
+        </div>
+        <figure class="hero__portrait" data-gl data-gl-instant data-gl-dither="1" data-gl-ink="#0E1431" data-gl-paper="#F3EEE4">
+          <Image src={site.photos.portrait} alt="Ravindra Sisodia, in profile, on a sunlit street" widths={[640, 960, 1400]} sizes="(max-width: 767px) 92vw, 42vw" loading="eager" fetchpriority="high" data-critical class="hero__photo" />
+          <img class="hero__dither" src="/img/portrait-dither.png" alt="" width="700" height="467" aria-hidden="true" loading="eager" />
+        </figure>
+        <p class="hero__meta" data-reveal="sweep" data-intro data-delay="0.5">
+          {hero.meta} <span class="hero__where">{hero.where}</span>
+        </p>
+        <div class="hero__corner">
+          <p class="hero__sun"><SunLine landing /></p>
+          <a class="hero__proof mono" href="#launches" data-reveal="fade" data-intro data-delay="0.8"><span class="link">{hero.proof}</span> <span class="hero__down" aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOON: the work in full light -->
+  <section class="launches" id="launches" aria-labelledby="launches-title" data-chapter-at="noon">
+    <div class="launches__head">
+      <h2 id="launches-title" class="title" data-split="lines">Three launches, three top tens.</h2>
+      <p class="lede" data-reveal="sweep">Mac apps I designed, engineered and shipped on Product Hunt in seven weeks, built with Claude Code.</p>
+    </div>
+    <ol class="launches__list">
+      {launches.map((l, i) => (
+        <li class="launch" style={`--i:${i}`}>
+          <a class="launch__media" href={`/work/${l.slug}/`} data-cursor="Open" aria-label={`${l.title}, how it was built`}>
+            <figure data-gl data-gl-duration="1.8">
+              <Image src={l.image} alt={l.imageAlt} widths={[480, 800, 1100]} sizes="(max-width: 767px) 92vw, 44vw" />
+            </figure>
+          </a>
+          <div class="launch__text">
+            <p class="launch__rank mono" data-reveal="sweep"><span class="launch__hash">#{l.rank}</span> Product of the Day, {l.dateLabel}</p>
+            <h3 class="launch__title"><a class="link launch__link" href={`/work/${l.slug}/`}>{l.title}<span class="launch__arrow" aria-hidden="true">→</span></a></h3>
+            <p class="launch__one">{l.one}</p>
+            <p class="launch__body">{l.body}</p>
+            <ul class="launch__stack" aria-label="Built with">{l.stack.map((s) => <li>{s}</li>)}</ul>
+            <p class="launch__stats mono"><span class="launch__points">{l.points}</span> points, {l.week}{l.extra ? `, ${l.extra}` : ''}</p>
+            <p class="launch__links">
+              <a class="link" href={l.siteHref} rel="noopener">{l.title} site</a>
+              <a class="link" href={l.phHref} rel="noopener">{l.title} on Product Hunt</a>
+              <a class="link" href={`/work/${l.slug}/`}>How {l.title} was built</a>
+            </p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="ships" aria-labelledby="ships-title" data-chapter-at="noon">
+    <h2 id="ships-title" class="statement" data-split="lines">{ships.title}</h2>
+    <dl class="ships__list">
+      {ships.items.map((s) => (
+        <div class="ships__item" data-reveal="sweep">
+          <dt>{s.href ? <a class="link" href={s.href} rel="noopener">{s.head}</a> : s.head}</dt>
+          <dd>{s.text}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <!-- AFTERNOON: the index -->
+  <section class="work" id="work" aria-labelledby="work-title" data-chapter-at="afternoon">
+    <div class="work__head">
+      <h2 id="work-title" class="title" data-split="lines">Selected work, across rooms.</h2>
+      <p class="lede" data-reveal="sweep">Six here. {['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'][works.length].replace(/^./, (c) => c.toUpperCase())} on the index, 2022 to 2026.</p>
+    </div>
+    <ul class="index" data-index>
+      {featured.map((w) => (
+        <li>
+          <a class="index__row index__row--home band" href={w.slug ? `/work/${w.slug}/` : w.href} data-preview={w.preview} data-cursor={w.slug ? 'Open' : 'Visit'} rel={w.slug ? undefined : 'noopener'}>
+            <span class="index__title roll" data-text={w.title}><span>{w.title}</span></span>
+            <span class="index__kind" data-cue={w.slug ? 'case' : 'live ↗'}>{w.kind}</span>
+            <span class="index__year mono">{w.year}</span>
+            <span class="index__ext mono" aria-hidden="true">{w.slug ? 'case' : 'live ↗'}</span>
+            {w.preview ? <img class="index__thumb" src={w.preview} alt="" width="160" height="100" loading="lazy" /> : <span class="index__tile mono" aria-hidden="true">{w.n}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="work__all"><a class="btn btn--line" href="/work/" data-fill><span class="btn__fill" aria-hidden="true"></span><span class="btn__label">All work, nineteen</span><span class="btn__arrow" aria-hidden="true">→</span></a></p>
+  </section>
+
+  <!-- the story: photos clear, text beside them, never over them -->
+  <section class="story" id="story" aria-label="Story" data-chapter-at="afternoon">
+    {story.map((s, i) => (
+      <div class={`story__pair ${i % 2 ? 'is-flipped' : ''}`}>
+        <figure class="story__photo" data-gl data-gl-scrub>
+          <Image src={s.photo} alt={s.alt} widths={[640, 1100, 1400]} sizes="(max-width: 767px) 100vw, 58vw" loading="lazy" />
+        </figure>
+        <div class="story__text">
+          <h2 class="story__place" data-split="lines">{s.place}</h2>
+          <p class="story__lines" data-split="lines">{s.lines.map((l) => <span class="story__l">{l}</span>)}</p>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- NIGHT: the sun is down, the inbox is open -->
+  <section class="contact" id="contact" aria-labelledby="contact-title" data-chapter-at="night">
+    <h2 id="contact-title" class="title title--xl" data-split="lines">{contact.title}</h2>
+    <p class="lede" data-reveal="sweep">{contact.note}</p>
+    <p class="contact__email">
+      <a class="btn btn--big" href={`mailto:${site.email}`} data-fill><span class="btn__fill" aria-hidden="true"></span><span class="btn__label">{hero.cta}</span><span class="btn__arrow" aria-hidden="true">→</span></a>
+      <span class="mono contact__addr">{site.email}</span>
+    </p>
+    <dl class="contact__grid">
+      <div><dt>Based in</dt><dd>{site.based}, UTC+5:30</dd></div>
+      <div><dt>Social</dt><dd>{site.socials.map((s) => <a class="link" href={s.href} rel="me noopener">{s.label}</a>)}</dd></div>
+      <div><dt>Currently</dt><dd>{contact.now}</dd></div>
+    </dl>
+    <footer class="finale">
+      <p class="mono finale__now" data-now>Right now in Jodhpur.</p>
+      <svg class="finale__name" viewBox="0 0 1000 84" preserveAspectRatio="xMinYMid meet" aria-hidden="true" focusable="false">
+        <text x="0" y="78" textLength="1000" lengthAdjust="spacingAndGlyphs">{site.name}</text>
+      </svg>
+      <p class="mono finale__legal">© 2026 {site.name}. Set in Archivo and JetBrains Mono. Built with Astro, GSAP and OGL.</p>
+    </footer>
+  </section>
+</Base>

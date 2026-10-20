@@ -1,0 +1,35 @@
+---
+import Base from '../../layouts/Base.astro';
+import Footer from '../../components/Footer.astro';
+import SunLine from '../../components/SunLine.astro';
+import { works } from '../../data/site';
+const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+const here = works.filter((w) => w.slug).length;
+const away = works.filter((w) => !w.slug).length;
+const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+const lede = `${cap(words[works.length])} rows. ${cap(words[here])} open a page here, ${words[away]} open where they live.`;
+---
+<Base title="Work" description="Nineteen pieces of work by Ravindra Sisodia, 2022 to 2026: Zop.Dev, YES Bank, CEAT, Tata Capital, three Mac apps and more." chapter="afternoon" state="0.7" current="/work/">
+  <section class="page page--index" aria-labelledby="index-title">
+    <div class="page__head">
+      <p class="mono page__kicker">Index, 2022 to 2026 <SunLine /></p>
+      <h1 id="index-title" class="title">All work, across rooms.</h1>
+      <p class="lede">{lede}</p>
+    </div>
+    <ul class="index index--full" data-index>
+      {works.map((w) => (
+        <li>
+          <a class="index__row band" href={w.slug ? `/work/${w.slug}/` : w.href} data-preview={w.preview} data-cursor={w.slug ? 'Open' : 'Visit'} rel={w.slug ? undefined : 'noopener'}>
+            <span class="index__n mono">{w.n}</span>
+            <span class="index__title roll" data-text={w.title}><span>{w.title}</span></span>
+            <span class="index__kind" data-cue={w.slug ? 'case' : 'live ↗'}>{w.kind}</span>
+            <span class="index__year mono">{w.year}</span>
+            <span class="index__ext mono" aria-hidden="true">{w.slug ? 'case' : 'live ↗'}</span>
+            {w.preview ? <img class="index__thumb" src={w.preview} alt="" width="160" height="100" loading="lazy" /> : <span class="index__tile mono" aria-hidden="true">{w.n}</span>}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+  <Footer />
+</Base>

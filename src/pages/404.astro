@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import SunLine from '../components/SunLine.astro';
+---
+<Base title="Not found" description="This page is not here. The sun is down on it." chapter="night" state="1">
+  <section class="nf" aria-labelledby="nf-title">
+    <div class="nf__sky" aria-hidden="true"><span class="nf__horizon"></span><span class="nf__sun"></span></div>
+    <p class="mono nf__code">404 <SunLine /></p>
+    <h1 id="nf-title" class="title title--xl" data-split="lines" data-intro>The sun is down on this one.</h1>
+    <p class="lede" data-reveal="sweep" data-intro data-delay="0.4">Nothing shipped at this address. The crew is asleep until morning.</p>
+    <div class="nf__sprite" aria-hidden="true"><img src="/img/sprites/ember-sleep.png" alt="" width="96" height="96" /></div>
+    <p><a class="btn btn--line" href="/" data-fill><span class="btn__fill" aria-hidden="true"></span><span class="btn__label">Back to the morning</span><span class="btn__arrow" aria-hidden="true">→</span></a></p>
+  </section>
+  <Footer />
+</Base>
