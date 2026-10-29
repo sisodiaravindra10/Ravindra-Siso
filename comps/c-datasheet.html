@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comp C, Datasheet</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;700&family=IBM+Plex+Sans:wght@400;500&family=IBM+Plex+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --paper: #F2F4F7;
+    --ink: #0E1116;
+    --muted: #4A5261;
+    --blue: #1F4FD1;         /* engineering ink */
+    --rule: rgba(14, 17, 22, 0.14);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--paper); color: var(--ink); font-family: "IBM Plex Sans", sans-serif; min-height: 100dvh; overflow: hidden; }
+  ::selection { background: var(--blue); color: var(--paper); }
+  .sheet { position: absolute; inset: 0 56px; }
+  .head { display: flex; justify-content: space-between; align-items: end; padding: 30px 0 14px; border-bottom: 2px solid var(--ink); }
+  .part { font: 700 30px/1 "IBM Plex Sans Condensed", sans-serif; letter-spacing: -0.01em; }
+  .part small { font: 500 13px/1 "IBM Plex Mono", monospace; color: var(--muted); letter-spacing: .06em; margin-left: 14px; }
+  .meta { font: 400 12px/1.5 "IBM Plex Mono", monospace; color: var(--muted); text-align: right; letter-spacing: .04em; }
+  nav { display: flex; gap: 22px; font: 500 12px/1 "IBM Plex Mono", monospace; letter-spacing: .08em; padding: 12px 0; border-bottom: 1px solid var(--rule); }
+  nav a { color: var(--blue); text-decoration: none; }
+  nav a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  .grid { display: grid; grid-template-columns: 1fr 700px; gap: 56px; padding-top: 44px; }
+  h1 { font: 700 clamp(2.8rem, 4.4vw, 4.4rem)/.95 "IBM Plex Sans Condensed", sans-serif; letter-spacing: -0.03em; }
+  .lede { margin-top: 18px; font-size: 1.1rem; line-height: 1.55; max-width: 38ch; color: var(--muted); }
+  h2 { font: 500 12px/1 "IBM Plex Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--blue); margin: 30px 0 10px; }
+  ul { list-style: none; padding: 0; display: grid; gap: 8px; font-size: .98rem; line-height: 1.45; }
+  li { padding-left: 18px; position: relative; }
+  li::before { content: ""; position: absolute; left: 0; top: .6em; width: 7px; height: 7px; background: var(--blue); }
+  .ctas { display: flex; gap: 12px; margin-top: 30px; }
+  .btn { display: inline-flex; align-items: center; min-height: 46px; padding: 0 20px; font: 500 12px/1 "IBM Plex Mono", monospace; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; }
+  .btn.primary { background: var(--blue); color: var(--paper); }
+  .btn.ghost { border: 1px solid var(--ink); color: var(--ink); }
+
+  /* Functional block diagram */
+  figure.diagram { position: relative; width: 700px; justify-self: end; height: 560px; border: 1px solid var(--rule); background:
+      linear-gradient(var(--rule) 1px, transparent 1px) 0 0 / 24px 24px,
+      linear-gradient(90deg, var(--rule) 1px, transparent 1px) 0 0 / 24px 24px; background-color: #F7F8FA; }
+  figure.diagram svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .node { position: absolute; background: #FFFFFF; border: 1px solid var(--ink); padding: 10px 12px; }
+  .node .k { font: 500 10px/1 "IBM Plex Mono", monospace; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .node .v { font: 700 18px/1.1 "IBM Plex Sans Condensed", sans-serif; margin-top: 6px; }
+  .node.src { left: 28px; top: 238px; width: 150px; }
+  .node.core { left: 236px; top: 222px; width: 170px; border-color: var(--blue); border-width: 1px; box-shadow: 0 0 0 3px rgba(31,79,209,.12); }
+  .out { position: absolute; left: 488px; width: 190px; background: #fff; border: 1px solid var(--ink); }
+  .out .img { height: 96px; background: #EDEFF3; display: grid; place-items: center; overflow: hidden; border-bottom: 1px solid var(--rule); }
+  .out .img img { max-height: 100%; max-width: 100%; }
+  .out .img { align-items: start; } .out .img img.receipt { width: 112%; max-height: none; margin-top: -4px; }
+  .out .cap { display: flex; justify-content: space-between; align-items: baseline; padding: 8px 10px; }
+  .out .cap b { font: 700 16px/1 "IBM Plex Sans Condensed", sans-serif; }
+  .out .cap span { font: 500 11px/1 "IBM Plex Mono", monospace; color: var(--blue); letter-spacing: .06em; }
+  .o1 { top: 24px; } .o2 { top: 206px; } .o3 { top: 388px; }
+  .wire { font: 500 10px/1 "IBM Plex Mono", monospace; letter-spacing: .12em; text-transform: uppercase; fill: var(--blue); }
+  figcaption { position: absolute; left: 0; bottom: -26px; font: 400 12px/1 "IBM Plex Mono", monospace; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header class="head">
+    <p class="part">RS-26 <small>Designer + AI engineer</small></p>
+    <p class="meta">Ravindra Sisodia · Datasheet<br>Rev 3 · September 2026</p>
+  </header>
+  <nav><a href="#">Launches</a><a href="#">Work</a><a href="#">How it ships</a><a href="#">Contact</a></nav>
+
+  <div class="grid">
+    <section>
+      <h1>Designs it.<br>Ships it with agents.</h1>
+      <p class="lede">Three Mac apps in the Product Hunt top 10 in seven weeks, built with Claude Code.</p>
+      <h2>Features</h2>
+      <ul>
+        <li>Chit #3, Crew #7 and Notchling #8, Product of the day</li>
+        <li>Swift and SwiftUI apps, from brand to release</li>
+        <li>Own design skill, /rav, drives every build</li>
+        <li>Claude Code hooks, transcripts and subagent review panels</li>
+      </ul>
+      <div class="ctas"><a class="btn primary" href="#">See the launches</a><a class="btn ghost" href="#">Contact</a></div>
+    </section>
+
+    <figure class="diagram" aria-label="Block diagram: the rav design skill feeds Claude Code, which ships Chit, Crew and Notchling">
+      <svg viewBox="0 0 700 560" preserveAspectRatio="none" aria-hidden="true">
+        <g stroke="#1F4FD1" stroke-width="1" fill="none">
+          <path d="M178 272 H236"/>
+          <path d="M406 272 H446 V96 H488"/><path d="M420 90 H440" stroke-dasharray="2 3"/>
+          <path d="M406 272 H488"/>
+          <path d="M406 272 H446 V460 H488"/>
+        </g>
+        <g fill="#1F4FD1"><circle cx="178" cy="272" r="3"/><circle cx="236" cy="272" r="3"/><circle cx="406" cy="272" r="3"/><circle cx="488" cy="96" r="3"/><circle cx="488" cy="272" r="3"/><circle cx="488" cy="460" r="3"/></g>
+        <text class="wire" x="330" y="86" text-anchor="start">Transcripts</text>
+        <text class="wire" x="410" y="262">Hooks</text>
+        <text class="wire" x="360" y="456">SwiftUI</text>
+        <text class="wire" x="184" y="262">Taste</text>
+      </svg>
+      <div class="node src"><p class="k">Skill</p><p class="v">/rav</p></div>
+      <div class="node core"><p class="k">Engine</p><p class="v">Claude Code<br>+ subagents</p></div>
+      <div class="out o1"><div class="img"><img class="receipt" src="receipt.png" alt="Chit receipt"></div><div class="cap"><b>Chit</b><span>#3 · SEP 26</span></div></div>
+      <div class="out o2"><div class="img"><img src="ember.png" alt="Crew monster Ember"></div><div class="cap"><b>Crew</b><span>#7 · AUG 7</span></div></div>
+      <div class="out o3"><div class="img" style="background:#E9E8E4"><img src="notch-cut.png" alt="Notchling face"></div><div class="cap"><b>Notchling</b><span>#8 · SEP 1</span></div></div>
+      <figcaption>Figure 1. Functional block diagram, how it ships.</figcaption>
+    </figure>
+  </div>
+</div>
+</body>
+</html>

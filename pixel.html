@@ -1,0 +1,812 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ravindra Sisodia — product designer who ships the app</title>
+<meta name="description" content="Senior product designer in Bengaluru. Five years across B2B SaaS, fintech and enterprise. I design in Figma, build in Claude Code, and ship Mac apps. Crew is the one you can download.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b0c10; --card:#14161d; --card2:#0e0f15;
+    --line:#2c3140; --line2:#3b4152; --hard:#07080b;
+    --ink:#f3f4f8; --dim:#aeb4c4; --faint:#767c8e;
+    --ember:#ff9a3d; --emberd:#8f4a12;
+    --sprout:#8ceb8c; --puddle:#ffd85a; --spark:#c6a3ff;
+    --breeze:#73c7ff; --pink:#ff9ed2;
+    --pix:"Press Start 2P", monospace;
+    --term:"VT323", ui-monospace, monospace;
+    --snap:cubic-bezier(0.16,1,0.3,1);
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);
+    background-size:26px 26px;
+    color:var(--ink);
+    font-family:var(--term);
+    font-size:21px;
+    line-height:1.35;
+    -webkit-font-smoothing:none;
+    overflow-x:hidden;
+  }
+  /* CRT scanlines over everything */
+  body::after{
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:200;
+    background:repeating-linear-gradient(rgba(0,0,0,.16) 0 1px,transparent 1px 3px);
+    opacity:.5;
+  }
+  img{image-rendering:pixelated}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+  .pix{font-family:var(--pix)}
+
+  .eyebrow{
+    font-family:var(--pix);font-size:10px;letter-spacing:.12em;
+    color:var(--faint);text-transform:uppercase;
+  }
+  h1{
+    font-family:var(--pix);font-size:clamp(18px,3.3vw,31px);line-height:1.55;
+    letter-spacing:.01em;max-width:19ch;margin:22px 0 0;
+  }
+  h1 .em{color:var(--ember);text-shadow:3px 3px 0 var(--emberd)}
+  h2{font-family:var(--pix);font-size:clamp(15px,2.5vw,23px);line-height:1.5;letter-spacing:.01em}
+  h3{font-family:var(--pix);font-size:12px;line-height:1.5;letter-spacing:.02em}
+  .sub{color:var(--dim);font-size:23px;max-width:50ch;margin:22px 0 0}
+  .lead{color:var(--dim);font-size:22px;max-width:54ch;margin:14px 0 0}
+  .center{text-align:center}
+  .center h1,.center .sub,.center .lead{margin-left:auto;margin-right:auto}
+
+  /* ---------- pixel button ---------- */
+  .btn{
+    font-family:var(--pix);font-size:11px;text-transform:uppercase;letter-spacing:.02em;
+    display:inline-flex;align-items:center;gap:9px;padding:15px 20px;cursor:pointer;
+    border:2px solid var(--hard);background:var(--ember);color:#1a1206;
+    box-shadow:5px 5px 0 var(--emberd);
+    transition:transform .06s var(--snap), box-shadow .06s var(--snap);
+  }
+  .btn:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--emberd)}
+  .btn:active{transform:translate(5px,5px);box-shadow:0 0 0 var(--emberd)}
+  .btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line2);box-shadow:5px 5px 0 var(--hard)}
+  .btn.ghost:hover{box-shadow:3px 3px 0 var(--hard)}
+  .btn.ghost:active{box-shadow:0 0 0 var(--hard)}
+
+  .box{background:var(--card);border:2px solid var(--line);box-shadow:5px 5px 0 rgba(0,0,0,.55)}
+
+  /* ---------- pixel window chrome ---------- */
+  .window{background:var(--card2);border:2px solid var(--line2);box-shadow:10px 10px 0 rgba(0,0,0,.6)}
+  .titlebar{display:flex;align-items:center;gap:8px;padding:11px 13px;border-bottom:2px solid var(--line)}
+  .titlebar i{width:12px;height:12px;display:block}
+  .titlebar i:nth-child(1){background:#ff5f57}
+  .titlebar i:nth-child(2){background:#febc2e}
+  .titlebar i:nth-child(3){background:#28c840}
+  .titlebar span{margin-left:8px;font-family:var(--pix);font-size:9px;color:var(--faint)}
+  .window > img{display:block;width:100%;height:auto}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:sticky;top:0;z-index:150;background:rgba(11,12,16,.85);
+    backdrop-filter:blur(4px);border-bottom:2px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .logo{display:flex;align-items:center;gap:11px;font-family:var(--pix);font-size:14px}
+  .logo .dots{display:flex;gap:3px}
+  .logo .dots i{width:10px;height:10px;display:block}
+  .navlinks{display:flex;gap:24px;align-items:center;font-family:var(--pix);font-size:10px;text-transform:uppercase}
+  .navlinks a{color:var(--faint);transition:color .15s var(--snap)}
+  .navlinks a:hover{color:var(--ink)}
+  .navlinks a.btn{color:#1a1206}
+  @media(max-width:760px){.navlinks a:not(.btn){display:none}}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:74px 0 0;overflow:hidden}
+  .hero::before{
+    content:"";position:absolute;left:12%;top:0;width:660px;height:360px;
+    background:radial-gradient(closest-side,rgba(255,154,61,.16),transparent);
+    pointer-events:none;
+  }
+  .hero .wrap{position:relative;z-index:1}
+  .cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+  .micro{
+    margin-top:20px;font-family:var(--pix);font-size:9px;letter-spacing:.06em;
+    color:var(--faint);line-height:1.9;
+  }
+  .micro b{color:var(--sprout);font-weight:400}
+
+  /* live crew walking along the floor of the hero */
+  .floor{
+    position:relative;height:130px;margin-top:34px;
+    border-top:2px solid var(--line);
+    background:linear-gradient(180deg,rgba(255,255,255,.02),transparent);
+  }
+  .floor::after{
+    content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:var(--line);
+  }
+  .critter{
+    position:absolute;bottom:10px;left:0;
+    width:66px;height:auto;
+    transform:translateX(0);
+    will-change:transform;
+  }
+  .critter img{display:block;width:100%;height:auto}
+  .critter .tag{
+    position:absolute;left:50%;top:-16px;transform:translateX(-50%);
+    font-family:var(--pix);font-size:7px;letter-spacing:.04em;
+    background:#1b1d25;border:1px solid var(--line2);color:var(--dim);
+    padding:4px 6px;white-space:nowrap;
+  }
+  /* The creature flips to face its direction of travel; the tag must not. */
+  .critter.flip img{transform:scaleX(-1)}
+  .floor-note{
+    position:absolute;right:4px;top:6px;
+    font-family:var(--pix);font-size:8px;letter-spacing:.08em;color:var(--faint);
+    text-align:right;line-height:1.9;
+  }
+  @media(max-width:760px){ .floor{height:104px} .critter{width:50px} .floor-note{display:none} }
+
+  section{padding:76px 0}
+  .band{background:var(--card2);border-top:2px solid var(--line);border-bottom:2px solid var(--line)}
+
+  /* ---------- crew marquee ---------- */
+  .crew-head{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end}
+  .crew-tagline{font-family:var(--pix);font-size:10px;line-height:2;color:var(--faint);text-align:right}
+  .crew-tagline b{color:var(--ember);font-weight:400}
+  @media(max-width:760px){.crew-head{grid-template-columns:1fr}.crew-tagline{text-align:left}}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:34px}
+  .stat{padding:20px}
+  .stat .n{font-family:var(--pix);font-size:21px;color:var(--ember);line-height:1.3}
+  .stat .l{font-family:var(--pix);font-size:8px;letter-spacing:.1em;color:var(--faint);margin-top:10px;line-height:1.8}
+  @media(max-width:760px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  .feat{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:16px}
+  .f{padding:22px}
+  .f .sprite{width:46px;height:auto;display:block;margin-bottom:14px}
+  .f h3{margin:0 0 8px;color:var(--ink)}
+  .f p{color:var(--dim);font-size:19px}
+  @media(max-width:860px){.feat{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.feat{grid-template-columns:1fr}}
+
+  /* ---------- work ---------- */
+  .work-list{margin-top:40px;border-top:2px solid var(--line)}
+  .work-row{
+    display:grid;grid-template-columns:44px 34px 1fr 150px 60px 26px;
+    gap:18px;align-items:center;
+    padding:16px 12px;border-bottom:2px solid var(--line);
+    transition:background .16s var(--snap), transform .16s var(--snap);
+  }
+  .work-row:hover{background:var(--card);transform:translateX(6px)}
+  .work-row .sprite{width:34px;height:auto;display:block}
+  .work-row .num{font-family:var(--pix);font-size:10px;color:var(--ember)}
+  .work-row .title{font-size:24px;line-height:1.1;color:var(--ink)}
+  .work-row .role,.work-row .year{
+    font-family:var(--pix);font-size:8px;letter-spacing:.1em;
+    color:var(--faint);text-transform:uppercase;line-height:1.8;
+  }
+  .work-row .arrow{font-family:var(--pix);font-size:11px;color:var(--faint);justify-self:end;
+    transition:transform .16s var(--snap), color .16s var(--snap)}
+  .work-row:hover .arrow{transform:translateX(4px);color:var(--ember)}
+  @media(max-width:860px){
+    .work-row{grid-template-columns:34px 30px 1fr 22px;gap:12px}
+    .work-row .role,.work-row .year{display:none}
+    .work-row .title{font-size:21px}
+  }
+
+  /* ---------- floating pixel preview ---------- */
+  .preview{
+    position:fixed;top:0;left:0;z-index:180;width:326px;
+    pointer-events:none;opacity:0;transform:translate(-9999px,-9999px);
+    transition:opacity .16s var(--snap);will-change:transform;
+  }
+  .preview.visible{opacity:1}
+  .preview .shot{
+    position:relative;width:100%;aspect-ratio:16/9;background:#0a0b0f;
+    display:grid;place-items:center;overflow:hidden;
+    font-family:var(--pix);font-size:8px;letter-spacing:.1em;color:var(--faint);
+  }
+  .preview .shot canvas,.preview .shot img{
+    position:absolute;inset:0;width:100%;height:100%;display:block;object-fit:cover;
+  }
+  @media(hover:none),(max-width:900px){.preview{display:none}}
+
+  /* ---------- terminal (about + contact) ---------- */
+  .term-body{padding:26px 24px;font-size:22px;line-height:1.5}
+  .term-line{display:flex;gap:12px;flex-wrap:wrap;align-items:baseline}
+  .term-line .p{color:var(--sprout);font-family:var(--pix);font-size:10px;white-space:nowrap}
+  .term-out{color:var(--dim);margin:10px 0 26px;max-width:62ch}
+  .term-out:last-child{margin-bottom:0}
+  .term-out b{color:var(--ink);font-weight:400}
+  .term-out .k{color:var(--breeze)}
+  .caret{
+    display:inline-block;width:11px;height:20px;background:var(--ember);
+    transform:translateY(3px);animation:blink 1.05s steps(1) infinite;
+  }
+  @keyframes blink{0%,50%{opacity:1}50.01%,100%{opacity:0}}
+
+  .kv{display:grid;grid-template-columns:repeat(2,1fr);gap:0 34px;margin-top:6px}
+  .kv div{
+    display:grid;grid-template-columns:1fr auto;gap:14px;padding:9px 0;
+    border-bottom:1px solid var(--line);font-size:20px;color:var(--dim);
+  }
+  .kv div b{color:var(--ink);font-weight:400}
+  @media(max-width:760px){.kv{grid-template-columns:1fr}}
+
+  /* ---------- contact ---------- */
+  .mailto{
+    display:inline-block;margin-top:8px;font-family:var(--pix);
+    font-size:clamp(11px,2.3vw,20px);line-height:1.9;color:var(--ember);
+    text-shadow:3px 3px 0 var(--emberd);word-break:break-all;
+  }
+  .mailto .char{
+    display:inline-block;transform:translateY(0);
+    transition:transform .34s var(--snap);
+    transition-delay:calc(var(--i) * 16ms);
+  }
+  .mailto:hover .char,.mailto:focus-visible .char{transform:translateY(-4px)}
+
+  .links{display:flex;flex-wrap:wrap;gap:12px;margin-top:34px}
+  .links a{
+    font-family:var(--pix);font-size:10px;text-transform:uppercase;letter-spacing:.04em;
+    padding:12px 15px;border:2px solid var(--line2);background:var(--card);color:var(--dim);
+    box-shadow:4px 4px 0 var(--hard);
+    transition:transform .06s var(--snap),box-shadow .06s var(--snap),color .15s var(--snap);
+  }
+  .links a:hover{transform:translate(2px,2px);box-shadow:2px 2px 0 var(--hard);color:var(--ink)}
+
+  /* ---------- footer ---------- */
+  footer{border-top:2px solid var(--line);padding:32px 0;color:var(--faint)}
+  footer .wrap{
+    display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;align-items:center;
+    font-family:var(--pix);font-size:9px;line-height:2;
+  }
+  footer a{color:var(--dim)}
+  footer a:hover{color:var(--ink)}
+  .palette{display:inline-flex;gap:4px}
+  .palette i{width:12px;height:12px;display:block}
+
+  /* ---------- scroll reveal ---------- */
+  .rise{opacity:0;transform:translateY(14px);transition:opacity .6s var(--snap),transform .6s var(--snap)}
+  .rise.in{opacity:1;transform:none}
+
+  @media (prefers-reduced-motion: reduce){
+    html{scroll-behavior:auto}
+    .rise{opacity:1;transform:none;transition:none}
+    .caret{animation:none}
+    .mailto .char{transition:none}
+    .mailto:hover .char{transform:none}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="wrap">
+  <a href="#top" class="logo">
+    <span class="dots">
+      <i style="background:var(--ember)"></i>
+      <i style="background:var(--breeze)"></i>
+      <i style="background:var(--sprout)"></i>
+    </span>
+    RAVINDRA
+  </a>
+  <div class="navlinks">
+    <a href="#crew">Crew</a>
+    <a href="#work">Work</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener" class="btn" style="padding:9px 14px">Get Crew</a>
+  </div>
+</div></nav>
+
+<!-- ============================== HERO ============================== -->
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow">&#9656; senior product designer &nbsp;/&nbsp; bengaluru, in</div>
+    <h1>Product designer who ships the <span class="em">app</span> too.</h1>
+    <p class="sub">
+      Five years across B2B SaaS, fintech and enterprise. These days I design in Figma,
+      build in Claude Code, and ship the result as a real Mac app you can download.
+    </p>
+    <div class="cta">
+      <a href="#crew" class="btn">&#9656; Meet Crew</a>
+      <a href="#work" class="btn ghost">See the work</a>
+    </div>
+    <div class="micro">
+      open for senior product design roles, 2026 &nbsp;&#183;&nbsp;
+      design + code &nbsp;&#183;&nbsp; <b>available</b>
+    </div>
+  </div>
+
+  <div class="floor" id="floor" aria-hidden="true">
+    <div class="floor-note">live crew<br>one per session</div>
+  </div>
+</header>
+
+<!-- ============================== CREW ============================== -->
+<section id="crew" class="band">
+  <div class="wrap">
+    <div class="crew-head rise">
+      <div>
+        <div class="eyebrow">&#9656; the one i shipped</div>
+        <h2 style="margin-top:14px">Crew</h2>
+        <p class="lead">
+          A tiny crew of pixel monsters for your Claude Code agents. One creature per chat
+          and subagent, living along the bottom of your screen. A glance tells you which
+          agent is working, which is stuck waiting on you, and which finished ten minutes ago.
+        </p>
+      </div>
+      <p class="crew-tagline">
+        free for macos<br>
+        <b>$12</b> one&#8209;time pro<br>
+        mit licensed
+      </p>
+    </div>
+
+    <div class="window rise" style="margin-top:44px">
+      <div class="titlebar"><i></i><i></i><i></i><span>crew &#8212; running in claude code</span></div>
+      <img src="./img/crew-strip.png" alt="Six pixel creatures walking along the bottom of a Claude Code window, each tagged as a chat session">
+    </div>
+
+    <div class="stats rise">
+      <div class="box stat"><div class="n">10</div><div class="l">species,<br>drawn in code</div></div>
+      <div class="box stat"><div class="n">7</div><div class="l">claude code<br>hooks read</div></div>
+      <div class="box stat"><div class="n">0</div><div class="l">servers,<br>accounts, telemetry</div></div>
+      <div class="box stat"><div class="n">$12</div><div class="l">one&#8209;time<br>for pro</div></div>
+    </div>
+
+    <div class="feat rise">
+      <div class="box f">
+        <img class="sprite" src="./img/ember.png" alt="">
+        <h3>Never fakes a state</h3>
+        <p>Every animation is driven by a real hook event. The moment one is not, you stop trusting the glance and go back to reading logs.</p>
+      </div>
+      <div class="box f">
+        <img class="sprite" src="./img/breeze.png" alt="">
+        <h3>Approve from the creature</h3>
+        <p>Pattern&#8209;scoped and opt&#8209;in. A blocked command raises a flag with Allow and Deny, right where you are already looking.</p>
+      </div>
+      <div class="box f">
+        <img class="sprite" src="./img/sprout.png" alt="">
+        <h3>Entirely local</h3>
+        <p>Seven hooks writing marker files, one app polling them. That is the whole thing, which is why it works offline.</p>
+      </div>
+    </div>
+
+    <div class="cta rise" style="margin-top:34px">
+      <a href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener" class="btn">&#9660; Download free</a>
+      <a href="https://github.com/sisodiaravindra10/crew" target="_blank" rel="noopener" class="btn ghost">Source on GitHub</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== WORK ============================== -->
+<section id="work">
+  <div class="wrap">
+    <div class="eyebrow rise">&#9656; selected work</div>
+    <h2 class="rise" style="margin-top:14px">Thirteen shown.<br>Forty more in the archive.</h2>
+    <p class="lead rise">Brand, product and marketing surfaces, 2022 to 2026. Hover a row to peek at it.</p>
+
+    <div class="work-list">
+      <a class="work-row rise" href="https://zop-dev-website-v3.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-dev-website-v3.vercel.app/" data-label="zop.dev / marketing site">
+        <img class="sprite" src="./img/ember.png" alt=""><span class="num">01</span>
+        <span class="title">Zop.Dev, marketing site</span>
+        <span class="role">Brand &#183; Web</span><span class="year">2026</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://screenroot.com/work/ceat-tyre-website-design/" target="_blank" rel="noopener"
+         data-href="https://screenroot.com/work/ceat-tyre-website-design/" data-label="ceat tyres / website">
+        <img class="sprite" src="./img/boulder.png" alt=""><span class="num">02</span>
+        <span class="title">CEAT Tyres, website</span>
+        <span class="role">Case &#183; Web</span><span class="year">2023</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://screenroot.com/work/yes-bank-app-ui-design/" target="_blank" rel="noopener"
+         data-href="https://screenroot.com/work/yes-bank-app-ui-design/" data-label="yes bank / app ui">
+        <img class="sprite" src="./img/breeze.png" alt=""><span class="num">03</span>
+        <span class="title">YES Bank, app UI</span>
+        <span class="role">Case &#183; Product</span><span class="year">2023</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://us.strandls.com/" target="_blank" rel="noopener"
+         data-href="https://us.strandls.com/" data-label="strand life sciences">
+        <img class="sprite" src="./img/sprout.png" alt=""><span class="num">04</span>
+        <span class="title">Strand Life Sciences</span>
+        <span class="role">Web &#183; Marketing</span><span class="year">2024</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://evermortalesco.com/" target="_blank" rel="noopener"
+         data-href="https://evermortalesco.com/" data-label="openstreet / evermortal esco">
+        <img class="sprite" src="./img/puddle.png" alt=""><span class="num">05</span>
+        <span class="title">Openstreet, Evermortal Esco</span>
+        <span class="role">Studio &#183; Web</span><span class="year">2024</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://vocautomotive.com/" target="_blank" rel="noopener"
+         data-href="https://vocautomotive.com/" data-label="voc automotive">
+        <img class="sprite" src="./img/spark.png" alt=""><span class="num">06</span>
+        <span class="title">VOC Automotive</span>
+        <span class="role">Web &#183; Marketing</span><span class="year">2025</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://federate.one/" target="_blank" rel="noopener"
+         data-href="https://federate.one/" data-label="federate">
+        <img class="sprite" src="./img/breeze.png" alt=""><span class="num">07</span>
+        <span class="title">Federate</span>
+        <span class="role">Identity &#183; Web</span><span class="year">2025</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://screenroot.com/work/tata-capital-website-design/" target="_blank" rel="noopener"
+         data-href="https://screenroot.com/work/tata-capital-website-design/" data-label="tata capital / website">
+        <img class="sprite" src="./img/boulder.png" alt=""><span class="num">08</span>
+        <span class="title">Tata Capital, website</span>
+        <span class="role">Case &#183; Web</span><span class="year">2022</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://zop-night-tetris-cloud.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-night-tetris-cloud.vercel.app/" data-label="zopnight / tetris cloud">
+        <img class="sprite" src="./img/spark.png" alt=""><span class="num">09</span>
+        <span class="title">ZopNight, Tetris Cloud</span>
+        <span class="role">Concept &#183; Web</span><span class="year">2026</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://zop-branding-launch-plan.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-branding-launch-plan.vercel.app/" data-label="zop.dev / brand launch plan">
+        <img class="sprite" src="./img/ember.png" alt=""><span class="num">10</span>
+        <span class="title">Zop.Dev, brand launch plan</span>
+        <span class="role">Brand &#183; Strategy</span><span class="year">2026</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://lyke-eosin.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://lyke-eosin.vercel.app/" data-label="lyke">
+        <img class="sprite" src="./img/puddle.png" alt=""><span class="num">11</span>
+        <span class="title">Lyke</span>
+        <span class="role">Product &#183; Web</span><span class="year">2026</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://contrast-check-v1.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://contrast-check-v1.vercel.app/" data-label="contrast check">
+        <img class="sprite" src="./img/sprout.png" alt=""><span class="num">12</span>
+        <span class="title">Contrast Check</span>
+        <span class="role">Tool &#183; Web</span><span class="year">2025</span><span class="arrow">&#9656;</span>
+      </a>
+      <a class="work-row rise" href="https://zop-dev-brandkit-v1.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-dev-brandkit-v1.vercel.app/" data-label="zop.dev / brand kit">
+        <img class="sprite" src="./img/ember.png" alt=""><span class="num">13</span>
+        <span class="title">Zop.Dev, brand kit</span>
+        <span class="role">Brand &#183; Identity</span><span class="year">2026</span><span class="arrow">&#9656;</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ABOUT ============================== -->
+<section id="about" class="band">
+  <div class="wrap">
+    <div class="eyebrow rise">&#9656; about</div>
+    <div class="window rise" style="margin-top:22px">
+      <div class="titlebar"><i></i><i></i><i></i><span>~/rav</span></div>
+      <div class="term-body">
+        <div class="term-line"><span class="p">~/rav &#9656;</span> whoami</div>
+        <p class="term-out">
+          <b>Ravindra Pratap Singh Sisodia.</b> Senior product designer, Bengaluru.
+          I grew up in Jodhpur, which is where the taste for hard light and flat color came from.
+          Pixels by day, petrol by dusk.
+        </p>
+
+        <div class="term-line"><span class="p">~/rav &#9656;</span> what i actually do</div>
+        <p class="term-out">
+          I design brands and the interfaces they live inside, then I build them.
+          Figma for the thinking, <span class="k">Claude Code</span> for the shipping,
+          <span class="k">Figma MCP</span> to keep the two honest with each other.
+          The output is production code, not a handoff file.
+        </p>
+
+        <div class="term-line"><span class="p">~/rav &#9656;</span> stack</div>
+        <div class="kv term-out">
+          <div><span>Design</span><b>Figma, Figma MCP</b></div>
+          <div><span>Build</span><b>Claude Code, SwiftUI</b></div>
+          <div><span>Web</span><b>HTML, CSS, JS, GSAP</b></div>
+          <div><span>Shipped</span><b>Crew, Notchling, Pop</b></div>
+          <div><span>Domains</span><b>B2B SaaS, fintech</b></div>
+          <div><span>Based</span><b>Bengaluru, UTC+5:30</b></div>
+        </div>
+
+        <div class="term-line"><span class="p">~/rav &#9656;</span> currently</div>
+        <p class="term-out">
+          Becoming an engineer who can also ship the design. Looking for the next app
+          or site to build end to end. <span class="caret"></span>
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CONTACT ============================== -->
+<section id="contact">
+  <div class="wrap">
+    <div class="eyebrow rise">&#9656; contact</div>
+    <h2 class="rise" style="margin-top:14px">Pitch me something impossible.</h2>
+    <p class="lead rise">
+      Inbox open. Reply within 24 hours most days. Slower on Sundays, and that is a feature.
+    </p>
+
+    <p class="rise" style="margin-top:30px">
+      <a class="mailto" href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a>
+    </p>
+
+    <div class="links rise">
+      <a href="https://www.linkedin.com/in/ravindra-sisodia/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://dribbble.com/sisodiaravindra" target="_blank" rel="noopener">Dribbble</a>
+      <a href="https://www.behance.net/ravindrasisodia" target="_blank" rel="noopener">Behance</a>
+      <a href="https://www.instagram.com/ravindrasiso/" target="_blank" rel="noopener">Instagram</a>
+      <a href="https://github.com/sisodiaravindra10" target="_blank" rel="noopener">GitHub</a>
+    </div>
+  </div>
+</section>
+
+<footer><div class="wrap">
+  <span>&#169; 2026 &#183; Ravindra Pratap Singh</span>
+  <span class="palette" aria-hidden="true">
+    <i style="background:var(--ember)"></i><i style="background:var(--sprout)"></i>
+    <i style="background:var(--puddle)"></i><i style="background:var(--spark)"></i>
+    <i style="background:var(--breeze)"></i><i style="background:var(--pink)"></i>
+  </span>
+  <span><a href="./dithered.html">previous cut &#9656;</a></span>
+</div></footer>
+
+<!-- floating pixel preview -->
+<div class="preview" id="preview" aria-hidden="true">
+  <div class="window">
+    <div class="titlebar"><i></i><i></i><i></i><span id="previewLabel">preview</span></div>
+    <div class="shot" id="previewShot">loading</div>
+  </div>
+</div>
+
+<script>
+const REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* =====================================================================
+   LIVE CREW — the hero floor
+   Same idea as the app: one creature per session, wandering, working,
+   dozing off. States swap the sprite PNG; movement is a transform.
+   ===================================================================== */
+(function crew(){
+  const floor = document.getElementById("floor");
+  if (!floor) return;
+
+  const SPECIES = ["ember","sprout","breeze","puddle","spark","boulder"];
+  const TAGS    = ["chat","chat","subagent","chat","subagent","chat"];
+
+  const members = SPECIES.map((name, i) => {
+    const el = document.createElement("div");
+    el.className = "critter";
+    el.innerHTML = `<span class="tag">${TAGS[i]}</span><img alt="">`;
+    floor.appendChild(el);
+    return {
+      el,
+      img: el.querySelector("img"),
+      name,
+      x: 0,
+      dir: i % 2 ? -1 : 1,
+      speed: 10 + (i % 3) * 5,      // px per second, deliberately slow
+      state: "walk",
+      until: 0,
+      sprite: "",
+    };
+  });
+
+  // Preload every frame so a state swap never flashes an empty box.
+  const frames = {};
+  SPECIES.forEach(n => ["", "-walk", "-blink", "-sleep"].forEach(s => {
+    const src = `./img/${n}${s}.png`;
+    frames[src] = new Image();
+    frames[src].src = src;
+  }));
+
+  const setSprite = (m, suffix) => {
+    const src = `./img/${m.name}${suffix}.png`;
+    if (m.sprite === src) return;
+    m.sprite = src;
+    m.img.src = src;
+  };
+
+  // Spread them across the floor on first layout.
+  function seed(){
+    const w = floor.clientWidth;
+    members.forEach((m, i) => {
+      m.x = (w / members.length) * i + 20;
+      m.el.style.transform = `translateX(${m.x}px)`;
+    });
+  }
+  seed();
+  new ResizeObserver(seed).observe(floor);
+
+  if (REDUCED) {
+    members.forEach(m => setSprite(m, ""));
+    return;
+  }
+
+  let last = performance.now();
+  function tick(now){
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    const w = floor.clientWidth;
+    const limit = w - 70;
+
+    members.forEach(m => {
+      if (now > m.until) {
+        // Pick the next state. Walking is the common case; the rest are
+        // short punctuation so the floor never reads as a looping GIF.
+        const roll = Math.random();
+        if (m.state === "walk" && roll < 0.35) {
+          m.state = roll < 0.12 ? "sleep" : "idle";
+          m.until = now + (m.state === "sleep" ? 2600 : 1200) + Math.random() * 1800;
+        } else {
+          m.state = "walk";
+          if (Math.random() < 0.35) m.dir *= -1;
+          m.until = now + 2400 + Math.random() * 3200;
+        }
+      }
+
+      if (m.state === "walk") {
+        m.x += m.dir * m.speed * dt;
+        if (m.x < 6)     { m.x = 6;     m.dir = 1; }
+        if (m.x > limit) { m.x = limit; m.dir = -1; }
+        // Two-frame walk cycle, swapped on a slow beat.
+        setSprite(m, Math.floor(now / 380) % 2 ? "-walk" : "");
+      } else if (m.state === "sleep") {
+        setSprite(m, "-sleep");
+      } else {
+        // Idle, with an occasional blink.
+        setSprite(m, Math.floor(now / 2400) % 5 === 0 ? "-blink" : "");
+      }
+
+      m.el.style.transform = `translateX(${m.x.toFixed(1)}px)`;
+      m.el.classList.toggle("flip", m.dir < 0);
+    });
+
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* =====================================================================
+   SCROLL REVEAL
+   ===================================================================== */
+(function reveal(){
+  const items = document.querySelectorAll(".rise");
+  if (REDUCED || !("IntersectionObserver" in window)) {
+    items.forEach(el => el.classList.add("in"));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (!e.isIntersecting) return;
+      e.target.classList.add("in");
+      io.unobserve(e.target);
+    });
+  }, { rootMargin: "0px 0px -8% 0px" });
+  items.forEach((el, i) => {
+    el.style.transitionDelay = `${Math.min(i % 6, 5) * 70}ms`;
+    io.observe(el);
+  });
+})();
+
+/* =====================================================================
+   HOVER PREVIEWS — a pixel-art render of each live site
+   Screenshot comes from microlink, then gets drawn into a low-res
+   canvas and scaled back up so it matches the rest of the page.
+   ===================================================================== */
+(function previews(){
+  const panel = document.getElementById("preview");
+  const shot  = document.getElementById("previewShot");
+  const label = document.getElementById("previewLabel");
+  if (!panel) return;
+
+  const W = 322, H = 181, CELL = 3;
+  const cache = new Map();
+  let mx = 0, my = 0;
+
+  const endpoint = (url) =>
+    `https://api.microlink.io/?url=${encodeURIComponent(url)}` +
+    `&screenshot=true&embed=screenshot.url&viewport.width=1280&viewport.height=720&meta=false`;
+
+  function pixelate(image){
+    const oW = Math.floor(W / CELL), oH = Math.floor(H / CELL);
+    const c = document.createElement("canvas");
+    c.width = oW; c.height = oH;
+    const g = c.getContext("2d");
+    const sw = image.naturalWidth, sh = image.naturalHeight;
+    const scale = Math.max(oW / sw, oH / sh);
+    const dw = sw * scale, dh = sh * scale;
+    g.drawImage(image, (oW - dw) / 2, 0, dw, dh);
+    return c;
+  }
+
+  function load(url){
+    if (cache.has(url)) return cache.get(url);
+    const slot = { state: "loading", canvas: null, waiters: [] };
+    cache.set(url, slot);
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try { slot.canvas = pixelate(img); slot.state = "ready"; }
+      catch (e) { slot.state = "error"; }
+      slot.waiters.splice(0).forEach(fn => fn());
+    };
+    img.onerror = () => {
+      slot.state = "error";
+      slot.waiters.splice(0).forEach(fn => fn());
+    };
+    img.src = endpoint(url);
+    return slot;
+  }
+
+  function paint(slot){
+    shot.innerHTML = "";
+    if (slot.state === "ready") {
+      const c = document.createElement("canvas");
+      c.width = slot.canvas.width; c.height = slot.canvas.height;
+      c.getContext("2d").drawImage(slot.canvas, 0, 0);
+      shot.appendChild(c);
+    } else {
+      shot.textContent = slot.state === "error" ? "no preview" : "loading";
+    }
+  }
+
+  function place(){
+    const pad = 22;
+    const pw = panel.offsetWidth, ph = panel.offsetHeight;
+    let x = mx + pad, y = my + pad;
+    if (x + pw > window.innerWidth  - 10) x = mx - pad - pw;
+    if (y + ph > window.innerHeight - 10) y = my - pad - ph;
+    panel.style.transform = `translate(${Math.max(8, x)}px, ${Math.max(8, y)}px)`;
+  }
+
+  document.addEventListener("mousemove", (e) => {
+    mx = e.clientX; my = e.clientY;
+    if (panel.classList.contains("visible")) place();
+  });
+
+  document.querySelectorAll(".work-row").forEach(row => {
+    const url = row.dataset.href;
+    if (!url) return;
+    row.addEventListener("mouseenter", () => {
+      label.textContent = row.dataset.label || "preview";
+      const slot = load(url);
+      paint(slot);
+      if (slot.state === "loading") {
+        slot.waiters.push(() => {
+          if (panel.classList.contains("visible") &&
+              label.textContent === row.dataset.label) paint(slot);
+        });
+      }
+      panel.classList.add("visible");
+      place();
+    });
+    row.addEventListener("mouseleave", () => panel.classList.remove("visible"));
+  });
+
+  // Warm the screenshots up before the first hover: microlink can take
+  // 10 to 30 seconds to render a page it has never seen.
+  const work = document.getElementById("work");
+  if (work && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      if (!entries.some(e => e.isIntersecting)) return;
+      document.querySelectorAll(".work-row").forEach(r => r.dataset.href && load(r.dataset.href));
+      io.disconnect();
+    }, { rootMargin: "300px" });
+    io.observe(work);
+  }
+})();
+
+/* =====================================================================
+   EMAIL — per-character lift
+   ===================================================================== */
+document.querySelectorAll(".mailto").forEach(link => {
+  const text = link.textContent;
+  link.setAttribute("aria-label", text);
+  link.textContent = "";
+  [...text].forEach((ch, i) => {
+    const s = document.createElement("span");
+    s.className = "char";
+    s.style.setProperty("--i", i);
+    s.textContent = ch;
+    link.appendChild(s);
+  });
+});
+</script>
+</body>
+</html>

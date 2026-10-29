@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comp A, Workbench</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --mat: #245C47;          /* self-healing cutting mat */
+    --mat-deep: #1B4A39;
+    --grid: rgba(214, 236, 222, 0.16);
+    --grid-major: rgba(214, 236, 222, 0.32);
+    --print: #F2F3EC;        /* the mat's white printing */
+    --yellow: #F2D35C;       /* the mat's yellow ruler printing */
+    --shadow: rgba(8, 30, 22, 0.55);
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--mat);
+    color: var(--print);
+    font-family: Inter, system-ui, sans-serif;
+    overflow: hidden;
+  }
+  ::selection { background: var(--yellow); color: var(--mat-deep); }
+
+  /* The mat: 1cm grid (40px), heavier every 5cm, cm rulers on two edges, faint 45° guide. */
+  .mat {
+    position: fixed; inset: 0;
+    background:
+      linear-gradient(135deg, transparent calc(50% - 0.5px), rgba(214,236,222,0.10) 50%, transparent calc(50% + 0.5px)),
+      linear-gradient(var(--grid-major) 1px, transparent 1px) 0 0 / 200px 200px,
+      linear-gradient(90deg, var(--grid-major) 1px, transparent 1px) 0 0 / 200px 200px,
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 40px 40px,
+      radial-gradient(120% 90% at 30% 20%, #2A6951 0%, var(--mat) 45%, var(--mat-deep) 100%);
+  }
+  .mat::after { /* self-healing surface: faint knife scores + grain */
+    content: ""; position: absolute; inset: 0; pointer-events: none; opacity: .5;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .1 0 0 0 0 .25 0 0 0 0 .18 0 0 0 .35 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  .ruler-top, .ruler-left { position: fixed; font: 500 10px/1 "JetBrains Mono", monospace; color: var(--yellow); letter-spacing: .04em; }
+  .ruler-top { top: 6px; left: 0; right: 0; height: 12px; }
+  .ruler-left { top: 0; bottom: 0; left: 6px; width: 16px; }
+  .ruler-top span { position: absolute; transform: translateX(-50%); }
+  .ruler-left span { position: absolute; transform: translateY(-50%); }
+
+  nav {
+    position: fixed; top: 28px; left: 48px; right: 48px; height: 44px; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between;
+    font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .12em; text-transform: uppercase;
+  }
+  nav .mark { display: flex; align-items: center; gap: 10px; }
+  nav .mark i { width: 10px; height: 10px; background: var(--yellow); display: block; }
+  nav ul { display: flex; gap: 28px; list-style: none; padding: 0; }
+  nav a { color: var(--print); text-decoration: none; }
+  nav a:hover { color: var(--yellow); }
+
+  .copy { position: absolute; left: 88px; top: 210px; width: 760px; z-index: 3; }
+  .copy .who { font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--yellow); margin-bottom: 26px; }
+  h1 {
+    font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-variation-settings: "opsz" 96;
+    font-size: clamp(3rem, 5vw, 5rem); line-height: .95; letter-spacing: -0.04em;
+  }
+  .sub { margin-top: 26px; font-size: 1.12rem; line-height: 1.55; max-width: 34ch; color: rgba(242,243,236,.88); }
+  .ctas { margin-top: 36px; display: flex; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; transition: transform 200ms var(--ease), background 150ms var(--ease); }
+  .btn.primary { background: var(--print); color: var(--mat-deep); }
+  .btn.primary:hover { transform: translateY(-2px); }
+  .btn.ghost { border: 1px solid rgba(242,243,236,.5); color: var(--print); }
+  .btn.ghost:hover { border-color: var(--print); }
+
+  /* Objects on the mat */
+  .obj { position: absolute; z-index: 2; }
+  .receipt { right: 330px; top: 120px; width: 300px; transform: rotate(-5deg); filter: drop-shadow(10px 18px 14px var(--shadow)); }
+  .receipt img { width: 100%; display: block; }
+  .tape { position: absolute; left: 50%; top: -14px; width: 120px; height: 34px; margin-left: -60px; transform: rotate(3deg);
+          background: rgba(242, 211, 92, .55); mix-blend-mode: normal; box-shadow: 0 1px 0 rgba(0,0,0,.08); }
+  .sticker img { display: block; width: 100%;
+    filter: drop-shadow(2px 0 0 var(--print)) drop-shadow(-2px 0 0 var(--print)) drop-shadow(0 2px 0 var(--print)) drop-shadow(0 -2px 0 var(--print)) drop-shadow(6px 9px 7px var(--shadow)); }
+  .s1 { right: 110px; top: 150px; width: 150px; transform: rotate(8deg); }
+  .s2 { right: 70px; top: 340px; width: 170px; transform: rotate(-6deg); }
+  .s3 { right: 210px; top: 560px; width: 130px; transform: rotate(4deg); }
+  .notch { right: 470px; top: 610px; width: 250px; transform: rotate(-3deg);
+           filter: drop-shadow(0 0 0 transparent) drop-shadow(8px 12px 10px var(--shadow)); }
+  .notch .die { background: var(--print); padding: 8px; border-radius: 14px 14px 46px 46px; }
+  .notch img { display: block; width: 100%; border-radius: 8px 8px 38px 38px; }
+
+  /* Pencil callouts: dimension-line annotations carrying real facts */
+  .note { position: absolute; z-index: 4; font: 500 11px/1.5 "JetBrains Mono", monospace; letter-spacing: .1em; text-transform: uppercase; color: var(--yellow); }
+  .note b { display: block; font: 800 34px/1 "Bricolage Grotesque", sans-serif; letter-spacing: -0.03em; color: var(--print); text-transform: none; }
+  .note::before { content: ""; position: absolute; background: var(--yellow); }
+  .n1 { right: 660px; top: 128px; text-align: right; }
+  .n1::before { right: -44px; top: 22px; width: 36px; height: 1px; }
+  .n2 { right: 40px; top: 690px; }
+  .n2::before { left: 18px; top: -30px; width: 1px; height: 24px; }
+  .n3 { left: 722px; top: 776px; }
+  .n3::before { left: 18px; top: -26px; width: 1px; height: 20px; }
+  .scale { position: absolute; left: 88px; bottom: 44px; z-index: 3; font: 500 11px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: rgba(242,243,236,.7); }
+</style>
+</head>
+<body>
+  <div class="mat" aria-hidden="true"></div>
+  <div class="ruler-top" id="rt" aria-hidden="true"></div>
+  <div class="ruler-left" id="rl" aria-hidden="true"></div>
+
+  <nav>
+    <span class="mark"><i></i>Ravindra Sisodia</span>
+    <ul><li><a href="#">Launches</a></li><li><a href="#">Work</a></li><li><a href="#">Contact</a></li></ul>
+  </nav>
+
+  <div class="copy">
+    <p class="who">Designer + AI engineer</p>
+    <h1>Designs it.<br>Ships it with agents.</h1>
+    <p class="sub">Three Mac apps in the Product Hunt top 10 in seven weeks, built with Claude Code.</p>
+    <div class="ctas"><a class="btn primary" href="#">See the launches</a><a class="btn ghost" href="#">Contact</a></div>
+  </div>
+
+  <figure class="obj receipt"><span class="tape"></span><img src="receipt.png" alt="Chit's printed receipt of a day of Claude Code work"></figure>
+  <figure class="obj sticker s1"><img src="ember.png" alt="Ember, a Crew monster sticker"></figure>
+  <figure class="obj sticker s2"><img src="breeze.png" alt="Breeze, a Crew monster sticker"></figure>
+  <figure class="obj sticker s3"><img src="sprout.png" alt="Sprout, a Crew monster sticker"></figure>
+  <figure class="obj notch"><div class="die"><img src="notch-cut.png" alt="Notchling's face, as a die-cut sticker"></div></figure>
+
+  <p class="note n1"><b>#3 Chit</b>Product of the day<br>Sep 26 · 777 KB</p>
+  <p class="note n2"><b>#7 Crew</b>Product of the day<br>Aug 7</p>
+  <p class="note n3"><b>#8 Notchling</b>Product of the day · Sep 1</p>
+
+  <p class="scale">Scale 1:1 · everything on this mat shipped</p>
+
+<script>
+  const rt = document.getElementById("rt"), rl = document.getElementById("rl");
+  for (let i = 1; i * 40 < innerWidth; i++) rt.insertAdjacentHTML("beforeend", `<span style="left:${i*40}px">${i % 5 === 0 ? i : "·"}</span>`);
+  for (let i = 1; i * 40 < innerHeight; i++) rl.insertAdjacentHTML("beforeend", `<span style="top:${i*40}px">${i % 5 === 0 ? i : "·"}</span>`);
+</script>
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comp B, Station board</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Noto+Sans+Devanagari:wght@700;800&family=JetBrains+Mono:wght@500&display=block" rel="stylesheet">
+<style>
+  :root {
+    --board: #F4C21B;        /* Indian Railways station-board yellow */
+    --ink: #111110;
+    --flap: #1A1A19;
+    --flap-hi: #242423;
+    --flap-text: #F3F1E6;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--board); color: var(--ink); font-family: Archivo, sans-serif; min-height: 100dvh; overflow: hidden; }
+  ::selection { background: var(--ink); color: var(--board); }
+  body::after { /* painted-steel grain */
+    content: ""; position: fixed; inset: 0; pointer-events: none; opacity: .35; mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45 0 0 0 0 .32 0 0 0 0 .02 0 0 0 .28 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  }
+  nav { position: fixed; top: 26px; left: 56px; right: 56px; display: flex; justify-content: space-between; align-items: center; z-index: 5;
+        font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .12em; text-transform: uppercase; }
+  nav ul { display: flex; gap: 28px; list-style: none; padding: 0; }
+  nav a { color: var(--ink); text-decoration: none; border-bottom: 1px solid transparent; padding-bottom: 3px; }
+  nav a:hover { border-color: var(--ink); }
+
+  /* The nameboard: black keyline border, two scripts stacked, set like a platform sign */
+  .board { position: absolute; left: 56px; right: 56px; top: 86px; border: 6px solid var(--ink); padding: 26px 40px 30px; text-align: center; }
+  .board::before { content: ""; position: absolute; inset: 6px; border: 1px solid var(--ink); pointer-events: none; }
+  .hi { font: 800 clamp(2.4rem, 4.6vw, 4.4rem)/1.25 "Noto Sans Devanagari", sans-serif; }
+  h1 { font-family: Archivo, sans-serif; font-weight: 900; font-variation-settings: "wdth" 70; font-size: clamp(4rem, 9.2vw, 9rem); line-height: .86; letter-spacing: -0.01em; margin-top: 2px; }
+  .board .line { margin-top: 18px; font: 600 14px/1 "JetBrains Mono", monospace; letter-spacing: .2em; text-transform: uppercase; }
+
+  .lower { position: absolute; left: 56px; right: 56px; top: 470px; display: grid; grid-template-columns: 1fr auto; gap: 40px; align-items: start; }
+  .sub { font: 600 1.25rem/1.45 Archivo, sans-serif; font-variation-settings: "wdth" 90; max-width: 30ch; }
+  .ctas { display: flex; gap: 12px; margin-top: 24px; }
+  .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; }
+  .btn.primary { background: var(--ink); color: var(--board); }
+  .btn.ghost { border: 1px solid var(--ink); color: var(--ink); }
+
+  /* Split-flap arrivals board */
+  .flapboard { background: var(--ink); padding: 18px 20px 20px; box-shadow: 0 18px 30px -18px rgba(60,40,0,.6); }
+  .fb-head { display: flex; justify-content: space-between; color: var(--board); font: 600 12px/1 "JetBrains Mono", monospace; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 12px; }
+  .fb-head .hi2 { font: 700 15px/1 "Noto Sans Devanagari", sans-serif; letter-spacing: 0; }
+  .row { display: flex; gap: 14px; margin-top: 6px; }
+  .cells { display: flex; gap: 3px; }
+  .c { position: relative; width: 26px; height: 38px; background: linear-gradient(var(--flap-hi) 0 50%, var(--flap) 50% 100%); border-radius: 3px;
+       color: var(--flap-text); font: 700 26px/38px Archivo, sans-serif; font-variation-settings: "wdth" 75; text-align: center; overflow: hidden; }
+  .c::after { content: ""; position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: #050505; }
+  .c.flip { animation: flip 70ms linear; }
+  @keyframes flip { 50% { transform: scaleY(.15); } }
+  .labels { display: flex; gap: 14px; color: rgba(244,194,27,.75); font: 500 10px/1 "JetBrains Mono", monospace; letter-spacing: .16em; margin-top: 10px; }
+  @media (prefers-reduced-motion: reduce) { .c.flip { animation: none; } }
+</style>
+</head>
+<body>
+  <nav><span>Ravindra Sisodia</span><ul><li><a href="#">Launches</a></li><li><a href="#">Work</a></li><li><a href="#">Contact</a></li></ul></nav>
+
+  <header class="board">
+    <p class="hi" lang="hi">रविंद्र सिसोदिया</p>
+    <h1>RAVINDRA SISODIA</h1>
+    <p class="line">Designer + AI engineer · from Jodhpur</p>
+  </header>
+
+  <section class="lower">
+    <div>
+      <p class="sub">Three Mac apps in the Product Hunt top 10 in seven weeks, built with Claude Code.</p>
+      <div class="ctas"><a class="btn primary" href="#">See the launches</a><a class="btn ghost" href="#">Contact</a></div>
+    </div>
+    <div class="flapboard" aria-label="Arrivals: Chit number 3 on 26 September, Crew number 7 on 7 August, Notchling number 8 on 1 September">
+      <div class="fb-head"><span>Arrivals</span><span class="hi2" lang="hi">आगमन</span><span>Product Hunt</span></div>
+      <div id="rows" aria-hidden="true"></div>
+      <div class="labels" aria-hidden="true"><span style="width:262px">APP</span><span style="width:84px">RANK</span><span>DATE</span></div>
+    </div>
+  </section>
+
+<script>
+  const ROWS = [["CHIT", "#3", "26 SEP"], ["CREW", "#7", "07 AUG"], ["NOTCHLING", "#8", "01 SEP"]];
+  const W = [9, 3, 6], CH = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#";
+  const host = document.getElementById("rows");
+  const cells = [];
+  ROWS.forEach((r) => {
+    const row = document.createElement("div"); row.className = "row";
+    r.forEach((txt, k) => {
+      const g = document.createElement("div"); g.className = "cells";
+      const t = txt.padEnd(W[k], " ");
+      for (const ch of t) { const c = document.createElement("span"); c.className = "c"; c.textContent = " "; g.appendChild(c); cells.push([c, ch]); }
+      row.appendChild(g);
+    });
+    host.appendChild(row);
+  });
+  const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  cells.forEach(([c, target], i) => {
+    if (reduced || target === " ") { c.textContent = target; return; }
+    let n = 6 + Math.floor(Math.random() * 10);   // irregular settle, like real flaps
+    const start = 350 + i * 22;                   // anticipation, then a rolling wave
+    setTimeout(function tick() {
+      c.classList.remove("flip"); void c.offsetWidth; c.classList.add("flip");
+      c.textContent = n-- > 0 ? CH[Math.floor(Math.random() * CH.length)] : target;
+      if (n >= 0) setTimeout(tick, 70);
+    }, start);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comp H, Linear / Vercel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=block" rel="stylesheet">
+<style>
+  :root { --bg: #08090A; --panel: #0F1011; --line: rgba(255,255,255,0.08); --line-hi: rgba(255,255,255,0.14);
+          --text: #F7F8F8; --dim: #8A8F98; --faint: #62666D; --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--text); font-family: Geist, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow: hidden; }
+  ::selection { background: rgba(255,255,255,.2); }
+  nav { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 max(32px, calc((100vw - 1200px) / 2)); border-bottom: 1px solid var(--line); }
+  .logo { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 15px; letter-spacing: -0.01em; }
+  .logo i { width: 18px; height: 18px; border-radius: 5px; background: linear-gradient(135deg, #F7F8F8, #8A8F98); display: block; }
+  nav ul { display: flex; gap: 28px; list-style: none; padding: 0; font-size: 14px; }
+  nav a { color: var(--dim); text-decoration: none; transition: color 150ms var(--ease); }
+  nav a:hover { color: var(--text); }
+  .nav-cta { font-size: 14px; color: var(--text); text-decoration: none; border: 1px solid var(--line-hi); border-radius: 8px; padding: 7px 14px; }
+  .hero { text-align: center; padding-top: 96px; position: relative; }
+  .hero::before { content: ""; position: absolute; left: 50%; top: -120px; width: 900px; height: 480px; margin-left: -450px; pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(120,130,160,.14), transparent 65%); }
+  .pill { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; color: var(--dim); border: 1px solid var(--line-hi); border-radius: 999px; padding: 6px 14px 6px 6px; text-decoration: none; }
+  .pill b { font-weight: 500; font-size: 12px; color: var(--text); background: rgba(255,255,255,.08); border-radius: 999px; padding: 3px 9px; }
+  h1 { margin: 28px auto 0; max-width: 900px; font-weight: 600; font-size: clamp(3rem, 5.4vw, 4.75rem); line-height: 1.02; letter-spacing: -0.045em;
+       background: linear-gradient(180deg, #F7F8F8 30%, #9BA0A8); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: 6px; }
+  .sub { margin: 22px auto 0; max-width: 34em; font-size: 1.15rem; line-height: 1.55; color: var(--dim); }
+  .ctas { margin-top: 34px; display: flex; gap: 12px; justify-content: center; }
+  .btn { display: inline-flex; align-items: center; height: 44px; padding: 0 20px; border-radius: 10px; font-size: 15px; font-weight: 500; text-decoration: none; transition: opacity 150ms var(--ease); }
+  .btn.primary { background: var(--text); color: var(--bg); }
+  .btn.ghost { color: var(--text); border: 1px solid var(--line-hi); }
+  .btn:hover { opacity: .88; }
+  .shots { margin: 72px auto 0; width: min(1200px, calc(100vw - 64px)); display: grid; grid-template-columns: 1fr 1.4fr 1.4fr; gap: 16px; }
+  .win { border: 1px solid var(--line-hi); border-radius: 14px; background: var(--panel); overflow: hidden; box-shadow: 0 30px 60px -30px rgba(0,0,0,.8), inset 0 1px 0 rgba(255,255,255,.06); }
+  .bar { height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid var(--line); font: 500 11px/1 "Geist Mono", monospace; color: var(--faint); }
+  .bar i { width: 9px; height: 9px; border-radius: 50%; background: #2A2C2F; display: block; }
+  .bar span { margin-left: auto; color: var(--dim); }
+  .win img { display: block; width: 100%; height: 300px; object-fit: cover; object-position: top center; }
+</style>
+</head>
+<body>
+  <nav>
+    <span class="logo"><i></i>Ravindra Sisodia</span>
+    <ul><li><a href="#">Launches</a></li><li><a href="#">How I build</a></li><li><a href="#">Work</a></li></ul>
+    <a class="nav-cta" href="#">Contact</a>
+  </nav>
+  <section class="hero">
+    <a class="pill" href="#"><b>New</b>Chit is #3 Product of the Day on Product Hunt →</a>
+    <h1>Designer who ships software with agents.</h1>
+    <p class="sub">Three Mac apps in the Product Hunt top 10 in seven weeks, built with Claude Code.</p>
+    <div class="ctas"><a class="btn primary" href="#">See the launches</a><a class="btn ghost" href="#">How I build</a></div>
+  </section>
+  <div class="shots">
+    <div class="win"><div class="bar"><i></i><i></i><i></i><span>Chit · #3</span></div><img src="chit-dashboard-dark.png" alt="Chit dashboard showing a day of Claude Code work"></div>
+    <div class="win"><div class="bar"><i></i><i></i><i></i><span>Crew · #7</span></div><img src="crew-ui.png" alt="Crew asking to approve a git push, with its pixel monster"></div>
+    <div class="win"><div class="bar"><i></i><i></i><i></i><span>Notchling · #8</span></div><img src="notch-ui.png" alt="Notchling in the MacBook notch"></div>
+  </div>
+</body>
+</html>

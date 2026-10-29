@@ -1,0 +1,673 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0D0A08">
+<title>Ravindra Sisodia, designer and AI engineer</title>
+<meta name="description" content="Ravindra Sisodia designs software, then ships it with agents. Three Mac apps in the Product Hunt top 10 in seven weeks: Chit, Crew and Notchling.">
+<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ravindra-siso.vercel.app/">
+<meta property="og:title" content="Ravindra Sisodia, designer and AI engineer">
+<meta property="og:description" content="Three Mac apps in the Product Hunt top 10: Chit #3, Crew #7, Notchling #8. Built with Claude Code.">
+<meta property="og:image" content="https://ravindra-siso.vercel.app/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://api.fontshare.com" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://api.fontshare.com/v2/css?f[]=zodiak@400,700,401,701&f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="./assets/face.webp">
+<style>
+  /* ------------------------------------------------------------------
+     Tokens. One dark theme for the whole page: a desk at night under
+     one warm lamp. Amber is the only accent.
+     Z scale: canvas 0, veil 1, content 2, nav 10, loader 100.
+     ------------------------------------------------------------------ */
+  :root {
+    --night: #0D0A08;
+    --night-2: #15100C;
+    --warm: #F3E6D3;
+    --dim: rgba(243, 230, 211, 0.74);
+    --faint: rgba(243, 230, 211, 0.5);
+    --line: rgba(243, 230, 211, 0.14);
+    --lamp: #FFC98A;
+    --display: "Zodiak", "Times New Roman", serif;
+    --body: "Satoshi", system-ui, sans-serif;
+    --mono: "JetBrains Mono", ui-monospace, monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --spring: cubic-bezier(0.32, 0.72, 0, 1);
+    --gutter: clamp(20px, 4.4vw, 64px);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--night); color-scheme: dark; scrollbar-color: #3A2C22 var(--night); scrollbar-width: thin; }
+  ::-webkit-scrollbar { width: 11px; }
+  ::-webkit-scrollbar-track { background: var(--night); }
+  ::-webkit-scrollbar-thumb { background: #3A2C22; border: 3px solid var(--night); border-radius: 99px; }
+  body { margin: 0; background: var(--night); color: var(--warm); font-family: var(--body); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+  ::selection { background: var(--lamp); color: var(--night); }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--lamp); outline-offset: 3px; }
+  img { max-width: 100%; display: block; }
+  .skip { position: absolute; left: 16px; top: -60px; z-index: 101; background: var(--lamp); color: var(--night); padding: 13px 16px; min-height: 44px; font: 500 14px var(--body); text-decoration: none; }
+  .skip:focus { top: 16px; }
+  .mono { font-family: var(--mono); font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+  /* ---------- Loader: the name's letters rise, then the cover fades ---------- */
+  .loader { position: fixed; inset: 0; z-index: 100; background: var(--night); display: grid; place-items: center; transition: opacity 450ms var(--ease); }
+  .loader.is-done { opacity: 0; pointer-events: none; }
+  .loader-name { font: italic 400 1.9rem/1 var(--display); letter-spacing: -0.02em; overflow: hidden; padding: 0.12em 0 0.2em; }
+  .loader-name .ch { display: inline-block; transform: translateY(110%); transition: transform 600ms var(--ease); transition-delay: calc(var(--i) * 32ms); }
+  .loader.is-rising .ch { transform: none; }
+
+  /* ---------- Stage: the fixed 3D desk behind the hero and launches ---------- */
+  #stage { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; display: block; transition: opacity 600ms var(--ease); }
+  .stage-still { position: fixed; inset: 0; z-index: 0; background: var(--night) url(./assets/hero-still.jpg) center / cover no-repeat; display: none; }
+  .no-webgl .stage-still { display: block; }
+  .no-webgl #stage { display: none; }
+  .veil { position: fixed; inset: 0; z-index: 1; pointer-events: none; transition: opacity 600ms var(--ease);
+          background: linear-gradient(90deg, rgba(13,10,8,0.94) 0%, rgba(13,10,8,0.78) 32%, rgba(13,10,8,0) 58%); }
+  .grain { position: fixed; inset: 0; z-index: 1; pointer-events: none; opacity: 0.05;
+           background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  body.past-stage #stage, body.past-stage .veil, body.past-stage .stage-still { opacity: 0; }
+
+  /* ---------- Nav ---------- */
+  .nav { position: fixed; top: 0; left: 0; right: 0; z-index: 10; height: 72px; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
+  .nav::before { content: ""; position: absolute; inset: 0; background: linear-gradient(rgba(13,10,8,0.8), rgba(13,10,8,0)); pointer-events: none; transition: background 300ms var(--ease); }
+  body.past-stage .nav::before { background: rgba(13,10,8,0.94); border-bottom: 1px solid var(--line); }
+  .nav > * { position: relative; }
+  .brand { display: flex; align-items: center; gap: 10px; min-height: 44px; text-decoration: none; }
+  .brand i { width: 10px; height: 10px; background: var(--lamp); display: block; }
+  .nav ul { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+  .nav ul a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 12px; text-decoration: none; color: var(--dim); transition: color 150ms var(--ease); }
+  .nav ul a:hover { color: var(--warm); }
+
+  main { position: relative; z-index: 2; }
+  .wrap { padding: 0 var(--gutter); }
+
+  /* ---------- Buttons ---------- */
+  .btn { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; padding: 0 22px; font: 500 12px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; text-decoration: none;
+         transition: transform 200ms var(--spring), background 150ms var(--ease), border-color 150ms var(--ease), color 150ms var(--ease); }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary { background: var(--warm); color: var(--night); }
+  .btn-primary:hover { background: var(--lamp); transform: translateY(-2px); }
+  .btn-ghost { border: 1px solid rgba(243,230,211,0.4); color: var(--warm); }
+  .btn-ghost:hover { border-color: var(--warm); }
+
+  /* ---------- Hero ---------- */
+  .hero { min-height: 100dvh; display: flex; align-items: center; padding-top: 72px; }
+  .hero-copy { max-width: 720px; }
+  .eyebrow { color: var(--lamp); margin: 0 0 22px; }
+  h1 { font-family: var(--display); font-weight: 700; font-size: clamp(2.8rem, 4.7vw, 5rem); line-height: 0.96; letter-spacing: -0.035em; margin: 0; text-wrap: balance; }
+  h1 em { font-style: italic; font-weight: 400; color: var(--lamp); }
+  .lede { margin: 26px 0 0; max-width: 34ch; font-size: 1.2rem; line-height: 1.55; color: var(--dim); }
+  .ctas { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 34px; }
+  .hero-foot { position: absolute; left: var(--gutter); bottom: 32px; display: flex; gap: 32px; color: var(--faint); }
+  .hero-foot b { color: var(--lamp); font-weight: 500; margin-right: 8px; }
+
+  /* ---------- Launches: each stop is a screen; the camera flies behind them ---------- */
+  .launch { min-height: 100dvh; display: flex; align-items: center; }
+  .launch-card { max-width: 520px; }
+  .rank { display: flex; align-items: flex-end; gap: 18px; }
+  .rank-num { font: italic 400 clamp(5rem, 10vw, 9rem)/0.8 var(--display); letter-spacing: -0.05em; color: var(--lamp); font-variant-numeric: tabular-nums; }
+  .rank-when { color: var(--dim); padding-bottom: 8px; line-height: 1.6; }
+  .launch h2 { font: 700 clamp(2.4rem, 4vw, 3.6rem)/1 var(--display); letter-spacing: -0.03em; margin: 26px 0 0; }
+  .tagline { margin: 12px 0 0; font-size: 1.2rem; color: var(--warm); }
+  .what { margin: 14px 0 0; color: var(--dim); max-width: 46ch; }
+  .stack { list-style: none; margin: 20px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .stack li { font: 500 11px/1 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; padding: 8px 10px; border: 1px solid var(--line); color: var(--dim); }
+  .stats { margin: 18px 0 0; color: var(--dim); font-variant-numeric: tabular-nums; }
+  .launch-links { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 22px; }
+  .badge { display: inline-flex; min-height: 44px; align-items: center; transition: opacity 150ms var(--ease); }
+  .badge:hover { opacity: 0.85; }
+  .badge img { height: 44px; width: auto; }
+
+  /* ---------- After the stage: solid night, generous chapters ---------- */
+  .chapter { padding: clamp(80px, 10vw, 140px) 0; background: var(--night); }
+  .chapter-head { max-width: 1000px; margin-bottom: clamp(48px, 7vw, 88px); }
+  .chapter h2 { font: 700 clamp(2.6rem, 5vw, 4.6rem)/1 var(--display); letter-spacing: -0.035em; margin: 18px 0 0; text-wrap: balance; }
+  .chapter h2 em { font-style: italic; font-weight: 400; color: var(--lamp); }
+  .chapter-lede { margin: 22px 0 0; max-width: 58ch; color: var(--dim); font-size: 1.1rem; }
+
+  /* How I build: one routed line, four real steps sitting on it */
+  .flow { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; }
+  .flow::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 1px; background: linear-gradient(90deg, var(--lamp), rgba(255,201,138,0.2)); }
+  .step { position: relative; padding-top: 40px; }
+  .step::before { content: ""; position: absolute; left: 0; top: 0; width: 15px; height: 15px; border: 1px solid var(--lamp); background: var(--night); }
+  .step .mono { color: var(--lamp); }
+  .step h3 { font: 700 1.6rem/1.1 var(--display); letter-spacing: -0.02em; margin: 12px 0 10px; }
+  .step p { margin: 0; color: var(--dim); font-size: 0.98rem; }
+  .step a { color: var(--warm); text-underline-offset: 3px; position: relative; }
+  .step a::after { content: ""; position: absolute; left: -8px; right: -8px; top: -12px; bottom: -12px; }
+
+  /* Selected work: asymmetric image tiles, then the rest as quiet rows */
+  .tiles { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 20px; }
+  .tile { position: relative; display: block; text-decoration: none; background: var(--night-2); border: 1px solid var(--line); overflow: hidden; }
+  .tile:nth-child(1) { grid-column: span 7; }
+  .tile:nth-child(2) { grid-column: span 5; }
+  .tile:nth-child(3) { grid-column: span 5; }
+  .tile:nth-child(4) { grid-column: span 7; }
+  .tile-img { height: clamp(240px, 28vw, 420px); overflow: hidden; }
+  .tile-img img { width: 100%; height: 100%; object-fit: cover; object-position: top center; filter: saturate(0.85) sepia(0.12); transition: transform 700ms var(--ease), filter 300ms var(--ease); }
+  .tile:hover .tile-img img { transform: scale(1.03); filter: none; }
+  .tile-meta { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 18px 20px; border-top: 1px solid var(--line); }
+  .tile-meta h3 { font: 700 1.5rem/1.1 var(--display); letter-spacing: -0.02em; margin: 0; }
+  .tile-meta span { color: var(--faint); white-space: nowrap; }
+  .more { margin-top: 72px; }
+  .more-head { color: var(--faint); margin: 0 0 12px; }
+  .rows { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 40px; }
+  .row { display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: baseline; padding: 18px 0; border-top: 1px solid var(--line); text-decoration: none; transition: padding-left 220ms var(--ease), color 150ms var(--ease); }
+  .row:hover { padding-left: 6px; color: var(--lamp); }
+  .row b { font: 400 1.3rem/1.2 var(--display); letter-spacing: -0.01em; }
+  .row span { color: var(--faint); }
+  .peek { /* rav-verify-ignore: decorative hover preview, aria-hidden, content lives in the rows */ position: fixed; top: 0; left: 0; z-index: 9; width: 300px; pointer-events: none; opacity: 0; transition: opacity 200ms var(--ease); border: 1px solid var(--line); background: var(--night-2); }
+  .peek.on { opacity: 1; }
+  .peek img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; object-position: top; animation: peekIn 220ms var(--ease); }
+  @keyframes peekIn { from { opacity: 0; } }
+
+  /* Story: photos stay clean; words live on the night below them */
+  .story { display: grid; grid-template-columns: 1.15fr 1fr; gap: 20px; }
+  .story figure { margin: 0; }
+  .story .photo { overflow: hidden; border: 1px solid var(--line); }
+  .story .photo img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; filter: saturate(0.9) sepia(0.08); }
+  .story figcaption { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding-top: 22px; }
+  .story figcaption h3 { font: 700 clamp(1.9rem, 3vw, 2.8rem)/1 var(--display); letter-spacing: -0.03em; margin: 0; }
+  .story figcaption h3 em { font-style: italic; font-weight: 400; color: var(--lamp); }
+  .story figcaption p { margin: 0; color: var(--dim); max-width: 26ch; text-align: right; font-size: 0.98rem; }
+
+  /* Contact */
+  .contact h2 { max-width: 18ch; }
+  .mail { display: inline-block; margin-top: 40px; font: italic 400 clamp(1.8rem, 5vw, 4.4rem)/1.1 var(--display); letter-spacing: -0.03em; text-decoration: none; border-bottom: 1px solid var(--lamp); padding-bottom: 6px; transition: color 150ms var(--ease); overflow-wrap: anywhere; }
+  .mail:hover { color: var(--lamp); }
+  .contact-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; margin-top: 88px; padding-top: 32px; border-top: 1px solid var(--line); }
+  .contact-grid h3 { margin: 0 0 12px; color: var(--faint); font-weight: 500; }
+  .contact-grid p { display: block; margin: 0; padding: 4px 0; color: var(--dim); text-decoration: none; font-size: 0.98rem; }
+  .contact-grid a { display: flex; align-items: center; min-height: 44px; margin: 0; padding: 0; color: var(--dim); text-decoration: none; font-size: 0.98rem; }
+  .contact-grid a:hover { color: var(--warm); text-decoration: underline; text-underline-offset: 3px; }
+  footer { display: flex; justify-content: space-between; gap: 16px; padding: 28px var(--gutter) 40px; color: var(--faint); border-top: 1px solid var(--line); background: var(--night); position: relative; z-index: 2; }
+  footer a { color: var(--dim); text-underline-offset: 3px; position: relative; }
+  footer a::after { content: ""; position: absolute; left: -6px; right: -6px; top: -14px; bottom: -14px; }
+
+  /* ---------- Phones ---------- */
+  @media (max-width: 900px) {
+    body { font-size: 16px; }
+    .nav ul a { padding: 0 8px; }
+    .nav .brand span { display: none; }
+    .veil { background: linear-gradient(0deg, rgba(13,10,8,0.97) 0%, rgba(13,10,8,0.94) 56%, rgba(13,10,8,0.5) 63%, rgba(13,10,8,0) 70%); }
+    .rank-num { font-size: 4.2rem; }
+    .launch h2 { margin-top: 14px; }
+    .launch .what { margin-top: 10px; }
+    .hero { align-items: flex-end; padding-bottom: 96px; }
+    .hero-foot { bottom: 24px; gap: 20px; }
+    .launch { align-items: flex-end; padding-bottom: 64px; }
+    .flow { grid-template-columns: 1fr; gap: 36px; }
+    .flow::before { left: 7px; right: auto; top: 0; bottom: 0; width: 1px; height: auto; background: linear-gradient(180deg, var(--lamp), rgba(255,201,138,0.2)); }
+    .step { padding: 0 0 0 40px; }
+    .tiles { grid-template-columns: 1fr; }
+    .tile:nth-child(n) { grid-column: auto; }
+    .rows { grid-template-columns: 1fr; }
+    .peek { display: none; }
+    .story { grid-template-columns: 1fr; gap: 56px; }
+    .story figcaption { flex-direction: column; align-items: flex-start; }
+    .story figcaption p { text-align: left; }
+    .contact-grid { grid-template-columns: 1fr 1fr; }
+    .mail { font-size: clamp(1.1rem, 5.5vw, 2.4rem); white-space: nowrap; overflow-wrap: normal; }
+    .tile-meta { flex-direction: column; align-items: flex-start; gap: 8px; }
+    footer { flex-direction: column; }
+  }
+  @media (max-width: 520px) { .contact-grid { grid-template-columns: 1fr; } }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader-name .ch { transform: none; transition: none; }
+    .tile-img img, .row, .btn { transition: none; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="loader" id="loader" aria-hidden="true"><span class="loader-name" id="loaderName">Ravindra Sisodia</span></div>
+
+<canvas id="stage" aria-hidden="true"></canvas>
+<div class="stage-still" aria-hidden="true"></div>
+<div class="veil" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<nav class="nav" aria-label="Primary">
+  <a class="brand mono" href="#top"><i></i><span>Ravindra Sisodia</span></a>
+  <ul class="mono">
+    <li><a href="#launches">Launches</a></li>
+    <li><a href="#projects">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<main id="main">
+  <section class="hero wrap" id="top">
+    <div class="hero-copy">
+      <p class="eyebrow mono">Designer + AI engineer</p>
+      <h1>Designs it.<br>Ships it with <em>agents.</em></h1>
+      <p class="lede">Three Mac apps in the Product Hunt top 10 in seven weeks, built with Claude Code.</p>
+      <div class="ctas"><a class="btn btn-primary" href="#launches">See the launches</a><a class="btn btn-ghost" href="#contact">Contact</a></div>
+    </div>
+    <p class="hero-foot mono" aria-hidden="true"><span><b>#3</b>Chit</span><span><b>#7</b>Crew</span><span><b>#8</b>Notchling</span></p>
+  </section>
+
+  <section id="launches" aria-label="Product Hunt launches">
+    <article class="launch wrap" data-shot="chit">
+      <div class="launch-card">
+        <div class="rank"><span class="rank-num">#3</span><span class="rank-when mono">Product of the day<br>Sep 26, 2026</span></div>
+        <h2>Chit</h2>
+        <p class="tagline">A printed receipt of your day in Claude Code.</p>
+        <p class="what">Parses the session transcripts Claude Code writes to disk and prints what you shipped, grouped by project and ready to paste.</p>
+        <ul class="stack"><li>Swift</li><li>Transcript parsing</li><li>777 KB, no network</li></ul>
+        <p class="stats mono">226 points · #26 of the week</p>
+        <div class="launch-links">
+          <a class="btn btn-ghost" href="https://chit.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
+          <a class="badge" href="https://www.producthunt.com/products/chit-2" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/top-post-badge.svg?post_id=1254383&amp;theme=dark&amp;period=daily" alt="Chit, #3 Product of the Day on Product Hunt" width="204" height="44" loading="lazy"></a>
+        </div>
+      </div>
+    </article>
+
+    <article class="launch wrap" data-shot="crew">
+      <div class="launch-card">
+        <div class="rank"><span class="rank-num">#7</span><span class="rank-when mono">Product of the day<br>Aug 7, 2026</span></div>
+        <h2>Crew</h2>
+        <p class="tagline">A tiny crew of monsters for your Claude Code agents.</p>
+        <p class="what">Listens to Claude Code hook events and gives every running chat and subagent its own pixel monster along the bottom of your screen.</p>
+        <ul class="stack"><li>SwiftUI</li><li>Claude Code hooks</li><li>Multi-agent tracking</li></ul>
+        <p class="stats mono">#45 of the week</p>
+        <div class="launch-links">
+          <a class="btn btn-ghost" href="https://crew-deskmates.vercel.app/crew/" target="_blank" rel="noopener">Site ↗</a>
+          <a class="badge" href="https://www.producthunt.com/products/crew-a-tiny-crew-for-claude-code" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1216349&amp;theme=dark" alt="Crew, featured on Product Hunt" width="204" height="44" loading="lazy"></a>
+        </div>
+      </div>
+    </article>
+
+    <article class="launch wrap" data-shot="notch">
+      <div class="launch-card">
+        <div class="rank"><span class="rank-num">#8</span><span class="rank-when mono">Product of the day<br>Sep 1, 2026</span></div>
+        <h2>Notchling</h2>
+        <p class="tagline">A little creature that lives in your MacBook notch.</p>
+        <p class="what">Follows your cursor, dozes when you go idle, and carries any file you drop into its mouth. Live weather, drawn frame by frame.</p>
+        <ul class="stack"><li>SwiftUI</li><li>Canvas + TimelineView</li><li>Drag and drop</li></ul>
+        <p class="stats mono">#53 of the week · In the PH newsletter</p>
+        <div class="launch-links">
+          <a class="btn btn-ghost" href="https://notchling.zopcloud.zop.dev/" target="_blank" rel="noopener">Site ↗</a>
+          <a class="badge" href="https://www.producthunt.com/products/notchling-lives-in-your-notch" target="_blank" rel="noopener"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1232843&amp;theme=dark" alt="Notchling, featured on Product Hunt" width="204" height="44" loading="lazy"></a>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <section class="chapter" id="build" aria-labelledby="build-title">
+    <div class="wrap">
+      <header class="chapter-head">
+        <p class="eyebrow mono">How it ships</p>
+        <h2 id="build-title">The launches are the output. The system is <em>the work.</em></h2>
+      </header>
+      <div class="flow">
+        <div class="step"><p class="mono">Taste</p><h3>My own design skill</h3><p><a href="https://rav-skill.zopcloud.zop.dev" target="_blank" rel="noopener">/rav</a> is a Claude Code skill with a core spec and eight reference playbooks for layout, motion, color and copy. It built this page.</p></div>
+        <div class="step"><p class="mono">Build</p><h3>Hooks, not polling</h3><p>Crew wires Claude Code's UserPromptSubmit, Stop, PreToolUse and SubagentStop events into one shell script, so every agent appears the moment it starts.</p></div>
+        <div class="step"><p class="mono">Review</p><h3>Agents that review agents</h3><p>Notchling's weather scenes went through an eight-agent panel: one subagent per screenshot plus a coherence judge, scoring against a written brief.</p></div>
+        <div class="step"><p class="mono">Record</p><h3>Transcripts as data</h3><p>Chit and my daily worklog read Claude Code's own session transcripts, so the record of what I shipped writes itself every evening.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="chapter" id="projects" aria-labelledby="work-title">
+    <div class="wrap">
+      <header class="chapter-head">
+        <p class="eyebrow mono">Selected work</p>
+        <h2 id="work-title">Brands, sites and apps, <em>2018 to 2026.</em></h2>
+      </header>
+      <div class="tiles">
+        <a class="tile" href="https://zop-dev-website-v3.vercel.app/" target="_blank" rel="noopener"><div class="tile-img"><img src="./img/work-zopdev-site.png" alt="Zop.Dev marketing site hero: Build. Deploy. Govern. On every cloud." loading="lazy"></div><div class="tile-meta"><h3>Zop.Dev · Marketing site</h3><span class="mono">Brand · Web · 2026</span></div></a>
+        <a class="tile" href="https://zop-dev-brandkit-v1.vercel.app/" target="_blank" rel="noopener"><div class="tile-img"><img src="./img/work-zopdev-brandkit.png" alt="Zop.Dev brand kit, an internal tool for templates, tokens and icons" loading="lazy"></div><div class="tile-meta"><h3>Zop.Dev · Brand kit</h3><span class="mono">Brand · Identity · 2026</span></div></a>
+        <a class="tile" href="https://screenroot.com/work/yes-bank-app-ui-design/" target="_blank" rel="noopener"><div class="tile-img"><img src="./img/work-yesbank.png" alt="YES Bank mobile app screens" loading="lazy"></div><div class="tile-meta"><h3>YES Bank · App UI</h3><span class="mono">Case · Product · 2023</span></div></a>
+        <a class="tile" href="https://screenroot.com/work/ceat-tyre-website-design/" target="_blank" rel="noopener"><div class="tile-img"><img src="./img/work-ceat.png" alt="CEAT Tyres website on a laptop" loading="lazy"></div><div class="tile-meta"><h3>CEAT Tyres · Website</h3><span class="mono">Case · Web · 2023</span></div></a>
+      </div>
+      <div class="more">
+        <p class="more-head mono">More work</p>
+        <div class="rows">
+          <a class="row" href="https://us.strandls.com/" target="_blank" rel="noopener" data-peek="./img/thumb-strand.jpg"><b>Strand Life Sciences</b><span class="mono">Web · 2024</span></a>
+          <a class="row" href="https://vocautomotive.com/" target="_blank" rel="noopener" data-peek="./img/thumb-voc.jpg"><b>VOC Automotive</b><span class="mono">Web · 2025</span></a>
+          <a class="row" href="https://federate.one/" target="_blank" rel="noopener"><b>Federate</b><span class="mono">Identity · 2025</span></a>
+          <a class="row" href="https://screenroot.com/work/tata-capital-website-design/" target="_blank" rel="noopener" data-peek="./img/thumb-tata-capital.jpg"><b>Tata Capital · Website</b><span class="mono">Case · 2022</span></a>
+          <a class="row" href="https://zop-night-tetris-cloud.vercel.app/" target="_blank" rel="noopener" data-peek="./img/thumb-zopnight-tetris.jpg"><b>ZopNight · Tetris Cloud</b><span class="mono">Concept · 2026</span></a>
+          <a class="row" href="https://zop-branding-launch-plan.vercel.app/" target="_blank" rel="noopener" data-peek="./img/thumb-launch-plan.jpg"><b>Zop.Dev · Brand launch plan</b><span class="mono">Strategy · 2026</span></a>
+          <a class="row" href="https://lyke-eosin.vercel.app/" target="_blank" rel="noopener" data-peek="./img/thumb-lyke.jpg"><b>Lyke</b><span class="mono">Product · 2026</span></a>
+          <a class="row" href="https://contrast-check-v1.vercel.app/" target="_blank" rel="noopener" data-peek="./img/thumb-contrast-check.jpg"><b>Contrast Check</b><span class="mono">Tool · 2025</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="peek" id="peek" aria-hidden="true"></div>
+  </section>
+
+  <section class="chapter" id="story" aria-label="Story">
+    <div class="wrap story">
+      <figure>
+        <div class="photo"><img src="./story-jodhpur.jpg" alt="Mehrangarh Fort above the blue city of Jodhpur" loading="lazy"></div>
+        <figcaption><h3>The place where I grew <em>with design.</em></h3><p class="mono">Jodhpur, Rajasthan</p></figcaption>
+      </figure>
+      <figure>
+        <div class="photo"><img src="./story-bike.jpg" alt="My Royal Enfield parked above a hillside tea estate" loading="lazy"></div>
+        <figcaption><h3>Pixels by day, <em>petrol by dusk.</em></h3><p class="mono">The only thing that empties my head</p></figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="chapter contact" id="contact" aria-labelledby="contact-title">
+    <div class="wrap">
+      <p class="eyebrow mono">Contact</p>
+      <h2 id="contact-title">Pitch me something <em>impossible.</em></h2>
+      <a class="mail" href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a>
+      <div class="contact-grid">
+        <div><h3 class="mono">Based in</h3><p>Bengaluru, India · UTC+5:30</p></div>
+        <div><h3 class="mono">Elsewhere</h3>
+          <a href="https://github.com/sisodiaravindra10" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.linkedin.com/in/ravindra-sisodia/" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://dribbble.com/sisodiaravindra" target="_blank" rel="noopener">Dribbble</a>
+          <a href="https://www.behance.net/ravindrasisodia" target="_blank" rel="noopener">Behance</a>
+          <a href="https://www.instagram.com/ravindrasiso/" target="_blank" rel="noopener">Instagram</a>
+        </div>
+        <div><h3 class="mono">Replies</h3><p>Within 24 hours, most days. Slower on Sundays.</p></div>
+        <div><h3 class="mono">Currently</h3><p>An AI engineer who also ships the design. Looking for the next app or site to build end to end.</p></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="mono">
+  <span>© 2026 · Ravindra Sisodia</span>
+  <span>Previous version: <a href="./v1/">the dithered one</a></span>
+</footer>
+
+<!-- Optional smooth scroll. The page reads and scrolls normally if this fails to load. -->
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.20/dist/lenis.min.js" onerror="void 0"></script><!-- rav-verify-ignore: progressive enhancement only -->
+<script>
+/* ---------- Loader: hold for the letters, the page and the fonts; never past 1.8s ---------- */
+(function () {
+  const loader = document.getElementById("loader"), name = document.getElementById("loaderName");
+  const text = name.textContent;
+  name.innerHTML = [...text].map((c, i) => `<span class="ch" style="--i:${i}">${c === " " ? "&nbsp;" : c}</span>`).join("");
+  requestAnimationFrame(() => requestAnimationFrame(() => loader.classList.add("is-rising")));
+  const start = performance.now();
+  let done = false;
+  function finish() {
+    if (done) return; done = true;
+    setTimeout(() => { loader.classList.add("is-done"); setTimeout(() => loader.remove(), 500); },
+      Math.max(0, 1050 - (performance.now() - start)));
+  }
+  const loaded = document.readyState === "complete" ? Promise.resolve() : new Promise((r) => addEventListener("load", r, { once: true }));
+  Promise.all([loaded, document.fonts ? document.fonts.ready : null, window.__stageReady || null]).then(finish);
+  setTimeout(finish, 1800);
+})();
+
+/* ---------- Smooth scroll (skipped for reduced motion) ---------- */
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (window.Lenis && !REDUCED) {
+  const lenis = new Lenis({ duration: 1.05, smoothWheel: true });
+  (function raf(t) { lenis.raf(t); requestAnimationFrame(raf); })(performance.now());
+  window.__lenis = lenis;
+  document.querySelectorAll('a[href^="#"]').forEach((a) => a.addEventListener("click", (e) => {
+    const t = document.querySelector(a.getAttribute("href")); if (!t) return; e.preventDefault(); lenis.scrollTo(t);
+  }));
+}
+
+/* Dev hook (inert without the param): ?at=<css selector> jumps there on load, for screenshots. */
+(function () { const at = new URLSearchParams(location.search).get("at"); if (!at) return;
+  addEventListener("load", () => { const el = document.querySelector(at); if (el) scrollTo(0, el.getBoundingClientRect().top + scrollY); }); })();
+
+/* ---------- Work rows: a calm preview that follows the pointer ---------- */
+(function () {
+  const peek = document.getElementById("peek"); if (!peek || !matchMedia("(hover: hover)").matches) return;
+  let x = 0, y = 0, showT = 0, hideT = 0;
+  addEventListener("pointermove", (e) => { x = e.clientX; y = e.clientY; place(); }, { passive: true });
+  function place() { const w = 300, h = 188, px = x + w + 32 > innerWidth ? x - w - 24 : x + 24, py = Math.min(y + 24, innerHeight - h - 8); peek.style.transform = `translate(${px}px, ${py}px)`; }
+  document.querySelectorAll(".row[data-peek]").forEach((row) => {
+    row.addEventListener("mouseenter", () => {
+      clearTimeout(hideT);
+      peek.innerHTML = `<img src="${row.dataset.peek}" alt="">`;
+      if (!peek.classList.contains("on")) { clearTimeout(showT); showT = setTimeout(() => peek.classList.add("on"), 120); }
+    });
+    row.addEventListener("mouseleave", () => { clearTimeout(showT); hideT = setTimeout(() => peek.classList.remove("on"), 140); });
+  });
+})();
+</script>
+
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+<script type="module">
+import * as THREE from "three";
+
+const canvas = document.getElementById("stage");
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const SMALL = matchMedia("(max-width: 900px)").matches;
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: !SMALL, powerPreference: "high-performance" });
+} catch (e) {
+  document.documentElement.classList.add("no-webgl");
+  throw e;
+}
+renderer.setPixelRatio(Math.min(devicePixelRatio, SMALL ? 1.5 : 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color("#0D0A08");
+scene.fog = new THREE.Fog("#0D0A08", 13, 30);
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.1, 80);
+
+/* Walnut desk, painted on a canvas: long grain streaks over a warm dark base. */
+const wc = document.createElement("canvas"); wc.width = 1024; wc.height = 1024;
+const w = wc.getContext("2d");
+w.fillStyle = "#3A2418"; w.fillRect(0, 0, 1024, 1024);
+for (let i = 0; i < 900; i++) {
+  const y = Math.random() * 1024, a = Math.random() * 0.12;
+  w.strokeStyle = Math.random() > .5 ? `rgba(20,10,5,${a})` : `rgba(120,78,48,${a})`;
+  w.lineWidth = 1 + Math.random() * 3; w.beginPath(); w.moveTo(0, y);
+  for (let x = 0; x <= 1024; x += 64) w.lineTo(x, y + Math.sin(x / 140 + i) * 6);
+  w.stroke();
+}
+const wood = new THREE.CanvasTexture(wc); wood.colorSpace = THREE.SRGBColorSpace; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(2, 2);
+const desk = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshStandardMaterial({ map: wood, roughness: .55, metalness: .05 }));
+desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
+
+/* One warm lamp over the desk, plus a faint cool fill. */
+const lamp = new THREE.SpotLight("#FFC98A", 260, 30, Math.PI / 5.2, 0.55, 1.6);
+lamp.position.set(6.2, 8, 2.8); lamp.target.position.set(4.1, 0, 0.4); lamp.castShadow = true;
+lamp.shadow.mapSize.set(SMALL ? 1024 : 2048, SMALL ? 1024 : 2048); lamp.shadow.bias = -0.0006; lamp.shadow.normalBias = 0.03; lamp.shadow.radius = 6;
+scene.add(lamp, lamp.target);
+scene.add(new THREE.HemisphereLight("#445066", "#1A0F08", 0.35));
+
+const loader = new THREE.TextureLoader();
+const pending = [];
+const tex = (src) => { let done; pending.push(new Promise((r) => (done = r))); const t = loader.load(src, done, undefined, done); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+
+/* Me, behind the desk: the cut-out portrait as a lamp-lit card, faded into the dark at the bottom. */
+const faceTex = tex("./assets/face.webp");
+const faceMat = new THREE.ShaderMaterial({
+  transparent: true,
+  uniforms: { map: { value: faceTex }, grade: { value: new THREE.Color(0.98, 0.88, 0.76) } },
+  vertexShader: `varying vec2 vUv;
+    void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+  fragmentShader: `uniform sampler2D map; uniform vec3 grade; varying vec2 vUv;
+    void main() {
+      vec4 c = texture2D(map, vUv);
+      float fade = smoothstep(0.02, 0.36, vUv.y);                       // dissolve into the desk's shadow
+      float light = mix(0.55, 1.0, smoothstep(0.1, 0.9, vUv.x));        // lamp side is brighter
+      gl_FragColor = vec4(c.rgb * grade * light, c.a * fade);
+      #include <colorspace_fragment>
+    }`,
+});
+const FACE_W = 6.1, FACE_H = FACE_W * 1117 / 1400;
+const face = new THREE.Mesh(new THREE.PlaneGeometry(FACE_W, FACE_H), faceMat);
+face.position.set(5.9, FACE_H / 2 + 0.02, -5.4);
+face.rotation.x = -0.08;
+scene.add(face);
+
+/* Chit receipt: a thin curled sheet lying on the desk. */
+const rg = new THREE.PlaneGeometry(1.9, 1.9 * 1208 / 920, 20, 30);
+const rp = rg.attributes.position;
+for (let i = 0; i < rp.count; i++) { const y = rp.getY(i); rp.setZ(i, 0.06 * Math.pow(y / 1.25, 2) + 0.02 * Math.sin(rp.getX(i) * 3)); }
+rg.computeVertexNormals();
+const receipt = new THREE.Mesh(rg, new THREE.MeshStandardMaterial({ map: tex("./assets/receipt.png"), transparent: true, alphaTest: .4, roughness: .9, side: THREE.DoubleSide }));
+receipt.rotation.set(-Math.PI / 2, 0, 0.22); receipt.position.set(2.9, 0.03, 0.3); receipt.castShadow = true; receipt.receiveShadow = true;
+receipt.userData.shot = "chit"; scene.add(receipt);
+
+/* Crew monsters as voxel toys: every 10px pixel of the real sprite becomes a block in its exact colour. */
+const CELL = 10, DEPTH = 6;
+function voxelize(src, height) {
+  let done; pending.push(new Promise((r) => (done = r)));
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onerror = () => done();
+    img.onload = () => {
+      const cw = Math.floor(img.width / CELL), ch = Math.floor(img.height / CELL);
+      const cv = document.createElement("canvas"); cv.width = img.width; cv.height = img.height;
+      const g = cv.getContext("2d", { willReadFrequently: true }); g.drawImage(img, 0, 0);
+      const data = g.getImageData(0, 0, img.width, img.height).data;
+      const cells = []; let minX = cw, maxX = 0, maxY = 0;
+      for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+        const i = ((y * CELL + CELL / 2) * img.width + (x * CELL + CELL / 2)) * 4;
+        if (data[i + 3] < 128) continue;
+        cells.push([x, y, data[i], data[i + 1], data[i + 2]]);
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+      }
+      const v = height / (maxY + 1), half = (v * DEPTH) / 2, cx = (minX + maxX) / 2;
+      // Only exposed faces: front and back per pixel, sides only where a neighbour is empty.
+      const solid = new Set(cells.map(([x, y]) => x + "," + y));
+      const P = [], N = [], C = [], col = new THREE.Color();
+      const quad = (a, b, c, d, n) => { for (const q of [a, b, c, a, c, d]) { P.push(...q); N.push(...n); C.push(col.r, col.g, col.b); } };
+      for (const [x, y, r, gg, b] of cells) {
+        col.setRGB(r / 255, gg / 255, b / 255, THREE.SRGBColorSpace);
+        const x0 = (x - cx) * v - v / 2, x1 = x0 + v, y1 = (maxY - y) * v + v, y0 = y1 - v;
+        quad([x0, y0, half], [x1, y0, half], [x1, y1, half], [x0, y1, half], [0, 0, 1]);
+        quad([x1, y0, -half], [x0, y0, -half], [x0, y1, -half], [x1, y1, -half], [0, 0, -1]);
+        if (!solid.has((x - 1) + "," + y)) quad([x0, y0, -half], [x0, y0, half], [x0, y1, half], [x0, y1, -half], [-1, 0, 0]);
+        if (!solid.has((x + 1) + "," + y)) quad([x1, y0, half], [x1, y0, -half], [x1, y1, -half], [x1, y1, half], [1, 0, 0]);
+        if (!solid.has(x + "," + (y - 1))) quad([x0, y1, half], [x1, y1, half], [x1, y1, -half], [x0, y1, -half], [0, 1, 0]);
+        if (!solid.has(x + "," + (y + 1))) quad([x0, y0, -half], [x1, y0, -half], [x1, y0, half], [x0, y0, half], [0, -1, 0]);
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(P, 3));
+      geo.setAttribute("normal", new THREE.Float32BufferAttribute(N, 3));
+      geo.setAttribute("color", new THREE.Float32BufferAttribute(C, 3));
+      const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45 }));
+      mesh.castShadow = true; mesh.receiveShadow = true;
+      resolve(mesh); done();
+    };
+    img.src = src;
+  });
+}
+const toys = [];
+[["./assets/ember.png", 4.4, -1.2, -0.35], ["./assets/breeze.png", 6.1, -0.5, -0.55], ["./assets/sprout.png", 6.6, 1.0, -0.35]]
+  .forEach(([src, x, z, ry], i) => voxelize(src, 1.1).then((mesh) => {
+    const toy = new THREE.Group(); toy.add(mesh); mesh.userData.shot = "crew";
+    toy.position.set(x, 0, z); toy.rotation.y = ry; toy.userData = { phase: i * 1.7, ry };
+    scene.add(toy); toys.push(toy);
+  }));
+
+/* Notchling: an extruded notch shape, flat top corners, round bottom corners, face on the front. */
+const NW = 1.7, NH = 0.82, NR = 0.3, ns = new THREE.Shape();
+ns.moveTo(-NW / 2, NH / 2); ns.lineTo(NW / 2, NH / 2); ns.lineTo(NW / 2, -NH / 2 + NR); ns.quadraticCurveTo(NW / 2, -NH / 2, NW / 2 - NR, -NH / 2);
+ns.lineTo(-NW / 2 + NR, -NH / 2); ns.quadraticCurveTo(-NW / 2, -NH / 2, -NW / 2, -NH / 2 + NR); ns.lineTo(-NW / 2, NH / 2);
+const notch = new THREE.Mesh(new THREE.ExtrudeGeometry(ns, { depth: 0.28, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3 }),
+  new THREE.MeshStandardMaterial({ color: "#050505", roughness: .35, metalness: .2 }));
+notch.scale.setScalar(0.85); notch.position.set(4.3, NH * 0.85 / 2 + 0.02, 2.75); notch.rotation.y = -0.35; notch.castShadow = true; notch.userData.shot = "notch"; scene.add(notch);
+const nface = new THREE.Mesh(new THREE.PlaneGeometry(NW * 0.96, NH * 0.93), new THREE.MeshBasicMaterial({ map: tex("./assets/notch-cut.png"), transparent: true }));
+nface.position.set(0, 0, 0.305); nface.userData.shot = "notch"; notch.add(nface);
+
+/* ---------- Camera: one keyframe per stop; scroll blends between them ---------- */
+const V = (x, y, z) => new THREE.Vector3(x, y, z);
+const SHOTS = SMALL ? {
+  hero:  { pos: V(2.2, 3.4, 11.8), look: V(4.6, 0.9, -1.2) },
+  chit:  { pos: V(2.8, 7.0, 6.9),  look: V(2.9, -1.8, 0.8) },
+  crew:  { pos: V(5.4, 3.2, 8.4),  look: V(5.4, -0.6, 0.6) },
+  notch: { pos: V(4.3, 2.9, 10.4), look: V(4.3, -0.9, 3.0) },
+} : {
+  hero:  { pos: V(-1.2, 3.7, 10.2), look: V(3.4, 2.05, -0.6) },
+  chit:  { pos: V(0.4, 5.0, 3.4),  look: V(1.3, 0.0, 0.2) },
+  crew:  { pos: V(5.2, 2.6, 5.6),  look: V(4.6, 0.6, -0.2) },
+  notch: { pos: V(2.2, 1.35, 6.6), look: V(3.6, 0.35, 2.75) },
+};
+const ORDER = ["hero", "chit", "crew", "notch"];
+const cur = { pos: SHOTS.hero.pos.clone(), look: SHOTS.hero.look.clone() };
+let target = 0;           // fractional index into ORDER, driven by scroll
+
+const sections = [document.querySelector(".hero"), ...document.querySelectorAll(".launch")];
+function scrollIndex() {
+  // Fractional stop index: 0 when the hero is centred, 1 when Chit's screen is centred, and so on.
+  const mid = innerHeight / 2;
+  const c = sections.map((el) => { const r = el.getBoundingClientRect(); return r.top + r.height / 2; });
+  if (mid <= c[0]) return 0;
+  for (let i = 0; i < c.length - 1; i++) {
+    if (mid < c[i + 1]) { const t = (mid - c[i]) / (c[i + 1] - c[i]); return i + (REDUCED ? Math.round(t) : t); }
+  }
+  return c.length - 1;
+}
+function shotAt(f) {
+  const i = Math.min(ORDER.length - 2, Math.floor(f)), t = f - i;
+  const s = t * t * (3 - 2 * t);    // dwell at each stop, no velocity kinks
+  const a = SHOTS[ORDER[i]], b = SHOTS[ORDER[Math.min(ORDER.length - 1, i + 1)]];
+  return { pos: a.pos.clone().lerp(b.pos, s), look: a.look.clone().lerp(b.look, s) };
+}
+
+/* Pointer: gentle parallax, and the objects are buttons into their launch. */
+let mx = 0, my = 0;
+addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; hover(e); }, { passive: true });
+const ray = new THREE.Raycaster(), ndc = new THREE.Vector2();
+const clickable = () => [receipt, notch, nface, ...toys.map((t) => t.children[0])];
+function pick(e) {
+  if (document.body.classList.contains("past-stage")) return null;
+  ndc.set(e.clientX / innerWidth * 2 - 1, -(e.clientY / innerHeight) * 2 + 1);
+  ray.setFromCamera(ndc, camera);
+  const hit = ray.intersectObjects(clickable(), false)[0];
+  return hit ? hit.object.userData.shot : null;
+}
+function hover(e) { if (e.target.closest("a, button")) return; document.body.style.cursor = pick(e) ? "pointer" : ""; }
+addEventListener("click", (e) => {
+  if (e.target.closest("a, button, input")) return;
+  const shot = pick(e); if (!shot) return;
+  const el = document.querySelector(`.launch[data-shot="${shot}"]`);
+  if (window.__lenis) window.__lenis.scrollTo(el); else el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth" });
+});
+
+/* The stage fades and stops drawing once "How it ships" scrolls in. */
+const buildSection = document.getElementById("build");
+
+let lastT = 0;
+function frame(t) {
+  requestAnimationFrame(frame);
+  const dt = Math.min(0.1, (t - (lastT || t)) / 1000); lastT = t;
+  const past = buildSection.getBoundingClientRect().top < innerHeight * 0.35;
+  document.body.classList.toggle("past-stage", past);
+  if (past) return;
+  const k = REDUCED ? 0 : t / 1000;
+  target = scrollIndex();
+  const want = shotAt(target);
+  const ease = REDUCED ? 1 : 1 - Math.exp(-dt * 4.5);   // time-based, same feel at any frame rate
+  cur.pos.lerp(want.pos, ease); cur.look.lerp(want.look, ease);
+  camera.position.copy(cur.pos);
+  if (!REDUCED) camera.position.add(V(Math.sin(k * .15) * .25 + mx * .5, my * .25, Math.cos(k * .12) * .2));
+  camera.lookAt(cur.look);
+  toys.forEach((toy) => { const p = toy.userData.phase;
+    toy.position.y = REDUCED ? 0 : Math.max(0, Math.sin(k * 3 + p)) * 0.035;
+    toy.rotation.y = toy.userData.ry + (REDUCED ? 0 : Math.sin(k * .5 + p) * 0.12); });
+  renderer.render(scene, camera);
+}
+Promise.all(pending).then(() => { window.__stageDrawn = true; });
+requestAnimationFrame(frame);
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); });
+</script>
+<script defer src="/_vercel/insights/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Loader variants</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root { --lav: #B4B2F3; --ink: #0B0B0E; --mono: "JetBrains Mono", ui-monospace, monospace; --serif: "Instrument Serif", Times, serif; --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; background: #121115; color: var(--lav); font-family: var(--mono); padding: 40px 5vw 64px; }
+  header { display: flex; justify-content: space-between; align-items: end; gap: 24px; flex-wrap: wrap; margin-bottom: 32px; }
+  h1 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(2rem, 4vw, 3.4rem); letter-spacing: -0.03em; margin: 0; }
+  button { font: inherit; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--lav); background: transparent; border: 1px solid var(--lav); min-height: 44px; padding: 0 16px; cursor: pointer; transition: background 150ms var(--ease), color 150ms var(--ease); }
+  button:hover { background: var(--lav); color: var(--ink); }
+  button:focus-visible { outline: 2px solid var(--lav); outline-offset: 3px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 420px), 1fr)); gap: 40px 32px; }
+  .card { display: grid; gap: 12px; }
+  .meta { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .meta h2 { font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 1.6rem; letter-spacing: -0.02em; margin: 0; }
+  .meta p { margin: 4px 0 0; font-size: 11px; letter-spacing: 0.06em; opacity: 0.85; line-height: 1.5; }
+  .stage { position: relative; aspect-ratio: 16 / 10; overflow: hidden; border: 1px solid rgba(180,178,243,0.35);
+           background: var(--lav) url(./portrait.jpg) center 30% / cover; }
+  .stage::before { content: ""; position: absolute; inset: 0; background: var(--lav); mix-blend-mode: multiply; }
+  .stage .hero { position: absolute; left: 0; right: 0; bottom: 14%; text-align: center; font-family: var(--serif); font-style: italic;
+                 font-size: clamp(1.8rem, 5vw, 3rem); letter-spacing: -0.05em; color: var(--lav); text-shadow: 0 1px 0 rgba(0,0,0,.2); }
+  .ld { position: absolute; inset: 0; z-index: 2; background: var(--lav); color: var(--ink); display: grid; place-items: center; }
+  .ld.hide { opacity: 0; pointer-events: none; }
+
+  /* 1 hairline */
+  .v1 { transition: opacity 350ms var(--ease); }
+  .v1 .in { display: grid; justify-items: center; gap: 12px; }
+  .v1 .name { font-family: var(--serif); font-style: italic; font-size: 1.1rem; }
+  .v1 .line { width: 90px; height: 1px; background: rgba(11,11,14,.18); overflow: hidden; }
+  .v1 .fill { height: 100%; background: var(--ink); transform: scaleX(0); transform-origin: left; transition: transform 900ms var(--ease); }
+
+  /* 2 name reveal */
+  .v2 { transition: opacity 400ms var(--ease); }
+  .v2 .name { font-family: var(--serif); font-style: italic; font-size: 1.5rem; letter-spacing: -0.02em; overflow: hidden; padding: 0.1em 0 0.15em; }
+  .v2 .name span { display: inline-block; transform: translateY(110%); transition: transform 600ms var(--ease); transition-delay: calc(var(--i) * 32ms); }
+  .v2.go .name span { transform: none; }
+
+  /* 3 dither dissolve */
+  .v3 { background: transparent; }
+  .v3 canvas { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; }
+  .v3 .name { position: relative; font-family: var(--serif); font-style: italic; font-size: 1.1rem; transition: opacity 250ms var(--ease); }
+
+  /* 4 corner counter */
+  .v4 { transition: opacity 350ms var(--ease); place-items: end start; padding: 18px; }
+  .v4 .count { font-size: 11px; letter-spacing: 0.2em; font-variant-numeric: tabular-nums; }
+  .v4 .who { position: absolute; top: 18px; left: 18px; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; }
+
+  /* 5 shutter lift */
+  .v5 { border-bottom: 1px solid rgba(11,11,14,.25); }
+  .v5 .name { font-family: var(--serif); font-style: italic; font-size: 1.2rem; }
+  .v5 .slats { position: absolute; inset: 0; background: repeating-linear-gradient(to bottom, transparent 0 13px, rgba(11,11,14,.07) 13px 14px); pointer-events: none; }
+  .v5 .handle { position: absolute; bottom: 10px; left: 50%; width: 36px; height: 3px; margin-left: -18px; background: rgba(11,11,14,.35); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ld, .ld * { transition-duration: 1ms !important; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <h1>Loader variants</h1>
+  <button id="all">Replay all</button>
+</header>
+
+<div class="grid">
+  <section class="card" data-v="1">
+    <div class="stage"><div class="hero">Ravindra Sisodia</div><div class="ld v1"><div class="in"><span class="name">Ravindra Sisodia</span><span class="line"><span class="fill"></span></span></div></div></div>
+    <div class="meta"><div><h2>Hairline</h2><p>Current build. Name plus a line that fills with real load progress. About 1.2s.</p></div><button>Replay</button></div>
+  </section>
+
+  <section class="card" data-v="2">
+    <div class="stage"><div class="hero">Ravindra Sisodia</div><div class="ld v2"><span class="name"></span></div></div>
+    <div class="meta"><div><h2>Name reveal</h2><p>Letters rise into place one by one, then the cover fades. No bar. About 1.3s.</p></div><button>Replay</button></div>
+  </section>
+
+  <section class="card" data-v="3">
+    <div class="stage"><div class="hero">Ravindra Sisodia</div><div class="ld v3"><canvas></canvas><span class="name">Ravindra Sisodia</span></div></div>
+    <div class="meta"><div><h2>Dither dissolve</h2><p>The cover breaks into the site's Bayer dot pattern and reveals the page. One pass. About 1.1s.</p></div><button>Replay</button></div>
+  </section>
+
+  <section class="card" data-v="4">
+    <div class="stage"><div class="hero">Ravindra Sisodia</div><div class="ld v4"><span class="who">Ravindra Sisodia</span><span class="count">00</span></div></div>
+    <div class="meta"><div><h2>Corner counter</h2><p>A small mono count in the corner, nothing in the middle of the screen. About 1s.</p></div><button>Replay</button></div>
+  </section>
+
+  <section class="card" data-v="5">
+    <div class="stage"><div class="hero">Ravindra Sisodia</div><div class="ld v5"><div class="slats"></div><span class="name">Ravindra Sisodia</span><span class="handle"></span></div></div>
+    <div class="meta"><div><h2>Shutter lift</h2><p>The cover lifts like a shop shutter: a short hesitation, the pull, a small settle. About 1.4s.</p></div><button>Replay</button></div>
+  </section>
+</div>
+
+<script>
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+const BAYER8 = [0,32,8,40,2,34,10,42,48,16,56,24,50,18,58,26,12,44,4,36,14,46,6,38,60,28,52,20,62,30,54,22,3,35,11,43,1,33,9,41,51,19,59,27,49,17,57,25,15,47,7,39,13,45,5,37,63,31,55,23,61,29,53,21];
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+const variants = {
+  async 1(ld) {
+    const fill = ld.querySelector(".fill");
+    ld.classList.remove("hide"); fill.style.transition = "none"; fill.style.transform = "scaleX(0)";
+    await wait(30); fill.style.transition = ""; fill.style.transform = "scaleX(0.85)";
+    await wait(800); fill.style.transform = "scaleX(1)";
+    await wait(200); ld.classList.add("hide");
+  },
+  async 2(ld) {
+    const el = ld.querySelector(".name");
+    el.innerHTML = [..."Ravindra Sisodia"].map((c, i) => `<span style="--i:${i}">${c === " " ? "&nbsp;" : c}</span>`).join("");
+    ld.classList.remove("hide", "go");
+    await wait(40); ld.classList.add("go");
+    await wait(950); ld.classList.add("hide");
+  },
+  async 3(ld) {
+    const cv = ld.querySelector("canvas"), name = ld.querySelector(".name");
+    const r = cv.getBoundingClientRect(), cell = 3;
+    const w = Math.ceil(r.width / cell), h = Math.ceil(r.height / cell);
+    cv.width = w; cv.height = h;
+    const ctx = cv.getContext("2d"), img = ctx.createImageData(w, h);
+    name.style.opacity = 1;
+    const draw = (p) => {
+      const cut = p * 64, d = img.data;
+      for (let y = 0, i = 0; y < h; y++) for (let x = 0; x < w; x++, i += 4) {
+        const on = BAYER8[((y & 7) << 3) + (x & 7)] >= cut;
+        d[i] = 180; d[i + 1] = 178; d[i + 2] = 243; d[i + 3] = on ? 255 : 0;
+      }
+      ctx.putImageData(img, 0, 0);
+    };
+    draw(0);
+    await wait(500);
+    name.style.opacity = 0;
+    const t0 = performance.now(), dur = reduced ? 1 : 600;
+    await new Promise((done) => {
+      const step = (now) => { const p = Math.min(1, (now - t0) / dur); draw(p * p); p < 1 ? requestAnimationFrame(step) : done(); };
+      requestAnimationFrame(step);
+    });
+  },
+  async 4(ld) {
+    const c = ld.querySelector(".count");
+    ld.classList.remove("hide");
+    const t0 = performance.now(), dur = 800;
+    await new Promise((done) => {
+      const step = (now) => { const p = Math.min(1, (now - t0) / dur); c.textContent = String(Math.round((1 - Math.pow(1 - p, 2)) * 100)).padStart(2, "0"); p < 1 ? requestAnimationFrame(step) : done(); };
+      requestAnimationFrame(step);
+    });
+    await wait(150); ld.classList.add("hide");
+  },
+  async 5(ld) {
+    ld.getAnimations().forEach((a) => a.cancel());
+    await wait(550);
+    if (reduced) { ld.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 300, fill: "forwards" }); return; }
+    ld.animate([
+      { transform: "translateY(0)" },
+      { transform: "translateY(1.5%)", offset: 0.12 },     /* hesitation: a slight dip before the pull */
+      { transform: "translateY(-104%)", offset: 0.86 },
+      { transform: "translateY(-100%)" }                    /* settle */
+    ], { duration: 850, easing: "cubic-bezier(0.55, 0, 0.25, 1)", fill: "forwards" });
+  },
+};
+
+function play(card) {
+  const ld = card.querySelector(".ld");
+  variants[card.dataset.v](ld);
+}
+document.querySelectorAll(".card").forEach((card) => {
+  card.querySelector(".meta button").addEventListener("click", () => play(card));
+});
+document.getElementById("all").addEventListener("click", () => document.querySelectorAll(".card").forEach(play));
+window.addEventListener("load", () => setTimeout(() => document.querySelectorAll(".card").forEach(play), 400));
+</script>
+</body>
+</html>

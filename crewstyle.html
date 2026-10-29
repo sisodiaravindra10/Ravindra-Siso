@@ -1,0 +1,1017 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ravindra Sisodia, Senior Product Designer, Bengaluru</title>
+<meta name="description" content="Ravindra Pratap Singh Sisodia, senior product designer in Bengaluru. A designer-engineer who builds brands and the interfaces they live inside. Thirteen selected projects, 2022 to 2026.">
+<meta name="author" content="Ravindra Pratap Singh Sisodia">
+<meta name="theme-color" content="#0b0c10">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ravindra Sisodia, Senior Product Designer">
+<meta property="og:description" content="A designer-engineer who builds brands and the interfaces they live inside.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   Crew's visual system, carrying the dithered site's content and flow.
+   Palette, type, 2px borders and hard offset shadows all come from
+   crew-deskmates.vercel.app/crew. The Bayer 8x8 dither is kept from the
+   previous cut, recoloured to sit on the OLED ground.
+   ========================================================================== */
+:root{
+  --bg:#0b0c10;
+  --card:#14161d;
+  --card2:#0e0f15;
+  --line:#2c3140;
+  --line2:#3b4152;
+  --hard:#07080b;
+
+  --ink:#f3f4f8;
+  --dim:#aeb4c4;
+  --faint:#767c8e;
+
+  --ember:#ff9a3d;
+  --emberd:#8f4a12;
+  --sprout:#8ceb8c;
+  --puddle:#ffd85a;
+  --spark:#c6a3ff;
+  --breeze:#73c7ff;
+  --pink:#ff9ed2;
+
+  --pix:"Press Start 2P", monospace;
+  --term:"VT323", ui-monospace, monospace;
+  --snap:cubic-bezier(0.16,1,0.3,1);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg);
+  background-image:radial-gradient(rgba(255,255,255,.035) 1px,transparent 1px);
+  background-size:26px 26px;
+  color:var(--ink);
+  font-family:var(--term);
+  font-size:21px;
+  line-height:1.35;
+  -webkit-font-smoothing:none;
+  overflow-x:hidden;
+}
+/* CRT scanlines over everything */
+body::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:200;
+  background:repeating-linear-gradient(rgba(0,0,0,.16) 0 1px,transparent 1px 3px);
+  opacity:.5;
+}
+img,canvas{image-rendering:pixelated}
+a{color:inherit;text-decoration:none}
+
+::selection{background:var(--ember);color:#1a1206}
+html{scrollbar-color:#2c3140 var(--bg);scrollbar-width:thin}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#2c3140;border:3px solid var(--bg)}
+::-webkit-scrollbar-thumb:hover{background:#3b4152}
+
+:focus-visible{outline:2px solid var(--ember);outline-offset:3px}
+
+.wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+.pix{font-family:var(--pix)}
+
+.skip{
+  position:absolute;left:14px;top:-70px;z-index:9999;
+  font-family:var(--pix);font-size:10px;text-transform:uppercase;letter-spacing:.06em;
+  background:var(--ember);color:#1a1206;border:2px solid var(--hard);
+  padding:14px 16px;min-height:44px;display:inline-flex;align-items:center;
+  transition:top .3s var(--snap);
+}
+.skip:focus{top:14px}
+
+.eyebrow{
+  font-family:var(--pix);font-size:10px;letter-spacing:.12em;
+  color:var(--faint);text-transform:uppercase;
+}
+
+h2{font-family:var(--pix);font-size:clamp(15px,2.6vw,22px);line-height:1.5;letter-spacing:.01em}
+h3{font-family:var(--pix);font-size:12px;line-height:1.5;letter-spacing:.02em}
+.lead{color:var(--dim);font-size:22px;max-width:52ch;margin:14px 0 0}
+
+/* ---------- pixel button ---------- */
+.btn{
+  font-family:var(--pix);font-size:11px;text-transform:uppercase;letter-spacing:.02em;
+  display:inline-flex;align-items:center;gap:9px;padding:15px 20px;cursor:pointer;
+  border:2px solid var(--hard);background:var(--ember);color:#1a1206;
+  box-shadow:5px 5px 0 var(--emberd);
+  transition:transform .06s var(--snap), box-shadow .06s var(--snap);
+}
+.btn:hover{transform:translate(2px,2px);box-shadow:3px 3px 0 var(--emberd)}
+.btn:active{transform:translate(5px,5px);box-shadow:0 0 0 var(--emberd)}
+.btn.ghost{background:var(--card);color:var(--ink);border-color:var(--line2);box-shadow:5px 5px 0 var(--hard)}
+.btn.ghost:hover{box-shadow:3px 3px 0 var(--hard)}
+.btn.ghost:active{box-shadow:0 0 0 var(--hard)}
+
+.box{background:var(--card);border:2px solid var(--line);box-shadow:5px 5px 0 rgba(0,0,0,.55)}
+
+/* ==========================================================================
+   BOOT LOADER, carried over from the dithered cut
+   ========================================================================== */
+.loader{
+  position:fixed;inset:0;z-index:9998;
+  background:var(--bg);color:var(--ink);
+  display:grid;place-items:center;overflow:hidden;
+}
+.loader-canvas{
+  position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:.5;
+}
+.loader-num{
+  position:relative;
+  font-family:var(--pix);
+  font-size:clamp(26px,6vw,54px);
+  line-height:1;
+  letter-spacing:.02em;
+  color:var(--ink);
+  background:var(--bg);
+  border:2px solid var(--line2);
+  box-shadow:6px 6px 0 var(--hard);
+  padding:20px 24px;
+  user-select:none;
+  transition:transform .85s cubic-bezier(0.5,0,0.1,1);
+}
+.loader-num.is-final{transform:scale(1.25);color:var(--ember)}
+.loader-meta{
+  position:absolute;
+  font-family:var(--pix);font-size:9px;letter-spacing:.14em;line-height:2;
+  color:var(--dim);
+  background:var(--bg);
+  border:1px solid var(--line);
+  padding:9px 11px;
+}
+.loader-meta-tl{top:22px;left:22px}
+.loader-meta-br{bottom:22px;right:22px;text-align:right}
+
+.shell{opacity:0;transition:opacity .9s var(--snap)}
+.shell.is-ready{opacity:1}
+
+/* ==========================================================================
+   NAV
+   ========================================================================== */
+nav{
+  position:sticky;top:0;z-index:150;
+  background:rgba(11,12,16,.85);backdrop-filter:blur(4px);
+  border-bottom:2px solid var(--line);
+}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;height:64px;gap:12px}
+.logo{display:flex;align-items:center;gap:11px;font-family:var(--pix);font-size:14px}
+.logo .dots{display:flex;gap:3px}
+.logo .dots i{width:10px;height:10px;display:block}
+.navlinks{display:flex;gap:8px;align-items:center}
+.navlinks a{
+  font-family:var(--pix);font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);padding:10px 12px;border:1px solid transparent;
+  white-space:nowrap;
+  transition:color .16s var(--snap), border-color .16s var(--snap);
+}
+.navlinks a:hover{color:var(--ink);border-color:var(--line2)}
+.nav-name{
+  font-family:var(--pix);font-size:9px;letter-spacing:.14em;color:var(--faint);
+  white-space:nowrap;
+}
+/* The name plate is the first thing to go, then the bracket padding tightens,
+   so the three links never wrap onto a second row. */
+@media(max-width:1000px){ .nav-name{display:none} }
+@media(max-width:620px){ .navlinks a{padding:10px 6px;font-size:9px;letter-spacing:.04em} }
+@media(max-width:460px){ .logo{font-size:11px} .logo .dots i{width:8px;height:8px} }
+
+/* ==========================================================================
+   HERO, the dithered portrait with the wordmark over it
+   ========================================================================== */
+.hero{position:relative;height:calc(100svh - 64px);min-height:460px;overflow:hidden}
+.hero-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+/* The dither is high contrast by design, so the lower third gets a scrim to
+   keep the wordmark and the status line readable over it. */
+.hero::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:66%;z-index:1;
+  background:linear-gradient(to top, var(--bg) 30%, rgba(11,12,16,.9) 55%, rgba(11,12,16,0) 100%);
+  pointer-events:none;
+}
+.hero-inner{
+  position:absolute;inset:0;z-index:2;
+  display:grid;align-content:end;
+  padding:0 22px 12vh;
+  max-width:1060px;margin:0 auto;left:0;right:0;
+  pointer-events:none;
+}
+.hero-name{
+  font-family:var(--pix);
+  font-size:clamp(19px,4.6vw,44px);
+  line-height:1.5;
+  letter-spacing:.01em;
+  color:var(--ink);
+  text-shadow:4px 4px 0 var(--hard);
+  margin:0;
+}
+.hero-name .em{color:var(--ember);text-shadow:4px 4px 0 var(--emberd)}
+.hero-sub{
+  font-family:var(--pix);font-size:10px;letter-spacing:.13em;line-height:2.2;
+  color:var(--ink);margin-top:24px;text-shadow:2px 2px 0 var(--hard);
+}
+.hero-sub b{color:var(--sprout);font-weight:400}
+/* Rotated sidebar, kept from the previous cut */
+.sidebar{
+  position:absolute;left:22px;bottom:6vh;z-index:3;
+  transform-origin:left bottom;transform:rotate(-90deg) translateY(-100%);
+  display:flex;gap:28px;white-space:nowrap;pointer-events:none;
+  font-family:var(--pix);font-size:8px;letter-spacing:.16em;color:var(--faint);
+}
+@media(max-width:900px){ .sidebar{display:none} .hero-inner{padding-bottom:9vh} }
+
+/* ==========================================================================
+   STORY CHAPTERS
+   ========================================================================== */
+.chapter{
+  position:relative;min-height:84svh;overflow:hidden;
+  display:grid;align-items:center;
+  /* Extra top padding clears the sticky nav when a chapter is scrolled to. */
+  padding:120px 22px 90px;
+  border-top:2px solid var(--line);
+  scroll-margin-top:64px;
+}
+section{scroll-margin-top:64px}
+.chapter-canvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;opacity:.62}
+/* Directional scrim so the copy always has a quiet ground under it, whichever
+   side of the frame the chapter sets its text on. */
+.chapter::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(to right, var(--bg) 0%, rgba(11,12,16,.82) 42%, rgba(11,12,16,.15) 82%);
+}
+.chapter-jodhpur::before{
+  background:linear-gradient(to left, var(--bg) 0%, rgba(11,12,16,.82) 42%, rgba(11,12,16,.15) 82%);
+}
+@media(max-width:900px){
+  .chapter::before,
+  .chapter-jodhpur::before{
+    background:linear-gradient(to top, var(--bg) 8%, rgba(11,12,16,.86) 52%, rgba(11,12,16,.3) 100%);
+  }
+}
+.chapter-inner{position:relative;z-index:2;max-width:1060px;margin:0 auto;width:100%}
+.chapter-title{
+  font-family:var(--pix);
+  font-size:clamp(15px,3.4vw,30px);
+  line-height:1.6;letter-spacing:.01em;margin:0;
+  text-shadow:4px 4px 0 var(--hard);
+}
+.chapter-title .em{color:var(--ember);text-shadow:4px 4px 0 var(--emberd)}
+.chapter-aside{
+  font-family:var(--term);font-size:23px;line-height:1.35;color:var(--ink);
+  margin:0 0 20px;max-width:34ch;
+}
+.chapter-aside .em{color:var(--breeze)}
+.chapter-tag{
+  font-family:var(--pix);font-size:9px;letter-spacing:.16em;color:var(--ember);
+  display:block;margin-bottom:18px;text-shadow:2px 2px 0 var(--hard);
+}
+.chapter-bike .chapter-inner{text-align:left}
+.chapter-jodhpur .chapter-canvas{opacity:.5}
+@media(min-width:901px){
+  .chapter-jodhpur .chapter-inner{text-align:right}
+  .chapter-jodhpur .chapter-aside{margin-left:auto}
+}
+
+/* ==========================================================================
+   SECTIONS
+   ========================================================================== */
+section{padding:76px 0}
+.band{background:var(--card2);border-top:2px solid var(--line);border-bottom:2px solid var(--line)}
+.sec-head{display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end;margin-bottom:44px}
+.sec-kicker{
+  font-family:var(--pix);font-size:9px;letter-spacing:.14em;line-height:2;
+  color:var(--faint);text-align:right;max-width:26ch;
+}
+.sec-kicker .em{color:var(--ember)}
+@media(max-width:820px){ .sec-head{grid-template-columns:1fr} .sec-kicker{text-align:left} }
+
+/* ---------- WORK ---------- */
+.work-list{border-top:2px solid var(--line)}
+.work-row{
+  display:grid;grid-template-columns:44px 1fr 150px 60px 26px;
+  gap:18px;align-items:center;
+  padding:18px 12px;border-bottom:2px solid var(--line);
+  transition:background .16s var(--snap), transform .16s var(--snap);
+}
+.work-row:hover{background:var(--card);transform:translateX(6px)}
+.work-row .num{font-family:var(--pix);font-size:10px;color:var(--ember)}
+.work-row .title{font-size:24px;line-height:1.1;color:var(--ink)}
+.work-row .role,.work-row .year{
+  font-family:var(--pix);font-size:8px;letter-spacing:.1em;line-height:1.8;
+  color:var(--faint);text-transform:uppercase;
+}
+.work-row .arrow{
+  font-family:var(--pix);font-size:11px;color:var(--faint);justify-self:end;
+  transition:transform .16s var(--snap), color .16s var(--snap);
+}
+.work-row:hover .arrow{transform:translateX(4px);color:var(--ember)}
+@media(max-width:860px){
+  .work-row{grid-template-columns:36px 1fr 22px;gap:12px}
+  .work-row .role,.work-row .year{display:none}
+  .work-row .title{font-size:21px}
+}
+
+/* ---------- floating dithered preview ---------- */
+.preview{
+  position:fixed;top:0;left:0;z-index:180;width:326px;
+  pointer-events:none;opacity:0;transform:translate(-9999px,-9999px);
+  transition:opacity .16s var(--snap);will-change:transform;
+}
+.preview.visible{opacity:1}
+.pv-win{background:var(--card2);border:2px solid var(--line2);box-shadow:8px 8px 0 rgba(0,0,0,.6)}
+.pv-bar{display:flex;align-items:center;gap:7px;padding:9px 11px;border-bottom:2px solid var(--line)}
+.pv-bar i{width:10px;height:10px;display:block}
+.pv-bar i:nth-child(1){background:#ff5f57}
+.pv-bar i:nth-child(2){background:#febc2e}
+.pv-bar i:nth-child(3){background:#28c840}
+.pv-bar span{margin-left:6px;font-family:var(--pix);font-size:8px;color:var(--faint);letter-spacing:.08em}
+.pv-shot{
+  position:relative;width:100%;aspect-ratio:16/9;background:#0a0b0f;
+  display:grid;place-items:center;overflow:hidden;
+  font-family:var(--pix);font-size:8px;letter-spacing:.1em;color:var(--faint);
+}
+.pv-shot canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+@media(hover:none),(max-width:900px){.preview{display:none}}
+
+/* ---------- CONTACT ---------- */
+.mailto{
+  display:inline-block;font-family:var(--pix);
+  font-size:clamp(11px,2.4vw,21px);line-height:1.9;
+  color:var(--ember);text-shadow:3px 3px 0 var(--emberd);
+  word-break:break-all;margin-top:6px;
+}
+.mailto .char{
+  display:inline-block;transform:translateY(0);
+  transition:transform .34s var(--snap);
+  transition-delay:calc(var(--i) * 16ms);
+}
+.mailto:hover .char,.mailto:focus-visible .char{transform:translateY(-4px)}
+
+/* The pricing block's card treatment, reused for the four real contact cells. */
+.contact-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:52px}
+.cell{padding:24px 22px;position:relative;display:grid;gap:10px;align-content:start}
+.cell.flag{border-color:var(--ember);box-shadow:8px 8px 0 var(--emberd)}
+.cell h4{
+  font-family:var(--pix);font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--faint);margin:0;
+}
+.cell.flag h4{color:var(--ember)}
+.cell a,.cell span{font-size:20px;line-height:1.45;color:var(--dim)}
+.cell a{transition:color .16s var(--snap)}
+.cell a:hover{color:var(--ink);text-decoration:underline}
+.cell .em{color:var(--spark)}
+/* Specificity has to beat `.cell span`, which sets the 20px body size. */
+.cell span.badge{
+  position:absolute;top:-14px;right:16px;
+  background:var(--ember);color:#1a1206;border:2px solid var(--hard);
+  font-family:var(--pix);font-size:8px;line-height:1;letter-spacing:.08em;
+  padding:7px 9px;white-space:nowrap;
+}
+@media(max-width:900px){ .contact-grid{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:600px){ .contact-grid{grid-template-columns:1fr} }
+
+/* ---------- FOOTER ---------- */
+footer{border-top:2px solid var(--line);padding:32px 0;color:var(--faint)}
+footer .wrap{
+  display:flex;justify-content:space-between;flex-wrap:wrap;gap:16px;align-items:center;
+  font-family:var(--pix);font-size:9px;letter-spacing:.1em;line-height:2;
+}
+footer a{color:var(--dim)}
+footer a:hover{color:var(--ink)}
+.palette{display:inline-flex;gap:4px}
+.palette i{width:12px;height:12px;display:block}
+
+/* ---------- scroll reveal ---------- */
+.rise{opacity:0;transform:translateY(14px)}
+.js .rise{transition:opacity .6s var(--snap), transform .6s var(--snap)}
+.rise.in{opacity:1;transform:none}
+html:not(.js) .rise{opacity:1;transform:none}
+
+/* ---------- touch targets ---------- */
+@media (pointer: coarse){
+  .navlinks a,
+  .work-row,
+  .cell a,
+  .mailto,
+  .logo,
+  footer a{min-height:44px;display:flex;align-items:center}
+  .navlinks a{min-width:44px;justify-content:center}
+  .cell a{align-items:flex-start}
+}
+
+/* Reduced motion drops the travel, never the feedback. */
+@media (prefers-reduced-motion: reduce){
+  html{scroll-behavior:auto}
+  .rise{opacity:1;transform:none;transition:none}
+  .loader-num{transition:none}
+  .shell{transition:none}
+  .work-row{transition:background .15s var(--snap)}
+  .work-row:hover{transform:none}
+  .work-row:hover .arrow{transform:none}
+  .btn:hover,.btn:active{transform:none}
+  .mailto .char{transition:none}
+  .mailto:hover .char{transform:none}
+}
+
+/* Press Start 2P has no triangle glyph, so every marker and arrow is drawn
+   rather than typed. Keeps the pixel grid intact at any size. */
+.eyebrow::before,
+.chapter-tag::before{
+  content:"";display:inline-block;
+  width:8px;height:8px;background:var(--ember);
+  margin-right:10px;vertical-align:baseline;
+}
+.chapter-tag::before{box-shadow:2px 2px 0 var(--hard)}
+.work-row .arrow{
+  width:9px;height:9px;background:var(--faint);
+  clip-path:polygon(0 0, 100% 50%, 0 100%);
+  transition:transform .16s var(--snap), background .16s var(--snap);
+}
+.work-row:hover .arrow{transform:translateX(4px);background:var(--ember)}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#projects">Skip to the work</a>
+
+<!-- Halftone boot loader, removed once the count completes -->
+<div class="loader" id="loader" aria-hidden="true">
+  <canvas class="loader-canvas" id="loaderCanvas"></canvas>
+  <div class="loader-meta loader-meta-tl">LOADING<br>RAVINDRA &middot; STUDIO</div>
+  <div class="loader-meta loader-meta-br">DITHERED<br>IN BAYER_8x8</div>
+  <div class="loader-num" id="loaderNum">00</div>
+</div>
+
+<div class="shell" id="shell">
+
+<nav>
+  <div class="wrap">
+    <a href="#top" class="logo">
+      <span class="dots" aria-hidden="true">
+        <i style="background:var(--ember)"></i>
+        <i style="background:var(--breeze)"></i>
+        <i style="background:var(--sprout)"></i>
+      </span>
+      RAVINDRA
+    </a>
+    <div class="navlinks">
+      <a href="#projects">[ Projects ]</a>
+      <a href="#story">[ Story ]</a>
+      <a href="#contact">[ Contact ]</a>
+    </div>
+    <span class="nav-name">RAVINDRA PRATAP SINGH</span>
+  </div>
+</nav>
+
+<!-- ============================== HERO ============================== -->
+<header class="hero" id="top">
+  <canvas class="hero-canvas" id="heroCanvas" aria-label="Dithered portrait of Ravindra Sisodia" role="img"></canvas>
+  <div class="hero-inner">
+    <h1 class="hero-name">Ravindra<br><span class="em">Sisodia.</span></h1>
+    <p class="hero-sub">
+      senior product designer &nbsp;&middot;&nbsp; bengaluru, in<br>
+      open for senior product design roles, 2026 &nbsp;&middot;&nbsp; <b>available</b>
+    </p>
+  </div>
+  <div class="sidebar" aria-hidden="true">
+    <span>+ SMART_OBJECTS</span>
+    <span>7_ORIGINAL_STYLES</span>
+  </div>
+</header>
+
+<!-- ============================== STORY ============================== -->
+<section class="story" id="story" aria-label="Story" style="padding:0">
+
+  <article class="chapter chapter-jodhpur">
+    <canvas class="chapter-canvas" data-src="./story-jodhpur.jpg" aria-hidden="true"></canvas>
+    <div class="chapter-inner">
+      <span class="chapter-tag">Jodhpur, Rajasthan</span>
+      <p class="chapter-aside rise">
+        I am a designer-engineer who builds brands and the
+        <span class="em">interfaces they live inside.</span>
+      </p>
+      <h2 class="chapter-title rise">the place<br>where i grew<br><span class="em">with design.</span></h2>
+    </div>
+  </article>
+
+  <article class="chapter chapter-bike">
+    <canvas class="chapter-canvas" data-src="./story-bike.jpg" aria-hidden="true"></canvas>
+    <div class="chapter-inner">
+      <span class="chapter-tag">The road out</span>
+      <p class="chapter-aside rise">
+        the only thing that empties <span class="em">my head.</span>
+      </p>
+      <h2 class="chapter-title rise">Pixels by day,<br>petrol <span class="em">by dusk.</span></h2>
+    </div>
+  </article>
+
+</section>
+
+<!-- ============================== WORK ============================== -->
+<section id="projects" class="band">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow rise">02 &nbsp; selected work</div>
+        <h2 class="rise" style="margin-top:14px">Selected work,<br>across rooms.</h2>
+      </div>
+      <p class="sec-kicker rise">
+        thirteen shown.<br>forty more in the archive,<br><span class="em">2018 to 2026.</span>
+      </p>
+    </div>
+
+    <div class="work-list">
+      <a class="work-row rise" href="https://zop-dev-website-v3.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-dev-website-v3.vercel.app/" data-label="zop.dev / marketing site">
+        <span class="num">01</span><span class="title">Zop.Dev, marketing site</span>
+        <span class="role">Brand &middot; Web</span><span class="year">2026</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://screenroot.com/work/ceat-tyre-website-design/" target="_blank" rel="noopener"
+         data-href="https://screenroot.com/work/ceat-tyre-website-design/" data-label="ceat tyres / website">
+        <span class="num">02</span><span class="title">CEAT Tyres, website</span>
+        <span class="role">Case &middot; Web</span><span class="year">2023</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://screenroot.com/work/yes-bank-app-ui-design/" target="_blank" rel="noopener"
+         data-href="https://screenroot.com/work/yes-bank-app-ui-design/" data-label="yes bank / app ui">
+        <span class="num">03</span><span class="title">YES Bank, app UI</span>
+        <span class="role">Case &middot; Product</span><span class="year">2023</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://us.strandls.com/" target="_blank" rel="noopener"
+         data-href="https://us.strandls.com/" data-label="strand life sciences">
+        <span class="num">04</span><span class="title">Strand Life Sciences</span>
+        <span class="role">Web &middot; Marketing</span><span class="year">2024</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://evermortalesco.com/" target="_blank" rel="noopener"
+         data-href="https://evermortalesco.com/" data-label="openstreet / evermortal esco">
+        <span class="num">05</span><span class="title">Openstreet, Evermortal Esco</span>
+        <span class="role">Studio &middot; Web</span><span class="year">2024</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://vocautomotive.com/" target="_blank" rel="noopener"
+         data-href="https://vocautomotive.com/" data-label="voc automotive">
+        <span class="num">06</span><span class="title">VOC Automotive</span>
+        <span class="role">Web &middot; Marketing</span><span class="year">2025</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://federate.one/" target="_blank" rel="noopener"
+         data-href="https://federate.one/" data-label="federate">
+        <span class="num">07</span><span class="title">Federate</span>
+        <span class="role">Identity &middot; Web</span><span class="year">2025</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://screenroot.com/work/tata-capital-website-design/" target="_blank" rel="noopener"
+         data-href="https://screenroot.com/work/tata-capital-website-design/" data-label="tata capital / website">
+        <span class="num">08</span><span class="title">Tata Capital, website</span>
+        <span class="role">Case &middot; Web</span><span class="year">2022</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://zop-night-tetris-cloud.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-night-tetris-cloud.vercel.app/" data-label="zopnight / tetris cloud">
+        <span class="num">09</span><span class="title">ZopNight, Tetris Cloud</span>
+        <span class="role">Concept &middot; Web</span><span class="year">2026</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://zop-branding-launch-plan.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-branding-launch-plan.vercel.app/" data-label="zop.dev / brand launch plan">
+        <span class="num">10</span><span class="title">Zop.Dev, brand launch plan</span>
+        <span class="role">Brand &middot; Strategy</span><span class="year">2026</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://lyke-eosin.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://lyke-eosin.vercel.app/" data-label="lyke">
+        <span class="num">11</span><span class="title">Lyke</span>
+        <span class="role">Product &middot; Web</span><span class="year">2026</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://contrast-check-v1.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://contrast-check-v1.vercel.app/" data-label="contrast check">
+        <span class="num">12</span><span class="title">Contrast Check</span>
+        <span class="role">Tool &middot; Web</span><span class="year">2025</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+      <a class="work-row rise" href="https://zop-dev-brandkit-v1.vercel.app/" target="_blank" rel="noopener"
+         data-href="https://zop-dev-brandkit-v1.vercel.app/" data-label="zop.dev / brand kit">
+        <span class="num">13</span><span class="title">Zop.Dev, brand kit</span>
+        <span class="role">Brand &middot; Identity</span><span class="year">2026</span><span class="arrow" aria-hidden="true"></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CONTACT ============================== -->
+<section id="contact">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <div class="eyebrow rise">03 &nbsp; contact</div>
+        <h2 class="rise" style="margin-top:14px">Pitch me<br>something impossible.</h2>
+      </div>
+      <p class="sec-kicker rise">
+        inbox open.<br>reply within 24 hours, most days.<br><span class="em">slower on sundays.</span>
+      </p>
+    </div>
+
+    <p class="rise">
+      <a class="mailto" href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a>
+    </p>
+
+    <div class="contact-grid">
+      <div class="box cell rise">
+        <h4>Email</h4>
+        <a href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a>
+      </div>
+      <div class="box cell rise">
+        <h4>Based in</h4>
+        <span>Bengaluru, IN &middot; UTC+5:30</span>
+      </div>
+      <div class="box cell rise">
+        <h4>Social</h4>
+        <a href="https://www.instagram.com/ravindrasiso/" target="_blank" rel="noopener">instagram / ravindrasiso</a>
+        <a href="https://www.linkedin.com/in/ravindra-sisodia/" target="_blank" rel="noopener">linkedin / ravindra-sisodia</a>
+        <a href="https://dribbble.com/sisodiaravindra" target="_blank" rel="noopener">dribbble / sisodiaravindra</a>
+        <a href="https://www.behance.net/ravindrasisodia" target="_blank" rel="noopener">behance / ravindrasisodia</a>
+      </div>
+      <div class="box cell flag rise">
+        <span class="badge">OPEN</span>
+        <h4>Currently</h4>
+        <span>Becoming an <span class="em">AI engineer</span> who can also ship the design. Looking for the next app or site to build end to end.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>&#169; 2026 &middot; RAVINDRA PRATAP SINGH</span>
+    <span class="palette" aria-hidden="true">
+      <i style="background:var(--ember)"></i><i style="background:var(--sprout)"></i>
+      <i style="background:var(--puddle)"></i><i style="background:var(--spark)"></i>
+      <i style="background:var(--breeze)"></i><i style="background:var(--pink)"></i>
+    </span>
+    <span><a href="./index.html">all directions</a></span>
+  </div>
+</footer>
+
+</div><!-- /shell -->
+
+<!-- Floating preview, populated on work-row hover -->
+<div class="preview" id="preview" aria-hidden="true">
+  <div class="pv-win">
+    <div class="pv-bar"><i></i><i></i><i></i><span id="pvLabel">preview</span></div>
+    <div class="pv-shot" id="pvShot">hover a project</div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var REDUCED = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if ("IntersectionObserver" in window && !REDUCED) {
+    document.documentElement.className += " js";
+  }
+
+  /* ---------- Bayer 8x8, the same matrix the previous cut used ---------- */
+  var BAYER8 = new Uint8Array([
+     0,32, 8,40, 2,34,10,42,
+    48,16,56,24,50,18,58,26,
+    12,44, 4,36,14,46, 6,38,
+    60,28,52,20,62,30,54,22,
+     3,35,11,43, 1,33, 9,41,
+    51,19,59,27,49,17,57,25,
+    15,47, 7,39,13,45, 5,37,
+    63,31,55,23,61,29,53,21
+  ]);
+  var BAYER_SCALE = 255 / 64;
+
+  /* Ink colour for a lit dither cell, as r,g,b. Paper on the OLED ground. */
+  var INK = [243, 244, 248];
+
+  /* ======================================================================
+     Photo dither. Draws the source into a low resolution buffer, thresholds
+     it against the Bayer matrix, and writes opaque ink or full transparency
+     so the dot field behind it shows through.
+     ====================================================================== */
+  function attachDither(canvas, src, opts) {
+    opts = opts || {};
+    var cell     = opts.cell     || 2.2;
+    var contrast = opts.contrast || 1.18;
+    var bright   = opts.bright   === undefined ? -6 : opts.bright;
+    var cropX    = opts.cropX    === undefined ? 0.5 : opts.cropX;
+    var cropY    = opts.cropY    === undefined ? 0.25 : opts.cropY;
+    var amp      = opts.amp      === undefined ? 12 : opts.amp;
+    var period   = opts.period   || 4200;
+    var tint     = opts.tint     || INK;
+
+    var ctx = canvas.getContext("2d", { willReadFrequently: true, alpha: true });
+    var img = new Image();
+    var ready = false, oW = 0, oH = 0, srcBuf = null, out = null;
+
+    function layout() {
+      var r = canvas.getBoundingClientRect();
+      var w = Math.max(1, Math.floor(r.width / cell));
+      var h = Math.max(1, Math.floor(r.height / cell));
+      if (w === oW && h === oH) return;
+      oW = w; oH = h;
+      canvas.width = oW; canvas.height = oH;
+      out = ctx.createImageData(oW, oH);
+      srcBuf = null;
+    }
+
+    function resample() {
+      if (!oW || !oH || !ready) return;
+      var sw = img.naturalWidth, sh = img.naturalHeight;
+      var target = oW / oH, ratio = sw / sh, sx, sy, dw, dh;
+      if (ratio > target) { dh = sh; dw = sh * target; sx = (sw - dw) * cropX; sy = 0; }
+      else                { dw = sw; dh = sw / target; sx = 0; sy = Math.max(0, (sh - dh) * cropY); }
+      ctx.clearRect(0, 0, oW, oH);
+      ctx.drawImage(img, sx, sy, dw, dh, 0, 0, oW, oH);
+      try { srcBuf = ctx.getImageData(0, 0, oW, oH).data; }
+      catch (e) { srcBuf = null; }
+    }
+
+    function render(pulse) {
+      if (!srcBuf || !out) resample();
+      if (!srcBuf || !out) return;
+      var s = srcBuf, d = out.data, i = 0;
+      for (var y = 0; y < oH; y++) {
+        var row = (y & 7) << 3;
+        for (var x = 0; x < oW; x++, i += 4) {
+          var L = 0.2126 * s[i] + 0.7152 * s[i + 1] + 0.0722 * s[i + 2];
+          L = (L - 128) * contrast + 128 + bright;
+          var t = (BAYER8[row + (x & 7)] + 0.5) * BAYER_SCALE + pulse;
+          if (L > t) { d[i] = tint[0]; d[i+1] = tint[1]; d[i+2] = tint[2]; d[i+3] = 255; }
+          else       { d[i] = 0; d[i+1] = 0; d[i+2] = 0; d[i+3] = 0; }
+        }
+      }
+      ctx.putImageData(out, 0, 0);
+    }
+
+    img.onload = function () { ready = true; resample(); render(0); };
+    img.onerror = function () {
+      /* The photo is decoration here, so a miss just leaves the ground bare. */
+      canvas.style.display = "none";
+    };
+    img.src = src;
+
+    layout();
+    var pending = false;
+    new ResizeObserver(function () {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(function () { pending = false; layout(); render(0); });
+    }).observe(canvas);
+
+    if (REDUCED || amp === 0) return;
+
+    var TWO_PI = Math.PI * 2;
+    (function tick(now) {
+      if (ready && oW && oH) {
+        render(Math.sin(((now % period) / period) * TWO_PI) * amp);
+      }
+      requestAnimationFrame(tick);
+    })(0);
+  }
+
+  var heroCanvas = document.getElementById("heroCanvas");
+  if (heroCanvas) {
+    attachDither(heroCanvas, "./portrait.jpg", { cell: 2.2, contrast: 1.24, bright: -8, cropY: 0.2 });
+  }
+  var jod = document.querySelector(".chapter-jodhpur .chapter-canvas");
+  if (jod) attachDither(jod, jod.dataset.src, { cell: 2.6, contrast: 1.2, bright: -4, tint: [115, 199, 255] });
+  var bike = document.querySelector(".chapter-bike .chapter-canvas");
+  if (bike) attachDither(bike, bike.dataset.src, { cell: 2.6, contrast: 1.2, bright: -4, cropX: 0.82, tint: [255, 154, 61] });
+
+  /* ======================================================================
+     Boot loader. Procedural halftone cloud plus a counter, then reveal.
+     ====================================================================== */
+  var loader = document.getElementById("loader");
+  var numEl  = document.getElementById("loaderNum");
+  var shell  = document.getElementById("shell");
+
+  var stopCloud = (function () {
+    var c = document.getElementById("loaderCanvas");
+    if (!c) return function () {};
+    var g = c.getContext("2d", { willReadFrequently: true, alpha: true });
+    var CELL = 3, W = 0, H = 0, buf = null, raf = 0;
+
+    function layout() {
+      var r = c.getBoundingClientRect();
+      var w = Math.max(1, Math.floor(r.width / CELL));
+      var h = Math.max(1, Math.floor(r.height / CELL));
+      if (w === W && h === H) return;
+      W = w; H = h; c.width = W; c.height = H;
+      buf = g.createImageData(W, H);
+    }
+    layout();
+    new ResizeObserver(layout).observe(c);
+
+    function frame(now) {
+      if (!buf) return;
+      var d = buf.data, t = now * 0.001, i = 0;
+      var cx1 = W * (0.5 + Math.sin(t * 0.45) * 0.30);
+      var cy1 = H * (0.5 + Math.cos(t * 0.38) * 0.30);
+      var r1  = Math.min(W, H) * 0.65;
+      var pulse = Math.sin(t * 1.4) * 14;
+      for (var y = 0; y < H; y++) {
+        var row = (y & 7) << 3;
+        var wy = Math.sin((y / H) * Math.PI * 2 - t * 0.9) * 18;
+        for (var x = 0; x < W; x++, i += 4) {
+          var dx = x - cx1, dy = y - cy1;
+          var f1 = Math.max(0, 1 - Math.sqrt(dx * dx + dy * dy) / r1);
+          var wx = Math.sin((x / W) * Math.PI * 3 + t * 1.1) * 22;
+          /* Base sits well below mid grey so the field reads as sparse
+             texture with a drifting hot spot, not a solid sheet of ember. */
+          var L = 34 + wx * 0.6 + wy * 0.6 + f1 * 68;
+          var th = (BAYER8[row + (x & 7)] + 0.5) * BAYER_SCALE + pulse;
+          if (L > th) { d[i] = 255; d[i+1] = 154; d[i+2] = 61; d[i+3] = 255; }
+          else        { d[i] = 0; d[i+1] = 0; d[i+2] = 0; d[i+3] = 0; }
+        }
+      }
+      g.putImageData(buf, 0, 0);
+    }
+
+    if (REDUCED) { frame(0); return function () {}; }
+    (function tick(now) { frame(now); raf = requestAnimationFrame(tick); })(0);
+    return function () { cancelAnimationFrame(raf); };
+  })();
+
+  function reveal() {
+    if (!loader) return;
+    loader.style.transition = "opacity .9s cubic-bezier(0.2,0.7,0.2,1)";
+    loader.style.opacity = "0";
+    if (shell) shell.classList.add("is-ready");
+    setTimeout(function () { stopCloud(); loader.remove(); }, 950);
+  }
+
+  if (REDUCED) {
+    if (numEl) numEl.textContent = "100";
+    reveal();
+  } else {
+    var DURATION = 2200, start = performance.now();
+    (function count(now) {
+      var p = Math.min(1, (now - start) / DURATION);
+      var v = Math.floor((1 - Math.pow(1 - p, 1.6)) * 99);
+      if (numEl) numEl.textContent = v < 10 ? "0" + v : String(v);
+      if (p < 1) { requestAnimationFrame(count); }
+      else {
+        if (numEl) { numEl.textContent = "100"; numEl.classList.add("is-final"); }
+        setTimeout(reveal, 620);
+      }
+    })(performance.now());
+  }
+
+  /* ---------- scroll reveal ---------- */
+  var risers = document.querySelectorAll(".rise");
+  if ("IntersectionObserver" in window && !REDUCED) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        e.target.classList.add("in");
+        io.unobserve(e.target);
+      });
+    }, { rootMargin: "0px 0px -8% 0px" });
+    Array.prototype.forEach.call(risers, function (el, i) {
+      el.style.transitionDelay = (Math.min(i % 6, 5) * 70) + "ms";
+      io.observe(el);
+    });
+  } else {
+    Array.prototype.forEach.call(risers, function (el) { el.classList.add("in"); });
+  }
+
+  /* ======================================================================
+     Hover previews. Live screenshot from microlink, run through the same
+     Bayer dither so it matches the rest of the page.
+     ====================================================================== */
+  (function previews() {
+    var panel = document.getElementById("preview");
+    var shot  = document.getElementById("pvShot");
+    var label = document.getElementById("pvLabel");
+    if (!panel) return;
+
+    var W = 322, H = 181, CELL = 2;
+    var cache = {}, mx = 0, my = 0;
+
+    function endpoint(u) {
+      return "https://api.microlink.io/?url=" + encodeURIComponent(u) +
+        "&screenshot=true&embed=screenshot.url&viewport.width=1280&viewport.height=720&meta=false";
+    }
+
+    function ditherShot(image) {
+      var oW = Math.floor(W / CELL), oH = Math.floor(H / CELL);
+      var c = document.createElement("canvas");
+      c.width = oW; c.height = oH;
+      var g = c.getContext("2d", { willReadFrequently: true });
+      var sw = image.naturalWidth, sh = image.naturalHeight;
+      var scale = Math.max(oW / sw, oH / sh);
+      g.drawImage(image, (oW - sw * scale) / 2, 0, sw * scale, sh * scale);
+      var s;
+      try { s = g.getImageData(0, 0, oW, oH).data; } catch (e) { return null; }
+      var out = g.createImageData(oW, oH), d = out.data;
+      for (var y = 0, i = 0; y < oH; y++) {
+        var row = (y & 7) << 3;
+        for (var x = 0; x < oW; x++, i += 4) {
+          var L = 0.2126 * s[i] + 0.7152 * s[i+1] + 0.0722 * s[i+2];
+          L = (L - 128) * 1.22 + 128 - 6;
+          var t = (BAYER8[row + (x & 7)] + 0.5) * BAYER_SCALE;
+          if (L > t) { d[i] = 243; d[i+1] = 244; d[i+2] = 248; d[i+3] = 255; }
+          else       { d[i] = 0; d[i+1] = 0; d[i+2] = 0; d[i+3] = 0; }
+        }
+      }
+      g.putImageData(out, 0, 0);
+      return c;
+    }
+
+    function load(url) {
+      if (cache[url]) return cache[url];
+      var slot = { state: "loading", canvas: null, waiters: [] };
+      cache[url] = slot;
+      var im = new Image();
+      im.crossOrigin = "anonymous";
+      im.onload = function () {
+        var c = ditherShot(im);
+        slot.canvas = c;
+        slot.state = c ? "ready" : "error";
+        slot.waiters.splice(0).forEach(function (fn) { fn(); });
+      };
+      im.onerror = function () {
+        slot.state = "error";
+        slot.waiters.splice(0).forEach(function (fn) { fn(); });
+      };
+      im.src = endpoint(url);
+      return slot;
+    }
+
+    function paint(slot) {
+      shot.innerHTML = "";
+      if (slot.state === "ready") {
+        var c = document.createElement("canvas");
+        c.width = slot.canvas.width; c.height = slot.canvas.height;
+        c.getContext("2d").drawImage(slot.canvas, 0, 0);
+        shot.appendChild(c);
+      } else {
+        shot.textContent = slot.state === "error" ? "no preview" : "loading";
+      }
+    }
+
+    function place() {
+      var pad = 22, pw = panel.offsetWidth, ph = panel.offsetHeight;
+      var x = mx + pad, y = my + pad;
+      if (x + pw > window.innerWidth - 10) x = mx - pad - pw;
+      if (y + ph > window.innerHeight - 10) y = my - pad - ph;
+      panel.style.transform = "translate(" + Math.max(8, x) + "px," + Math.max(8, y) + "px)";
+    }
+
+    document.addEventListener("mousemove", function (e) {
+      mx = e.clientX; my = e.clientY;
+      if (panel.classList.contains("visible")) place();
+    });
+
+    Array.prototype.forEach.call(document.querySelectorAll(".work-row"), function (row) {
+      var url = row.dataset.href;
+      if (!url) return;
+      row.addEventListener("mouseenter", function () {
+        label.textContent = row.dataset.label || "preview";
+        var slot = load(url);
+        paint(slot);
+        if (slot.state === "loading") {
+          slot.waiters.push(function () {
+            if (panel.classList.contains("visible") && label.textContent === row.dataset.label) paint(slot);
+          });
+        }
+        panel.classList.add("visible");
+        place();
+      });
+      row.addEventListener("mouseleave", function () { panel.classList.remove("visible"); });
+    });
+
+    /* Warm the screenshots before the first hover: a page microlink has not
+       seen before can take 10 to 30 seconds to render. */
+    var work = document.getElementById("projects");
+    if (work && "IntersectionObserver" in window) {
+      var wio = new IntersectionObserver(function (entries) {
+        if (!entries.some(function (e) { return e.isIntersecting; })) return;
+        Array.prototype.forEach.call(document.querySelectorAll(".work-row"), function (r) {
+          if (r.dataset.href) load(r.dataset.href);
+        });
+        wio.disconnect();
+      }, { rootMargin: "300px" });
+      wio.observe(work);
+    }
+  })();
+
+  /* ---------- email, per character lift ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll(".mailto"), function (link) {
+    var text = link.textContent;
+    link.setAttribute("aria-label", text);
+    link.textContent = "";
+    text.split("").forEach(function (ch, i) {
+      var s = document.createElement("span");
+      s.className = "char";
+      s.style.setProperty("--i", i);
+      s.textContent = ch;
+      link.appendChild(s);
+    });
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comp E, Kinetic type</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter+Tight:wght@500;600&family=JetBrains+Mono:wght@500&display=block" rel="stylesheet">
+<style>
+  :root { --red: #EE3B24; --ink: #0D0C0C; --paper: #F2F1ED; --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--red); color: var(--ink); font-family: "Inter Tight", sans-serif; overflow: hidden; height: 100dvh; }
+  ::selection { background: var(--ink); color: var(--red); }
+  nav { position: absolute; top: 24px; left: 40px; right: 40px; display: flex; justify-content: space-between; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; z-index: 4; }
+  nav ul { display: flex; gap: 26px; list-style: none; padding: 0; }
+  nav a { color: var(--ink); text-decoration: none; }
+  h1 { position: absolute; left: 36px; top: 72px; font-family: Anton, sans-serif; font-weight: 400; text-transform: uppercase; line-height: .84; letter-spacing: -0.01em; z-index: 2; }
+  h1 .l1 { display: block; font-size: 15.5vw; }
+  h1 .l2 { display: block; font-size: 8.4vw; color: var(--paper); margin-top: 1.2vw; }
+  .side { position: absolute; left: 40px; top: 486px; width: 380px; z-index: 3; }
+  .sub { font-size: 1.15rem; line-height: 1.45; font-weight: 600; }
+  .ctas { display: flex; gap: 10px; margin-top: 22px; }
+  .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 20px; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; transition: transform 180ms var(--ease); }
+  .btn.primary { background: var(--ink); color: var(--paper); }
+  .btn.ghost { border: 1px solid var(--ink); color: var(--ink); }
+  .btn:hover { transform: translateY(-2px); }
+  .hero-sprite { position: absolute; right: 40px; top: 170px; width: 480px; image-rendering: pixelated; transform: rotate(-6deg); z-index: 3;
+                 filter: drop-shadow(18px 22px 0 rgba(13,12,12,.9)); }
+  .band { position: absolute; left: 0; right: 0; bottom: 0; height: 260px; background: var(--ink); color: var(--paper); z-index: 1; display: grid; grid-template-rows: 1fr 46px; }
+  .ranks { display: grid; grid-template-columns: repeat(3, 1fr); padding: 0 40px; align-items: end; }
+  .rank { display: flex; align-items: flex-end; gap: 14px; padding-bottom: 18px; }
+  .rank b { font: 400 118px/.8 Anton, sans-serif; color: var(--red); }
+  .rank span { font: 500 12px/1.5 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; padding-bottom: 6px; }
+  .rank span strong { display: block; font: 400 28px/1 Anton, sans-serif; letter-spacing: .01em; }
+  .marquee { background: var(--paper); color: var(--ink); overflow: hidden; display: flex; align-items: center; }
+  .track { display: flex; gap: 40px; white-space: nowrap; font: 400 22px/1 Anton, sans-serif; text-transform: uppercase; letter-spacing: .02em; animation: run 22s linear infinite; }
+  .track span::after { content: ""; display: inline-block; width: 10px; height: 10px; background: var(--red); margin-left: 40px; vertical-align: middle; }
+  @keyframes run { to { transform: translateX(-50%); } }
+  @media (prefers-reduced-motion: reduce) { .track { animation: none; } }
+</style>
+</head>
+<body>
+  <nav><span>Ravindra Sisodia</span><ul><li><a href="#">Launches</a></li><li><a href="#">Work</a></li><li><a href="#">Contact</a></li></ul></nav>
+  <h1><span class="l1">Designs it.</span><span class="l2">Ships it with agents.</span></h1>
+  <div class="side">
+    <p class="sub">Three Mac apps in the Product Hunt top 10 in seven weeks, built with Claude Code.</p>
+    <div class="ctas"><a class="btn primary" href="#">See the launches</a><a class="btn ghost" href="#">Contact</a></div>
+  </div>
+  <img class="hero-sprite" src="ember.png" alt="Ember, a Crew pixel monster">
+  <section class="band">
+    <div class="ranks">
+      <div class="rank"><b>#3</b><span><strong>Chit</strong>Sep 26</span></div>
+      <div class="rank"><b>#7</b><span><strong>Crew</strong>Aug 7</span></div>
+      <div class="rank"><b>#8</b><span><strong>Notchling</strong>Sep 1</span></div>
+    </div>
+    <div class="marquee" aria-hidden="true"><div class="track">
+      <span>Three Product Hunt top 10s</span><span>Built with Claude Code</span><span>Chit</span><span>Crew</span><span>Notchling</span>
+      <span>Three Product Hunt top 10s</span><span>Built with Claude Code</span><span>Chit</span><span>Crew</span><span>Notchling</span>
+    </div></div>
+  </section>
+</body>
+</html>

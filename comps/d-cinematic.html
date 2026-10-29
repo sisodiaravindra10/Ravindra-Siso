@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Comp D, Cinematic 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,600&family=Inter:wght@400;500&family=JetBrains+Mono:wght@500&display=block" rel="stylesheet">
+<style>
+  :root { --bg: #0D0A08; --warm: #F3E6D3; --dim: rgba(243,230,211,.7); --lamp: #FFC98A; --ease: cubic-bezier(0.16, 1, 0.3, 1); }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--warm); font-family: Inter, sans-serif; overflow: hidden; height: 100dvh; }
+  canvas { position: fixed; inset: 0; display: block; }
+  .veil { position: fixed; inset: 0; pointer-events: none; background: linear-gradient(90deg, rgba(13,10,8,.88) 0%, rgba(13,10,8,.55) 32%, transparent 58%); }
+  .grain { position: fixed; inset: 0; pointer-events: none; opacity: .06; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+  nav { position: fixed; top: 28px; left: 56px; right: 56px; display: flex; justify-content: space-between; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; z-index: 3; }
+  nav ul { display: flex; gap: 26px; list-style: none; padding: 0; }
+  nav a { color: var(--warm); text-decoration: none; opacity: .85; }
+  nav a:hover { opacity: 1; }
+  .copy { position: fixed; left: 56px; top: 50%; transform: translateY(-50%); width: 560px; z-index: 3; }
+  .who { font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .16em; text-transform: uppercase; color: var(--lamp); }
+  h1 { margin-top: 20px; font-family: Fraunces, serif; font-weight: 300; font-variation-settings: "opsz" 144; font-size: clamp(3rem, 5vw, 5rem); line-height: 1; letter-spacing: -0.03em; }
+  h1 em { font-style: italic; font-weight: 600; color: var(--lamp); }
+  .sub { margin-top: 22px; font-size: 1.1rem; line-height: 1.55; color: var(--dim); max-width: 34ch; }
+  .ctas { margin-top: 32px; display: flex; gap: 12px; }
+  .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 22px; font: 500 12px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; text-decoration: none; transition: background 150ms var(--ease); }
+  .btn.primary { background: var(--warm); color: var(--bg); }
+  .btn.ghost { border: 1px solid rgba(243,230,211,.4); color: var(--warm); }
+  .caps { position: fixed; left: 56px; bottom: 36px; display: flex; gap: 34px; font: 500 11px/1 "JetBrains Mono", monospace; letter-spacing: .14em; text-transform: uppercase; color: var(--dim); z-index: 3; }
+  .caps b { color: var(--lamp); margin-right: 8px; }
+</style>
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+</head>
+<body>
+  <canvas id="c" aria-label="A dark desk under a lamp with Chit's receipt, three voxel Crew monsters and Notchling on it"></canvas>
+  <div class="veil"></div><div class="grain"></div>
+  <nav><span>Ravindra Sisodia</span><ul><li><a href="#">Launches</a></li><li><a href="#">Work</a></li><li><a href="#">Contact</a></li></ul></nav>
+  <div class="copy">
+    <p class="who">Designer + AI engineer</p>
+    <h1>Designs it.<br>Ships it with <em>agents.</em></h1>
+    <p class="sub">Three Mac apps in the Product Hunt top 10 in seven weeks, built with Claude Code.</p>
+    <div class="ctas"><a class="btn primary" href="#">See the launches</a><a class="btn ghost" href="#">Contact</a></div>
+  </div>
+  <p class="caps"><span><b>#3</b>Chit</span><span><b>#7</b>Crew</span><span><b>#8</b>Notchling</span></p>
+
+<script type="module">
+import * as THREE from "three";
+const canvas = document.getElementById("c");
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.setSize(innerWidth, innerHeight);
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.outputColorSpace = THREE.SRGBColorSpace;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.15;
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color("#0D0A08");
+scene.fog = new THREE.Fog("#0D0A08", 9, 20);
+const camera = new THREE.PerspectiveCamera(32, innerWidth / innerHeight, 0.1, 60);
+
+// Walnut desk, painted on a canvas: long grain streaks over a warm dark base.
+const wc = document.createElement("canvas"); wc.width = 1024; wc.height = 1024;
+const w = wc.getContext("2d");
+w.fillStyle = "#3A2418"; w.fillRect(0, 0, 1024, 1024);
+for (let i = 0; i < 900; i++) {
+  const y = Math.random() * 1024, a = Math.random() * 0.12;
+  w.strokeStyle = Math.random() > .5 ? `rgba(20,10,5,${a})` : `rgba(120,78,48,${a})`;
+  w.lineWidth = 1 + Math.random() * 3; w.beginPath(); w.moveTo(0, y);
+  for (let x = 0; x <= 1024; x += 64) w.lineTo(x, y + Math.sin(x / 140 + i) * 6);
+  w.stroke();
+}
+const wood = new THREE.CanvasTexture(wc); wood.colorSpace = THREE.SRGBColorSpace; wood.wrapS = wood.wrapT = THREE.RepeatWrapping; wood.repeat.set(2, 2);
+const desk = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshStandardMaterial({ map: wood, roughness: .55, metalness: .05 }));
+desk.rotation.x = -Math.PI / 2; desk.receiveShadow = true; scene.add(desk);
+
+// One warm lamp, off to the upper right, plus a faint cool fill.
+const lamp = new THREE.SpotLight("#FFC98A", 260, 30, Math.PI / 5.5, 0.55, 1.6);
+lamp.position.set(5.5, 8, 2.5); lamp.target.position.set(3.2, 0, 0.4); lamp.castShadow = true;
+lamp.shadow.mapSize.set(2048, 2048); lamp.shadow.bias = -0.0006; lamp.shadow.normalBias = 0.03; lamp.shadow.radius = 6;
+scene.add(lamp, lamp.target);
+scene.add(new THREE.HemisphereLight("#445066", "#1A0F08", 0.35));
+
+const loader = new THREE.TextureLoader();
+const tex = (src) => { const t = loader.load(src); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t; };
+
+// Chit receipt: a thin curled sheet lying on the desk.
+const rg = new THREE.PlaneGeometry(1.9, 1.9 * 1208 / 920, 20, 30);
+const pos = rg.attributes.position;
+for (let i = 0; i < pos.count; i++) { const y = pos.getY(i); pos.setZ(i, 0.06 * Math.pow(y / 1.25, 2) + 0.02 * Math.sin(pos.getX(i) * 3)); }
+rg.computeVertexNormals();
+const receipt = new THREE.Mesh(rg, new THREE.MeshStandardMaterial({ map: tex("receipt.png"), transparent: true, alphaTest: .4, roughness: .9, side: THREE.DoubleSide }));
+receipt.rotation.set(-Math.PI / 2, 0, 0.22); receipt.position.set(2.2, 0.03, 0.2); receipt.castShadow = true; receipt.receiveShadow = true; scene.add(receipt);
+
+// Crew monsters as voxel toys: every 10px pixel of the real sprite becomes a block in its exact colour,
+// extruded into one merged mesh per monster.
+const CELL = 10, DEPTH = 6;
+function voxelize(src, height) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const cw = Math.floor(img.width / CELL), ch = Math.floor(img.height / CELL);
+      const cv = document.createElement("canvas"); cv.width = img.width; cv.height = img.height;
+      const g = cv.getContext("2d", { willReadFrequently: true }); g.drawImage(img, 0, 0);
+      const data = g.getImageData(0, 0, img.width, img.height).data;
+      const cells = [];
+      let minX = cw, maxX = 0, maxY = 0;
+      for (let y = 0; y < ch; y++) for (let x = 0; x < cw; x++) {
+        const i = ((y * CELL + CELL / 2) * img.width + (x * CELL + CELL / 2)) * 4;
+        if (data[i + 3] < 128) continue;
+        cells.push([x, y, data[i], data[i + 1], data[i + 2]]);
+        minX = Math.min(minX, x); maxX = Math.max(maxX, x); maxY = Math.max(maxY, y);
+      }
+      const v = height / (maxY + 1), half = (v * DEPTH) / 2, cx = (minX + maxX) / 2;
+      // Merged mesh with only exposed faces: front and back per pixel, sides only at an empty neighbour.
+      const solid = new Set(cells.map(([x, y]) => x + "," + y));
+      const P = [], N = [], C = [], col = new THREE.Color();
+      const quad = (a, b, c, d, n) => { for (const q of [a, b, c, a, c, d]) { P.push(...q); N.push(...n); C.push(col.r, col.g, col.b); } };
+      for (const [x, y, r, gg, b] of cells) {
+        col.setRGB(r / 255, gg / 255, b / 255, THREE.SRGBColorSpace);
+        const x0 = (x - cx) * v - v / 2, x1 = x0 + v, y1 = (maxY - y) * v + v, y0 = y1 - v;
+        quad([x0, y0, half], [x1, y0, half], [x1, y1, half], [x0, y1, half], [0, 0, 1]);
+        quad([x1, y0, -half], [x0, y0, -half], [x0, y1, -half], [x1, y1, -half], [0, 0, -1]);
+        if (!solid.has((x - 1) + "," + y)) quad([x0, y0, -half], [x0, y0, half], [x0, y1, half], [x0, y1, -half], [-1, 0, 0]);
+        if (!solid.has((x + 1) + "," + y)) quad([x1, y0, half], [x1, y0, -half], [x1, y1, -half], [x1, y1, half], [1, 0, 0]);
+        if (!solid.has(x + "," + (y - 1))) quad([x0, y1, half], [x1, y1, half], [x1, y1, -half], [x0, y1, -half], [0, 1, 0]);
+        if (!solid.has(x + "," + (y + 1))) quad([x0, y0, -half], [x1, y0, -half], [x1, y0, half], [x0, y0, half], [0, -1, 0]);
+      }
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(P, 3));
+      geo.setAttribute("normal", new THREE.Float32BufferAttribute(N, 3));
+      geo.setAttribute("color", new THREE.Float32BufferAttribute(C, 3));
+      const mesh = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.45, metalness: 0.0 }));
+      mesh.castShadow = true; mesh.receiveShadow = true;
+      resolve(mesh);
+    };
+    img.src = src;
+  });
+}
+const crew = [["ember.png", 3.7, -1.3, -0.35], ["breeze.png", 5.5, -0.5, -0.55], ["sprout.png", 5.0, 1.15, -0.2]];
+const standees = [];
+crew.forEach(([src, x, z, ry], i) => voxelize(src, 1.1).then((mesh) => {
+  const toy = new THREE.Group(); toy.add(mesh);
+  toy.position.set(x, 0, z); toy.rotation.y = ry; toy.userData = { baseY: 0, phase: i * 1.7, ry };
+  scene.add(toy); standees.push(toy);
+}));
+
+// Notchling: an extruded notch shape, flat top corners, round bottom corners, face on the front.
+const W = 1.7, H = 0.82, r = 0.3, s = new THREE.Shape();
+s.moveTo(-W / 2, H / 2); s.lineTo(W / 2, H / 2); s.lineTo(W / 2, -H / 2 + r); s.quadraticCurveTo(W / 2, -H / 2, W / 2 - r, -H / 2);
+s.lineTo(-W / 2 + r, -H / 2); s.quadraticCurveTo(-W / 2, -H / 2, -W / 2, -H / 2 + r); s.lineTo(-W / 2, H / 2);
+const notch = new THREE.Mesh(new THREE.ExtrudeGeometry(s, { depth: 0.28, bevelEnabled: true, bevelSize: 0.02, bevelThickness: 0.02, bevelSegments: 3 }),
+  new THREE.MeshStandardMaterial({ color: "#050505", roughness: .35, metalness: .2 }));
+notch.position.set(2.0, H / 2 + 0.02, 2.2); notch.rotation.y = -0.15; notch.castShadow = true; scene.add(notch);
+const face = new THREE.Mesh(new THREE.PlaneGeometry(W * 0.96, H * 0.93), new THREE.MeshBasicMaterial({ map: tex("notch-cut.png"), transparent: true }));
+face.position.set(0, 0, 0.305); notch.add(face);
+
+// Camera: slow drift plus a gentle follow of the pointer.
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+let mx = 0, my = 0;
+addEventListener("pointermove", (e) => { mx = e.clientX / innerWidth - .5; my = e.clientY / innerHeight - .5; });
+const look = new THREE.Vector3(2.2, 0.2, 0.6);
+function frame(t) {
+  const k = reduced ? 0 : t / 1000;
+  camera.position.set(-1.2 + Math.sin(k * .15) * .35 + mx * .6, 5.2 + my * .3, 7.4 + Math.cos(k * .12) * .25);
+  camera.lookAt(look);
+  // Idle life: a two-step hop like Crew's walk cycle, plus a slow turn.
+  standees.forEach((t) => { const p = t.userData.phase;
+    t.position.y = reduced ? 0 : Math.max(0, Math.sin(k * 3 + p)) * 0.035;
+    t.rotation.y = t.userData.ry + (reduced ? 0 : Math.sin(k * .5 + p) * 0.12); });
+  renderer.render(scene, camera);
+  if (!reduced) requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+addEventListener("resize", () => { camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix(); renderer.setSize(innerWidth, innerHeight); if (reduced) frame(0); });
+</script>
+</body>
+</html>
