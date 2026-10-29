@@ -151,7 +151,15 @@ export type Work = {
   slug?: string;       // internal case page
   preview?: string;    // public path for the cursor preview
   featured?: boolean;
+  group?: 'toys' | 'motion';
 };
+
+// The index reads as three rooms. Rows without a group sit in the first.
+export const groups = [
+  { key: undefined, title: 'Brands, products, launches', note: 'Client work from Zop.Dev and ScreenRoot, and three Mac apps.' },
+  { key: 'toys', title: 'Toys', note: 'Paste a link or a name, get a small world back. Six single-file web toys, all live.' },
+  { key: 'motion', title: 'Motion', note: 'Films made in Remotion. Every frame and every note of the score is code.' },
+] as const;
 
 // Order is his: the twelve from the current site, then the written Zop.Dev cases, then the launches.
 export const works: Work[] = [
@@ -174,11 +182,26 @@ export const works: Work[] = [
   { n: '17', title: 'Chit', kind: 'Mac app, launch', year: '2026', slug: 'chit', preview: '/img/previews/chit.jpg' },
   { n: '18', title: 'Crew', kind: 'Mac app, launch', year: '2026', slug: 'crew', preview: '/img/previews/crew.jpg' },
   { n: '19', title: 'Notchling', kind: 'Mac app, launch', year: '2026', slug: 'notchling', preview: '/img/previews/notchling.jpg' },
+  { n: '20', title: 'Git City', kind: 'Toy, repo as city', year: '2026', href: 'https://git-city-kappa.vercel.app/', preview: '/img/previews/toy-git-city.jpg', group: 'toys' },
+  { n: '21', title: 'Doppel', kind: 'Toy, browser as twin', year: '2026', href: 'https://doppel-five.vercel.app/', preview: '/img/previews/toy-doppel.jpg', group: 'toys' },
+  { n: '22', title: 'Terrarium', kind: 'Toy, site as plant', year: '2026', href: 'https://terrarium-mu.vercel.app/', preview: '/img/previews/toy-terrarium.jpg', group: 'toys' },
+  { n: '23', title: 'Sigil', kind: 'Toy, name as crest', year: '2026', href: 'https://sigil-plum.vercel.app/', preview: '/img/previews/toy-sigil.jpg', group: 'toys' },
+  { n: '24', title: 'Strata', kind: 'Toy, site as core', year: '2026', href: 'https://strata-web-iota.vercel.app/', preview: '/img/previews/toy-strata.jpg', group: 'toys' },
+  { n: '25', title: 'Range', kind: 'Toy, year as relief', year: '2026', href: 'https://range-xi.vercel.app/', preview: '/img/previews/toy-range.jpg', group: 'toys' },
+  { n: '26', title: 'MATERIAL', kind: 'Film, GLSL', year: '2026', slug: 'material', preview: '/img/previews/motion-material.jpg', group: 'motion' },
+  { n: '27', title: 'ZopNight in 60 seconds', kind: 'Film, Zop.Dev', year: '2026', slug: 'zopnight-explainer', preview: '/img/previews/motion-zopnight.jpg', group: 'motion' },
+  { n: '28', title: 'Cloud audit ads', kind: 'Ads, Zop.Dev', year: '2026', slug: 'cloud-audit-ads', preview: '/img/previews/motion-cloud-audit.jpg', group: 'motion' },
 ];
+
+const ones = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen'];
+const tens = ['', '', 'twenty', 'thirty', 'forty', 'fifty', 'sixty', 'seventy', 'eighty', 'ninety'];
+export const numberWord = (n: number) => (n < 20 ? ones[n] : tens[Math.floor(n / 10)] + (n % 10 ? '-' + ones[n % 10] : ''));
+export const capWord = (n: number) => numberWord(n).replace(/^./, (c) => c.toUpperCase());
 
 export type Figure = { src: ImageMetadata; alt: string; caption: string };
 export type Fact = { n: string; label: string };
 export type Section = { heading: string; text: string; facts?: Fact[] };
+export type Video = { src: string; poster: string; w: number; h: number; title: string; caption?: string };
 export type Case = {
   slug: string;
   title: string;
@@ -191,6 +214,8 @@ export type Case = {
   seed: number;            // procedural cover when there is no hero image
   sections: Section[];
   figures?: Figure[];
+  video?: Video;           // plays in place of the hero image
+  clips?: Video[];         // a grid of further films under the sections
   outcome: string;
   links?: { label: string; href: string }[];
 };
@@ -370,6 +395,63 @@ export const cases: Case[] = [
     ],
     outcome: 'Twenty-nine templates and nothing off-brand ships.',
     links: [{ label: 'Live kit', href: 'https://zop-dev-brandkit-v1.vercel.app/' }],
+  },
+  {
+    slug: 'material',
+    title: 'MATERIAL',
+    summary: 'One word through four materials, each a real WebGL shader rendered frame by frame. A 65 second type film with a score written in code.',
+    client: 'Own film',
+    year: '2026',
+    role: 'Direction, GLSL, score',
+    seed: 11.2,
+    video: { src: '/video/material.mp4', poster: '/video/material.jpg', w: 1280, h: 720, title: 'MATERIAL, a 65 second type film' },
+    sections: [
+      { heading: 'Context', text: 'Most type films lay a word over footage. The question here was how far it goes when the word is made of the material itself, and every frame is computed rather than keyframed.', facts: [{ n: '65 s', label: 'running time' }, { n: '60 fps', label: '16:9 and 9:16 cuts' }] },
+      { heading: 'Idea', text: 'Four acts, four shaders. Light pours volumetric rays through the letters. Liquid is raymarched chrome that morphs into the extruded word. Ink wicks into paper, and its red drop becomes the full stop. Glass refracts across three wavelengths. Then a beat-cut montage and an end card.' },
+      { heading: 'Craft', text: 'The word becomes geometry through a distance field computed from its rasterised letters, blurred and sampled bicubic so the chrome bevels stay smooth instead of striated. The score is synthesised in Node from the same timeline file that sets the cuts, so picture and sound cannot drift apart.', facts: [{ n: '4', label: 'fragment shaders' }, { n: '1', label: 'timeline for cuts and score' }] },
+    ],
+    outcome: 'Every frame and every note is code. Rendered in Remotion with a 2x supersample.',
+  },
+  {
+    slug: 'zopnight-explainer',
+    title: 'ZopNight in 60 seconds',
+    summary: 'A one minute explainer built from the real product: captured playground screens lifted into 3D over a shader night floor, with voice over.',
+    client: 'Zop.Dev',
+    year: '2026',
+    role: 'Script, motion, sound',
+    seed: 12.4,
+    video: { src: '/video/zopnight-explainer.mp4', poster: '/video/zopnight-explainer.jpg', w: 1280, h: 720, title: 'ZopNight explainer, 60 seconds' },
+    sections: [
+      { heading: 'Context', text: 'ZopNight cuts cloud spend across AWS, Azure and GCP. Explainers usually redraw the product as mock screens, and the mock drifts from the real thing within weeks.', facts: [{ n: '60 s', label: 'running time' }, { n: '3', label: 'clouds' }] },
+      { heading: 'Idea', text: 'Film the product itself. Every screen comes from the ZopNight playground and its sample data, and the camera moves between real elements: schedules that stop and start resources, savings per fix, anomalies.' },
+      { heading: 'Craft', text: 'A capture script records each screen at 2x along with the position of every element on it, so the camera can focus on, and lift into 3D, exactly the card the voice is talking about. Every claim was checked against the feature docs. The anomaly view shows spend against expected, so the script says that and nothing more.', facts: [{ n: '2x', label: 'screen capture' }, { n: '0', label: 'mocked screens' }] },
+    ],
+    outcome: 'A minute on ZopNight where nothing on screen is mocked up.',
+    links: [{ label: 'ZopNight playground', href: 'https://zopnight.com/playground' }],
+  },
+  {
+    slug: 'cloud-audit-ads',
+    title: 'Cloud audit ads',
+    summary: 'Six 30 second vertical ads for the Zop.Dev cloud audit. One offer, six ways into it.',
+    client: 'Zop.Dev',
+    year: '2026',
+    role: 'Concepts, motion, sound',
+    seed: 13.6,
+    video: { src: '/video/cloud-audit-1-receipt.mp4', poster: '/video/cloud-audit-1-receipt.jpg', w: 540, h: 960, title: 'Cloud audit ad, Receipt' },
+    sections: [
+      { heading: 'Context', text: 'Paid Reels for zop.dev/cloud-audit. One offer, and no way to know in advance which angle would stop the scroll.', facts: [{ n: '6', label: 'variants' }, { n: '30 s', label: 'each, 9:16' }] },
+      { heading: 'Idea', text: 'Six concepts side by side: Receipt, 24 Hours, Read-Only, POV, Needle and Chat. Three are voiced with word-synced captions and three are type only, so the set works with the sound on or off.' },
+      { heading: 'Craft', text: 'The page is the footage: its sections captured at phone width and three times density. Everything that carries meaning sits inside the area the Reels interface leaves clear. The numbers are the platform stats the page publishes, and the one sample report is labelled example data.', facts: [{ n: '3', label: 'voiced' }, { n: '3', label: 'type only' }] },
+    ],
+    clips: [
+      { src: '/video/cloud-audit-2-24-hours.mp4', poster: '/video/cloud-audit-2-24-hours.jpg', w: 540, h: 960, title: '24 Hours' },
+      { src: '/video/cloud-audit-3-read-only.mp4', poster: '/video/cloud-audit-3-read-only.jpg', w: 540, h: 960, title: 'Read-Only' },
+      { src: '/video/cloud-audit-4-pov.mp4', poster: '/video/cloud-audit-4-pov.jpg', w: 540, h: 960, title: 'POV' },
+      { src: '/video/cloud-audit-5-needle.mp4', poster: '/video/cloud-audit-5-needle.jpg', w: 540, h: 960, title: 'Needle' },
+      { src: '/video/cloud-audit-6-chat.mp4', poster: '/video/cloud-audit-6-chat.jpg', w: 540, h: 960, title: 'Chat' },
+    ],
+    outcome: 'Six finished cuts, one call to action.',
+    links: [{ label: 'zop.dev/cloud-audit', href: 'https://zop.dev/cloud-audit' }],
   },
 ];
 

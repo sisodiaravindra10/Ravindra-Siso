@@ -11,7 +11,8 @@ export function getStaticPaths() {
 const { c } = Astro.props;
 const next = nextCase(c.slug);
 const w = workFor(c.slug);
-const tall = !!c.hero && c.hero.width / c.hero.height < 1.6; // anything squarer than 16:10 stands beside the title
+const ar = c.video ? c.video.w / c.video.h : c.hero ? c.hero.width / c.hero.height : 0;
+const tall = ar > 0 && ar < 1.6; // anything squarer than 16:10 stands beside the title
 ---
 <Base title={c.title} description={c.summary} chapter="noon" state="0.5" current="/work/">
   <article class={`case ${tall ? 'case--tall' : ''}`} aria-labelledby="case-title">
@@ -27,7 +28,11 @@ const tall = !!c.hero && c.hero.width / c.hero.height < 1.6; // anything squarer
       </dl>
     </header>
 
-    {c.hero ? (
+    {c.video ? (
+      <figure class="case__hero case__hero--video" style={`--ar: ${(c.video.w / c.video.h).toFixed(4)}`}>
+        <video src={c.video.src} poster={c.video.poster} width={c.video.w} height={c.video.h} controls playsinline preload="metadata" aria-label={c.video.title}></video>
+      </figure>
+    ) : c.hero ? (
       <figure class="case__hero" data-gl data-gl-instant style={`--ar: ${(c.hero.width / c.hero.height).toFixed(4)}`}>
         <Image src={c.hero} alt={c.heroAlt ?? ''} widths={[720, 1200]} sizes="(max-width: 767px) 100vw, 80vw" loading="eager" fetchpriority="high" data-critical />
       </figure>
@@ -57,6 +62,17 @@ const tall = !!c.hero && c.hero.width / c.hero.height < 1.6; // anything squarer
             <figure class="case__fig">
               <div data-gl data-gl-duration="1.8" style={`--ar: ${(f.src.width / f.src.height).toFixed(4)}`}><Image src={f.src} alt={f.alt} widths={[640, 1000]} sizes="(max-width: 767px) 100vw, 60vw" loading="lazy" /></div>
               <figcaption>{f.caption}</figcaption>
+            </figure>
+          ))}
+        </section>
+      )}
+
+      {c.clips && c.clips.length > 0 && (
+        <section class="case__clips" aria-label="More films">
+          {c.clips.map((v) => (
+            <figure class="case__clip">
+              <div style={`--ar: ${(v.w / v.h).toFixed(4)}`}><video src={v.src} poster={v.poster} width={v.w} height={v.h} controls playsinline preload="none" aria-label={v.title}></video></div>
+              <figcaption class="mono">{v.title}</figcaption>
             </figure>
           ))}
         </section>

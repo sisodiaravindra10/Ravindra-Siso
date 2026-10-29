@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import SunLine from '../components/SunLine.astro';
-import { site, hero, launches, ships, works, story, contact } from '../data/site';
+import { site, hero, launches, ships, works, story, contact, capWord, numberWord } from '../data/site';
 const featured = works.filter((w) => w.featured);
 ---
 <Base current="/">
@@ -83,7 +83,7 @@ const featured = works.filter((w) => w.featured);
   <section class="work" id="work" aria-labelledby="work-title" data-chapter-at="afternoon">
     <div class="work__head">
       <h2 id="work-title" class="title" data-split="lines">Selected work, across rooms.</h2>
-      <p class="lede" data-reveal="sweep">Six here. {['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen','twenty'][works.length].replace(/^./, (c) => c.toUpperCase())} on the index, 2022 to 2026.</p>
+      <p class="lede" data-reveal="sweep">Six here. {capWord(works.length)} on the index, 2022 to 2026, toys and films included.</p>
     </div>
     <ul class="index" data-index>
       {featured.map((w) => (
@@ -98,7 +98,7 @@ const featured = works.filter((w) => w.featured);
         </li>
       ))}
     </ul>
-    <p class="work__all"><a class="btn btn--line" href="/work/" data-fill><span class="btn__fill" aria-hidden="true"></span><span class="btn__label">All work, nineteen</span><span class="btn__arrow" aria-hidden="true">→</span></a></p>
+    <p class="work__all"><a class="btn btn--line" href="/work/" data-fill><span class="btn__fill" aria-hidden="true"></span><span class="btn__label">All work, {numberWord(works.length)}</span><span class="btn__arrow" aria-hidden="true">→</span></a></p>
   </section>
 
   <!-- the story: photos clear, text beside them, never over them -->

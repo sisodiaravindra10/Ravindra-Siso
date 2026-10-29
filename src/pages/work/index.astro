@@ -2,14 +2,13 @@
 import Base from '../../layouts/Base.astro';
 import Footer from '../../components/Footer.astro';
 import SunLine from '../../components/SunLine.astro';
-import { works } from '../../data/site';
-const words = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve', 'thirteen', 'fourteen', 'fifteen', 'sixteen', 'seventeen', 'eighteen', 'nineteen', 'twenty'];
+import { works, groups, numberWord, capWord } from '../../data/site';
 const here = works.filter((w) => w.slug).length;
 const away = works.filter((w) => !w.slug).length;
-const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
-const lede = `${cap(words[works.length])} rows. ${cap(words[here])} open a page here, ${words[away]} open where they live.`;
+const lede = `${capWord(works.length)} rows. ${capWord(here)} open a page here, ${numberWord(away)} open where they live.`;
+const rooms = groups.map((g) => ({ ...g, rows: works.filter((w) => w.group === g.key) }));
 ---
-<Base title="Work" description="Nineteen pieces of work by Ravindra Sisodia, 2022 to 2026: Zop.Dev, YES Bank, CEAT, Tata Capital, three Mac apps and more." chapter="afternoon" state="0.7" current="/work/">
+<Base title="Work" description={`${capWord(works.length)} pieces of work by Ravindra Sisodia, 2022 to 2026: Zop.Dev, YES Bank, CEAT, Tata Capital, three Mac apps, six web toys and three films.`} chapter="afternoon" state="0.7" current="/work/">
   <section class="page page--index" aria-labelledby="index-title">
     <div class="page__head">
       <p class="mono page__kicker">Index, 2022 to 2026 <SunLine /></p>
@@ -17,7 +16,13 @@ const lede = `${cap(words[works.length])} rows. ${cap(words[here])} open a page 
       <p class="lede">{lede}</p>
     </div>
     <ul class="index index--full" data-index>
-      {works.map((w) => (
+      {rooms.map((g) => [
+        <li class="index__group">
+          <h2 class="index__group-title">{g.title}</h2>
+          <p class="index__group-note">{g.note}</p>
+          <span class="index__group-count mono">{String(g.rows.length).padStart(2, '0')}</span>
+        </li>,
+        ...g.rows.map((w) => (
         <li>
           <a class="index__row band" href={w.slug ? `/work/${w.slug}/` : w.href} data-preview={w.preview} data-cursor={w.slug ? 'Open' : 'Visit'} rel={w.slug ? undefined : 'noopener'}>
             <span class="index__n mono">{w.n}</span>
@@ -28,7 +33,7 @@ const lede = `${cap(words[works.length])} rows. ${cap(words[here])} open a page 
             {w.preview ? <img class="index__thumb" src={w.preview} alt="" width="160" height="100" loading="lazy" /> : <span class="index__tile mono" aria-hidden="true">{w.n}</span>}
           </a>
         </li>
-      ))}
+      ))])}
     </ul>
   </section>
   <Footer />
