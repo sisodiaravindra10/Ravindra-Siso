@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RavOS — Ravindra Sisodia</title>
+<meta name="description" content="The portfolio of Ravindra Sisodia, running on RavOS.">
+<link href="https://fonts.googleapis.com/css2?family=Silkscreen:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F2EFE7;
+  --ink:#16150F;
+  --dim:#6E6A5E;
+  --accent:#E0442E;
+  --sky-a:#1D2145;
+  --sky-b:#4A3A64;
+  --sky-c:#8A5A6E;
+  --pin:repeating-linear-gradient(0deg,var(--ink) 0 1px,transparent 1px 3px);
+  --mono:'Space Mono',monospace;
+  --pixel:'Silkscreen',monospace;
+  --serif:'Instrument Serif',serif;
+  --hard:4px 4px 0 rgba(10,9,20,.45);
+  --ez:cubic-bezier(0.16,1,0.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family:var(--mono);
+  color:var(--ink);
+  background:linear-gradient(180deg,var(--sky-a) 0%,var(--sky-b) 62%,var(--sky-c) 100%);
+  user-select:none;
+  cursor:default;
+  -webkit-font-smoothing:antialiased;
+}
+body.day{
+  --sky-a:#7FA8D9;--sky-b:#DDA98E;--sky-c:#E8C08A;
+}
+::selection{background:var(--accent);color:var(--paper)}
+
+/* dither veil over the sky */
+.dither{position:fixed;inset:0;pointer-events:none;opacity:.14;z-index:1;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect x='0' y='0' width='1' height='1' fill='white'/%3E%3Crect x='4' y='2' width='1' height='1' fill='white'/%3E%3Crect x='2' y='5' width='1' height='1' fill='white'/%3E%3Crect x='6' y='6' width='1' height='1' fill='white'/%3E%3C/svg%3E");
+}
+/* stars */
+.star{position:fixed;width:3px;height:3px;background:#EDEAE3;z-index:1;animation:tw 3s infinite;pointer-events:none}
+body.day .star{opacity:0}
+@keyframes tw{0%,100%{opacity:.9}50%{opacity:.15}}
+/* clouds */
+.cloud{position:fixed;height:18px;background:rgba(237,234,227,.16);z-index:1;pointer-events:none;border-radius:2px;animation:drift linear infinite}
+body.day .cloud{background:rgba(255,255,255,.5)}
+@keyframes drift{from{transform:translateX(-30vw)}to{transform:translateX(130vw)}}
+/* pixel sun-moon */
+.orb{position:fixed;top:9vh;left:56vw;width:72px;height:72px;z-index:1;pointer-events:none;
+  background:#EDEAE3;box-shadow:0 0 0 6px rgba(237,234,227,.12),0 0 60px rgba(237,234,227,.35);
+  clip-path:polygon(25% 0,75% 0,75% 8%,88% 8%,88% 16%,100% 16%,100% 25%,100% 75%,88% 75%,88% 84%,75% 84%,75% 100%,25% 100%,25% 92%,12% 92%,12% 84%,0 84%,0 25%,12% 25%,12% 16%,25% 16%,25% 8%);}
+body.day .orb{background:#F5D66B;box-shadow:0 0 0 6px rgba(245,214,107,.25),0 0 80px rgba(245,214,107,.5)}
+
+/* ---------- boot ---------- */
+#boot{position:fixed;inset:0;z-index:200;background:#0D0C14;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+#boot .mark{font-family:var(--pixel);font-size:2.4rem;color:var(--paper);letter-spacing:.1em}
+#boot .mark b{color:var(--accent)}
+#boot .bar{width:min(320px,70vw);height:14px;border:2px solid var(--paper);padding:2px}
+#boot .bar i{display:block;height:100%;width:0;background:var(--paper)}
+#boot .step{font-family:var(--mono);font-size:11px;color:#6E6A78;letter-spacing:.08em;height:1.2em}
+
+/* ---------- menu bar ---------- */
+.menubar{position:fixed;top:0;left:0;right:0;height:32px;z-index:100;background:var(--paper);border-bottom:2px solid var(--ink);display:flex;align-items:center;padding:0 10px;gap:2px;font-size:12px}
+.menubar .mlogo{font-family:var(--pixel);font-weight:700;padding:2px 10px;font-size:12px}
+.menubar .mlogo b{color:var(--accent)}
+.mitem{padding:3px 10px;position:relative;cursor:default}
+.mitem:hover,.mitem.open{background:var(--ink);color:var(--paper)}
+.mspacer{flex:1}
+.mright{font-size:11px;letter-spacing:.05em;display:flex;gap:14px;align-items:center}
+.dropdown{position:absolute;top:calc(100% + 2px);left:0;min-width:190px;background:var(--paper);border:2px solid var(--ink);box-shadow:var(--hard);display:none;z-index:101;color:var(--ink)}
+.mitem.open .dropdown{display:block}
+.dropdown button{all:unset;display:block;width:100%;padding:6px 12px;font-family:var(--mono);font-size:12px;box-sizing:border-box}
+.dropdown button:hover{background:var(--accent);color:var(--paper)}
+.dropdown button[disabled]{color:#B4AFA0;pointer-events:none}
+.dropdown hr{border:none;border-top:1px solid var(--ink);margin:3px 0}
+
+/* ---------- desktop icons ---------- */
+#desktop{position:fixed;inset:32px 0 0 0;z-index:2}
+.icons{position:absolute;top:20px;right:12px;bottom:110px;display:flex;flex-direction:column;flex-wrap:wrap-reverse;align-content:flex-end;gap:6px}
+.dicon{width:88px;padding:8px 4px;display:flex;flex-direction:column;align-items:center;gap:6px;border:1px solid transparent}
+.dicon svg{width:40px;height:40px;color:var(--paper);filter:drop-shadow(2px 2px 0 rgba(10,9,20,.5))}
+.dicon .lbl{font-family:var(--pixel);font-size:9px;color:var(--paper);background:rgba(13,12,20,.55);padding:1px 5px;text-align:center;line-height:1.4}
+.dicon:hover{border:1px dashed rgba(237,234,227,.5)}
+.dicon.selected{border:1px dashed var(--paper);background:rgba(237,234,227,.12)}
+body.day .dicon .lbl{background:rgba(13,12,20,.4)}
+
+/* selection marquee */
+#marquee{position:fixed;border:1px dashed var(--paper);background:rgba(237,234,227,.1);z-index:3;display:none;pointer-events:none}
+
+/* ---------- windows ---------- */
+.window{position:absolute;background:var(--paper);border:2px solid var(--ink);box-shadow:var(--hard);min-width:260px;display:flex;flex-direction:column;z-index:10}
+.titlebar{height:26px;border-bottom:2px solid var(--ink);display:flex;align-items:center;padding:0 8px;gap:8px;cursor:grab;background:var(--paper);flex:none}
+.titlebar:active{cursor:grabbing}
+.titlebar .stripes{flex:1;height:12px;background:var(--pin);opacity:.9}
+.window.blurred .titlebar .stripes{opacity:.25}
+.titlebar .wtitle{font-family:var(--pixel);font-size:10px;white-space:nowrap;padding:0 4px;background:var(--paper)}
+.closebox{width:14px;height:14px;border:2px solid var(--ink);background:var(--paper);flex:none;cursor:pointer;position:relative}
+.closebox:hover{background:var(--accent)}
+.wbody{padding:16px;overflow:auto;font-size:13px;line-height:1.65;max-height:60vh;user-select:text;cursor:auto}
+.wbody::-webkit-scrollbar{width:10px}
+.wbody::-webkit-scrollbar-thumb{background:var(--ink);border:2px solid var(--paper)}
+.wbody h2{font-family:var(--serif);font-weight:400;font-size:2rem;line-height:1.05;margin-bottom:.6rem}
+.wbody h2 em{font-style:italic;color:var(--accent)}
+.wbody .meta{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap}
+.wbody .meta span{border:1px solid var(--ink);padding:2px 7px}
+.wbody p{margin-bottom:.8rem}
+.wbody .visual{border:2px solid var(--ink);margin:12px 0;padding:14px;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(45deg,transparent 0 6px,rgba(22,21,15,.05) 6px 12px)}
+.wbody .visual svg{width:120px;height:90px;color:var(--ink)}
+.wbody a{color:var(--accent);text-decoration:underline;cursor:pointer}
+.statusbar{border-top:2px solid var(--ink);font-size:10px;padding:3px 8px;color:var(--dim);letter-spacing:.08em;flex:none;font-family:var(--mono)}
+
+/* terminal window */
+.term .wbody{background:#111018;color:#D8E3C8;font-size:12px;line-height:1.55;min-height:220px}
+.term .wbody .prompt{color:#E0442E}
+.term .wbody .val{color:#F2EFE7}
+.term .caret{display:inline-block;width:8px;height:14px;background:#D8E3C8;vertical-align:-2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* pop toy */
+.popgrid{display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin:8px 0}
+.bub{aspect-ratio:1;border:2px solid var(--ink);border-radius:50%;background:radial-gradient(circle at 32% 30%,#fff 0 18%,#DCD7C6 60%,#C9C3AE);cursor:pointer;transition:transform .12s var(--ez)}
+.bub:hover{transform:scale(1.1)}
+.bub.popped{border-style:dashed;background:none;transform:scale(.82);cursor:default}
+.popbar{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.08em}
+.popbar button{all:unset;border:2px solid var(--ink);padding:3px 12px;font-family:var(--pixel);font-size:10px;cursor:pointer;box-shadow:2px 2px 0 rgba(10,9,20,.35)}
+.popbar button:hover{background:var(--accent);color:var(--paper)}
+.popbar button:active{transform:translate(2px,2px);box-shadow:none}
+
+/* ---------- dock ---------- */
+.dock{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);z-index:100;display:flex;align-items:flex-end;gap:10px;background:rgba(242,239,231,.92);border:2px solid var(--ink);box-shadow:var(--hard);padding:8px 12px 6px}
+.ditem{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer}
+.ditem svg{width:34px;height:34px;color:var(--ink);transform-origin:bottom center;transition:transform .18s var(--ez)}
+.ditem .dot{width:5px;height:5px;background:transparent}
+.ditem.running .dot{background:var(--accent)}
+.ditem:hover svg{transform:scale(1.28) translateY(-3px)}
+.dock .dsep{width:2px;align-self:stretch;background:var(--ink);opacity:.25;margin:0 2px}
+
+/* tooltip */
+.dtip{position:fixed;z-index:120;font-family:var(--pixel);font-size:9px;background:var(--ink);color:var(--paper);padding:3px 8px;pointer-events:none;display:none;white-space:nowrap}
+
+@media(max-width:768px){
+  .icons{top:10px;right:8px;bottom:96px;gap:2px}
+  .dicon{width:76px}
+  .window{min-width:0}
+  .wbody{max-height:52vh}
+  .dock{gap:6px;padding:6px 8px 4px;max-width:94vw;overflow-x:auto}
+  .mright .mdate,.mright .mbatt{display:none}
+  .popgrid{grid-template-columns:repeat(6,1fr)}
+}
+@media(prefers-reduced-motion:reduce){
+  .cloud,.star{animation:none}
+}
+</style>
+</head>
+<body>
+
+<div id="boot">
+  <div class="mark">Rav<b>OS</b></div>
+  <div class="bar"><i></i></div>
+  <div class="step">finding pixels…</div>
+</div>
+
+<div class="dither"></div>
+<div class="orb"></div>
+<div id="marquee"></div>
+<div class="dtip"></div>
+
+<nav class="menubar" id="menubar">
+  <span class="mlogo">R<b>S</b></span>
+  <span class="mitem" data-menu>File
+    <span class="dropdown">
+      <button data-act="open:readme">Open README.txt</button>
+      <button data-act="open:terminal">New Terminal</button>
+      <hr>
+      <button data-act="closeall">Close All Windows</button>
+    </span>
+  </span>
+  <span class="mitem" data-menu>Edit
+    <span class="dropdown">
+      <button disabled>Undo Career Choices</button>
+      <button disabled>Cut Corners</button>
+      <button disabled>Paste Taste</button>
+    </span>
+  </span>
+  <span class="mitem" data-menu>Special
+    <span class="dropdown">
+      <button data-act="day">Toggle Daylight</button>
+      <button data-act="popall">Pop Everything</button>
+      <hr>
+      <button data-act="restart">Restart RavOS</button>
+    </span>
+  </span>
+  <span class="mitem" data-menu>Help
+    <span class="dropdown">
+      <button data-act="open:readme">About Ravindra</button>
+      <button data-act="mailto">Email the Designer</button>
+    </span>
+  </span>
+  <span class="mspacer"></span>
+  <span class="mright">
+    <span class="mbatt">⌁ 100%</span>
+    <span class="mdate" id="mdate"></span>
+    <span id="mclock">--:--</span>
+  </span>
+</nav>
+
+<div id="desktop">
+  <div class="icons" id="icons"></div>
+</div>
+
+<div class="dock" id="dock"></div>
+
+<!-- window content templates -->
+<template id="t-readme">
+  <h2>Hello, I am <em>Ravindra.</em></h2>
+  <div class="meta"><span>README.txt</span><span>v2026.07</span></div>
+  <p>Designer at Zop.Dev. I make brands, interfaces and toys — things with weight, things that pop, things that live in the notch of your MacBook.</p>
+  <p>This entire site is a small operating system. Drag the windows. Open the apps. Pop the bubbles. Nothing here scrolls; everything here moves.</p>
+  <p><a data-act="mailto">sisodia.ravindra10@gmail.com</a></p>
+</template>
+
+<template id="t-zopdev">
+  <h2>Zop.Dev — <em>brand & web</em></h2>
+  <div class="meta"><span>Brand</span><span>Web</span><span>2025</span></div>
+  <div class="visual"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2"><rect x="30" y="15" width="60" height="60"/><rect x="50" y="35" width="20" height="20" fill="currentColor" stroke="none"/></svg></div>
+  <p>Brand kit and homepage for a cloud platform. Cream paper, one orange square, a voice with no fluff. The system now runs across product, decks and film.</p>
+</template>
+
+<template id="t-sneha">
+  <h2>Sneha Kalita — <em>blossom gallery</em></h2>
+  <div class="meta"><span>WebGL</span><span>Portfolio</span></div>
+  <div class="visual"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2"><circle cx="60" cy="32" r="14"/><circle cx="44" cy="52" r="14"/><circle cx="76" cy="52" r="14"/><circle cx="60" cy="48" r="5" fill="currentColor" stroke="none"/></svg></div>
+  <p>An artist's portfolio as a 3D flower you walk through, petal by petal. Live at sneha-kalita.vercel.app.</p>
+</template>
+
+<template id="t-gitcity">
+  <h2>Git City — <em>repo to skyline</em></h2>
+  <div class="meta"><span>Generative</span><span>Toy</span></div>
+  <div class="visual"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2"><rect x="18" y="52" width="14" height="28"/><rect x="38" y="34" width="14" height="46"/><rect x="58" y="44" width="14" height="36"/><rect x="78" y="18" width="14" height="62"/><rect x="98" y="60" width="8" height="20"/></svg></div>
+  <p>Paste a repository link and watch it grow into a city. Commits become towers, contributors become districts, history becomes a skyline.</p>
+</template>
+
+<template id="t-crew">
+  <h2>Crew — <em>desktop agents</em></h2>
+  <div class="meta"><span>macOS</span><span>Tooling</span></div>
+  <div class="visual"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2"><rect x="30" y="30" width="8" height="8" fill="currentColor" stroke="none"/><rect x="56" y="30" width="8" height="8" fill="currentColor" stroke="none"/><rect x="82" y="30" width="8" height="8" fill="currentColor" stroke="none"/><path d="M14 66h92"/><rect x="44" y="44" width="32" height="16"/></svg></div>
+  <p>Pixel-art sprites marching along the bottom of the screen, one for every running Claude Code session. They carry tools, form squads, and overheat when the work gets heavy.</p>
+</template>
+
+<template id="t-notchling">
+  <h2>Notchling — <em>a notch creature</em></h2>
+  <div class="meta"><span>macOS</span><span>Toy</span></div>
+  <div class="visual"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2"><path d="M24 24h72a14 14 0 0 1-14 14H38a14 14 0 0 1-14-14Z"/><circle cx="50" cy="31" r="2.5" fill="currentColor" stroke="none"/><circle cx="70" cy="31" r="2.5" fill="currentColor" stroke="none"/><path d="M54 56h12M44 66h32"/></svg></div>
+  <p>A tiny creature that lives in the MacBook notch. It reacts to your day, snacks on dropped files, and quietly judges your tab count.</p>
+</template>
+
+<template id="t-laik">
+  <h2>Laik — <em>snacks first</em></h2>
+  <div class="meta"><span>Product</span><span>Concept</span></div>
+  <div class="visual"><svg viewBox="0 0 120 90" fill="none" stroke="currentColor" stroke-width="2"><path d="M60 74 30 48a17 17 0 0 1 24-24l6 6 6-6a17 17 0 0 1 24 24Z"/><path d="M50 52h20l-6 12"/></svg></div>
+  <p>A dating concept for people who hate small talk: match, send a real snack through quick-commerce, and let the conversation start when the doorbell rings.</p>
+</template>
+
+<template id="t-pop">
+  <div class="popbar"><span>POPPED: <b id="popcount">0</b>/24</span><button id="refill">REFILL</button></div>
+  <div class="popgrid" id="popgrid"></div>
+  <p style="font-size:11px;color:var(--dim)">bubble wrap for the soul. also available as a real Mac app.</p>
+</template>
+
+<template id="t-terminal"></template>
+
+<script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+<script>
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const isMobile = () => innerWidth < 769;
+
+/* ---------- tiny synth ---------- */
+let AC = null;
+function ac(){ if(!AC) AC = new (window.AudioContext||window.webkitAudioContext)(); return AC; }
+function blip(freq=520, dur=0.07, type='square', vol=0.04){
+  try{
+    const ctx = ac(), o = ctx.createOscillator(), g = ctx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(vol, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + dur);
+    o.connect(g); g.connect(ctx.destination);
+    o.start(); o.stop(ctx.currentTime + dur);
+  }catch(e){}
+}
+const popSound = () => { blip(300 + Math.random()*260, 0.09, 'sine', 0.09); };
+
+/* ---------- sky furniture ---------- */
+for(let i=0;i<40;i++){
+  const s=document.createElement('div');s.className='star';
+  s.style.left=Math.random()*100+'vw';s.style.top=Math.random()*70+'vh';
+  s.style.animationDelay=(Math.random()*3)+'s';
+  document.body.appendChild(s);
+}
+[[70,26,110],[46,52,150],[90,38,80]].forEach(([dur,top,w],i)=>{
+  const c=document.createElement('div');c.className='cloud';
+  c.style.top=top+'vh';c.style.width=w+'px';c.style.animationDuration=dur+'s';
+  c.style.animationDelay=(-dur*Math.random())+'s';
+  document.body.appendChild(c);
+});
+
+/* ---------- icon art ---------- */
+const ART = {
+  readme:   '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 4h16l6 6v26H9z"/><path d="M25 4v6h6M14 18h12M14 24h12M14 30h8"/></svg>',
+  zopdev:   '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="7" width="26" height="26"/><rect x="16" y="16" width="8" height="8" fill="currentColor" stroke="none"/></svg>',
+  sneha:    '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><circle cx="20" cy="13" r="6"/><circle cx="13" cy="23" r="6"/><circle cx="27" cy="23" r="6"/><circle cx="20" cy="21" r="2.5" fill="currentColor" stroke="none"/></svg>',
+  gitcity:  '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="22" width="6" height="12"/><rect x="15" y="12" width="6" height="22"/><rect x="24" y="18" width="6" height="16"/><rect x="33" y="8" width="3" height="26"/></svg>',
+  crew:     '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><rect x="10" y="10" width="5" height="5" fill="currentColor" stroke="none"/><rect x="25" y="10" width="5" height="5" fill="currentColor" stroke="none"/><rect x="13" y="20" width="14" height="8"/><path d="M6 34h28"/></svg>',
+  notchling:'<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 10h28a10 10 0 0 1-10 10H16A10 10 0 0 1 6 10Z"/><circle cx="16" cy="15" r="1.6" fill="currentColor" stroke="none"/><circle cx="24" cy="15" r="1.6" fill="currentColor" stroke="none"/><path d="M14 30h12"/></svg>',
+  laik:     '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 33 8 22a8 8 0 0 1 11-11l1 1 1-1a8 8 0 0 1 11 11Z"/></svg>',
+  pop:      '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><circle cx="13" cy="13" r="5"/><circle cx="27" cy="13" r="5"/><circle cx="13" cy="27" r="5"/><circle cx="27" cy="27" r="5" stroke-dasharray="3 3"/></svg>',
+  terminal: '<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="8" width="30" height="24"/><path d="M11 16l5 4-5 4M20 26h9"/></svg>',
+};
+
+/* ---------- app registry ---------- */
+const APPS = [
+  { id:'readme',    label:'README.txt',   title:'README.TXT',    w:400 },
+  { id:'zopdev',    label:'Zop.Dev',      title:'ZOP.DEV',       w:380 },
+  { id:'sneha',     label:'Sneha Kalita', title:'SNEHA KALITA',  w:380 },
+  { id:'gitcity',   label:'Git City',     title:'GIT CITY',      w:380 },
+  { id:'crew',      label:'Crew',         title:'CREW',          w:380 },
+  { id:'notchling', label:'Notchling',    title:'NOTCHLING',     w:380 },
+  { id:'laik',      label:'Laik',         title:'LAIK',          w:380 },
+  { id:'pop',       label:'pop.app',      title:'POP.APP',       w:360 },
+  { id:'terminal',  label:'Terminal',     title:'TERMINAL',      w:430 },
+];
+const app = id => APPS.find(a => a.id === id);
+
+/* ---------- desktop icons ---------- */
+const iconsEl = document.getElementById('icons');
+APPS.forEach(a => {
+  const d = document.createElement('div');
+  d.className = 'dicon'; d.dataset.id = a.id;
+  d.innerHTML = ART[a.id] + `<span class="lbl">${a.label}</span>`;
+  d.addEventListener('click', e => { e.stopPropagation(); selectIcon(d); });
+  d.addEventListener('dblclick', () => openWindow(a.id));
+  let tapT = 0;
+  d.addEventListener('pointerup', () => {
+    const now = Date.now();
+    if (now - tapT < 350 || isMobile()) openWindow(a.id);
+    tapT = now;
+  });
+  iconsEl.appendChild(d);
+});
+function selectIcon(el){
+  document.querySelectorAll('.dicon').forEach(i => i.classList.remove('selected'));
+  if (el) el.classList.add('selected');
+  blip(700, 0.03, 'square', 0.02);
+}
+document.getElementById('desktop').addEventListener('pointerdown', e => {
+  if (e.target.id === 'desktop') selectIcon(null);
+});
+
+/* ---------- dock ---------- */
+const dockEl = document.getElementById('dock');
+const tip = document.querySelector('.dtip');
+APPS.forEach((a, i) => {
+  if (a.id === 'terminal') {
+    const sep = document.createElement('div'); sep.className = 'dsep'; dockEl.appendChild(sep);
+  }
+  const d = document.createElement('div');
+  d.className = 'ditem'; d.dataset.id = a.id;
+  d.innerHTML = ART[a.id] + '<span class="dot"></span>';
+  d.addEventListener('click', () => { openWindow(a.id); blip(620, 0.05); });
+  d.addEventListener('mouseenter', () => {
+    tip.textContent = a.label; tip.style.display = 'block';
+    const r = d.getBoundingClientRect();
+    tip.style.left = (r.left + r.width/2 - tip.offsetWidth/2) + 'px';
+    tip.style.top = (r.top - 30) + 'px';
+  });
+  d.addEventListener('mouseleave', () => tip.style.display = 'none');
+  dockEl.appendChild(d);
+});
+/* dock magnification */
+dockEl.addEventListener('mousemove', e => {
+  if (isMobile() || reduced) return;
+  dockEl.querySelectorAll('.ditem svg').forEach(svg => {
+    const r = svg.getBoundingClientRect();
+    const dist = Math.abs(e.clientX - (r.left + r.width/2));
+    const s = Math.max(1, 1.55 - dist/130);
+    svg.style.transform = `scale(${s}) translateY(${-(s-1)*9}px)`;
+  });
+});
+dockEl.addEventListener('mouseleave', () => {
+  dockEl.querySelectorAll('.ditem svg').forEach(svg => svg.style.transform = '');
+});
+
+/* ---------- window manager ---------- */
+let zTop = 10, cascade = 0;
+const openWins = new Map();
+function focusWindow(w){
+  document.querySelectorAll('.window').forEach(x => x.classList.add('blurred'));
+  w.classList.remove('blurred');
+  w.style.zIndex = ++zTop;
+}
+function openWindow(id){
+  const a = app(id); if (!a) return;
+  if (openWins.has(id)) { focusWindow(openWins.get(id)); return; }
+  const w = document.createElement('div');
+  w.className = 'window' + (id === 'terminal' ? ' term' : '');
+  const width = isMobile() ? Math.min(a.w, innerWidth - 20) : a.w;
+  w.style.width = width + 'px';
+  const px = isMobile() ? 10 : 60 + (cascade % 5) * 44;
+  const py = isMobile() ? 46 + (cascade % 3) * 24 : 60 + (cascade % 5) * 36;
+  cascade++;
+  w.style.left = px + 'px'; w.style.top = py + 'px';
+  w.innerHTML = `
+    <div class="titlebar">
+      <span class="closebox"></span>
+      <span class="stripes"></span>
+      <span class="wtitle">${a.title}</span>
+      <span class="stripes"></span>
+    </div>
+    <div class="wbody"></div>
+    <div class="statusbar">${a.label} — RavOS 1.0</div>`;
+  w.querySelector('.wbody').appendChild(document.getElementById('t-' + id).content.cloneNode(true));
+  document.getElementById('desktop').appendChild(w);
+  openWins.set(id, w);
+  dockEl.querySelector(`.ditem[data-id="${id}"]`)?.classList.add('running');
+  focusWindow(w);
+  w.addEventListener('pointerdown', () => focusWindow(w));
+  w.querySelector('.closebox').addEventListener('click', e => { e.stopPropagation(); closeWindow(id); });
+  makeDraggable(w);
+  wireActions(w);
+  if (id === 'pop') initPop(w);
+  if (id === 'terminal') initTerm(w);
+  blip(500, 0.06);
+  if (!reduced) gsap.from(w, { scale: 0.5, opacity: 0, y: 40, duration: 0.55, ease: 'back.out(1.6)', transformOrigin: '50% 100%' });
+}
+function closeWindow(id){
+  const w = openWins.get(id); if (!w) return;
+  openWins.delete(id);
+  dockEl.querySelector(`.ditem[data-id="${id}"]`)?.classList.remove('running');
+  blip(260, 0.08);
+  if (reduced) { w.remove(); return; }
+  gsap.to(w, { scale: 0.6, opacity: 0, y: 30, duration: 0.28, ease: 'power2.in', onComplete: () => w.remove() });
+}
+function makeDraggable(w){
+  const bar = w.querySelector('.titlebar');
+  let sx, sy, ox, oy, dragging = false;
+  bar.addEventListener('pointerdown', e => {
+    if (e.target.classList.contains('closebox')) return;
+    dragging = true; bar.setPointerCapture(e.pointerId);
+    sx = e.clientX; sy = e.clientY;
+    ox = w.offsetLeft; oy = w.offsetTop;
+  });
+  bar.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const nx = Math.min(Math.max(ox + e.clientX - sx, -w.offsetWidth + 80), innerWidth - 80);
+    const ny = Math.min(Math.max(oy + e.clientY - sy, 0), innerHeight - 80);
+    w.style.left = nx + 'px'; w.style.top = ny + 'px';
+  });
+  bar.addEventListener('pointerup', () => dragging = false);
+}
+function wireActions(scope){
+  scope.querySelectorAll('[data-act]').forEach(el => {
+    el.addEventListener('click', () => runAction(el.dataset.act));
+  });
+}
+
+/* ---------- actions / menus ---------- */
+function runAction(act){
+  if (act.startsWith('open:')) return openWindow(act.slice(5));
+  if (act === 'closeall') return [...openWins.keys()].forEach(closeWindow);
+  if (act === 'day') { document.body.classList.toggle('day'); blip(840, 0.06); return; }
+  if (act === 'restart') return location.reload();
+  if (act === 'mailto') return location.href = 'mailto:sisodia.ravindra10@gmail.com';
+  if (act === 'popall') {
+    openWindow('pop');
+    setTimeout(() => document.querySelectorAll('.bub:not(.popped)').forEach((b, i) =>
+      setTimeout(() => b.click(), i * 55)), 350);
+  }
+}
+document.querySelectorAll('.mitem[data-menu]').forEach(m => {
+  m.addEventListener('click', e => {
+    e.stopPropagation();
+    const was = m.classList.contains('open');
+    document.querySelectorAll('.mitem').forEach(x => x.classList.remove('open'));
+    if (!was) { m.classList.add('open'); blip(760, 0.03, 'square', 0.02); }
+  });
+});
+addEventListener('click', () => document.querySelectorAll('.mitem').forEach(x => x.classList.remove('open')));
+document.querySelectorAll('.dropdown [data-act]').forEach(b =>
+  b.addEventListener('click', () => runAction(b.dataset.act)));
+
+/* ---------- clock ---------- */
+function tick(){
+  const d = new Date();
+  document.getElementById('mclock').textContent =
+    d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: false });
+  document.getElementById('mdate').textContent =
+    d.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+tick(); setInterval(tick, 1000);
+
+/* ---------- pop toy ---------- */
+function initPop(w){
+  const grid = w.querySelector('#popgrid');
+  const count = w.querySelector('#popcount');
+  const total = 24;
+  function fill(){
+    grid.innerHTML = ''; count.textContent = '0';
+    let popped = 0;
+    for (let i = 0; i < total; i++) {
+      const b = document.createElement('div');
+      b.className = 'bub';
+      b.addEventListener('click', () => {
+        if (b.classList.contains('popped')) return;
+        b.classList.add('popped');
+        popSound();
+        count.textContent = ++popped;
+        if (!reduced) gsap.fromTo(b, { scale: 1.25 }, { scale: 0.82, duration: 0.3, ease: 'elastic.out(1,0.4)' });
+        if (popped === total) blip(880, 0.25, 'triangle', 0.06);
+      });
+      grid.appendChild(b);
+    }
+  }
+  w.querySelector('#refill').addEventListener('click', () => { fill(); blip(660, 0.08); });
+  fill();
+}
+
+/* ---------- terminal ---------- */
+function initTerm(w){
+  const body = w.querySelector('.wbody');
+  const lines = [
+    ['<span class="prompt">ravindra@ravos</span> ~ % ', 'ravfetch', true],
+    ['', ''],
+    ['  <span class="val">██▓▓██</span>      <span class="val">ravindra sisodia</span>'],
+    ['  <span class="val">▓▓██▓▓</span>      ----------------'],
+    ['  <span class="val">██▓▓██</span>      role: designer @ zop.dev'],
+    ['              makes: brands, toys, interfaces'],
+    ['              stack: taste, gsap, swiftui, stubbornness'],
+    ['              shipped: 11 mac apps, 6 web toys, 1 blossom'],
+    ['              status: <span class="val">probably popping bubbles</span>'],
+    ['', ''],
+    ['<span class="prompt">ravindra@ravos</span> ~ % ', '', false, true],
+  ];
+  body.innerHTML = '';
+  let li = 0;
+  function nextLine(){
+    if (li >= lines.length) return;
+    const [pre, typed = '', doType, caret] = lines[li];
+    const div = document.createElement('div');
+    div.innerHTML = pre;
+    body.appendChild(div);
+    li++;
+    if (doType && typed && !reduced) {
+      let ci = 0;
+      const iv = setInterval(() => {
+        div.innerHTML = pre + typed.slice(0, ++ci);
+        if (ci >= typed.length) { clearInterval(iv); setTimeout(nextLine, 250); }
+      }, 70);
+    } else {
+      div.innerHTML = pre + typed + (caret ? '<span class="caret"></span>' : '');
+      setTimeout(nextLine, reduced ? 0 : 90);
+    }
+  }
+  nextLine();
+}
+
+/* ---------- selection marquee ---------- */
+const mq = document.getElementById('marquee');
+let mStart = null;
+document.getElementById('desktop').addEventListener('pointerdown', e => {
+  if (e.target.id !== 'desktop') return;
+  mStart = [e.clientX, e.clientY];
+  mq.style.display = 'block';
+});
+addEventListener('pointermove', e => {
+  if (!mStart) return;
+  const x = Math.min(mStart[0], e.clientX), y = Math.min(mStart[1], e.clientY);
+  const w = Math.abs(e.clientX - mStart[0]), h = Math.abs(e.clientY - mStart[1]);
+  Object.assign(mq.style, { left: x+'px', top: y+'px', width: w+'px', height: h+'px' });
+  document.querySelectorAll('.dicon').forEach(ic => {
+    const r = ic.getBoundingClientRect();
+    const hit = r.left < x+w && r.right > x && r.top < y+h && r.bottom > y;
+    ic.classList.toggle('selected', hit);
+  });
+});
+addEventListener('pointerup', () => { mStart = null; mq.style.display = 'none'; });
+
+/* ---------- boot sequence ---------- */
+const steps = ['finding pixels…','warming the notch…','feeding notchling…','inflating bubbles…','hoisting the dock…','ready.'];
+if (reduced) {
+  document.getElementById('boot').remove();
+  setTimeout(() => openWindow('readme'), 200);
+} else {
+  const bar = document.querySelector('#boot .bar i');
+  const step = document.querySelector('#boot .step');
+  const tl = gsap.timeline();
+  tl.to(bar, {
+    width: '100%', duration: 2.6, ease: 'steps(14)',
+    onUpdate(){ step.textContent = steps[Math.min(steps.length-1, Math.floor(this.progress()*steps.length))]; }
+  })
+  .to('#boot', { opacity: 0, duration: 0.5, ease: 'power2.in', delay: 0.2,
+    onComplete(){ document.getElementById('boot').remove(); } })
+  .from('.menubar', { yPercent: -110, duration: 0.6, ease: 'back.out(1.4)' }, '-=0.25')
+  .from('.dock', { yPercent: 160, xPercent: -50, duration: 0.7, ease: 'back.out(1.3)', clearProps: 'transform' }, '-=0.4')
+  .from('.dicon', { scale: 0, opacity: 0, duration: 0.45, stagger: 0.05, ease: 'back.out(2)' }, '-=0.45')
+  .add(() => openWindow('readme'), '+=0.15');
+}
+</script>
+</body>
+</html>

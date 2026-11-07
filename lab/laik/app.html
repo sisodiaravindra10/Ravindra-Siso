@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>laik · clickable mockup</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="stage">
+      <aside class="stage__rail stage__rail--left">
+        <span class="wordmark">laik</span>
+        <p class="blurb">
+          <strong>walk the loop.</strong> splash, phone, profile, swipe, match,
+          send, chat. nothing here is real.
+          <span class="script">it's a feel.</span>
+        </p>
+        <a class="back" href="index.html">← back to concept</a>
+      </aside>
+
+      <div class="phone">
+        <div class="phone__notch"></div>
+        <div class="phone__screen">
+
+          <!-- 01 splash -->
+          <section class="screen splash" id="screen-splash">
+            <span class="splash__meta">concept<span class="dot">·</span>v0<span class="dot">·</span>2026</span>
+
+            <div class="splash__center">
+              <span class="sticker sticker--cobalt sticker--r-neg-3">match. munch. maybe more.</span>
+              <h1 class="splash__wordmark">laik</h1>
+              <p class="splash__sub">send food, not paragraphs.</p>
+              <span class="sticker sticker--ink sticker--script sticker--r-2">shoot your shot →</span>
+            </div>
+
+            <span class="sticker sticker--heat sticker--r-5 splash__heat">down bad? same.</span>
+
+            <p class="splash__hint">opening<span id="splash-dots">...</span></p>
+          </section>
+
+          <!-- 02 phone -->
+          <section class="screen" id="screen-phone">
+            <div class="screen__top">
+              <span class="mono">01 · phone</span>
+              <span class="mono signature">laik</span>
+            </div>
+            <h2 class="screen__title">what's your number?</h2>
+            <p class="screen__sub">we'll text you a code. standard rates apply.</p>
+
+            <div class="keypad">
+              <div class="keypad__display">
+                <div class="label">+91 india</div>
+                <div class="number" id="phone-number">98765 43210<span class="caret"></span></div>
+              </div>
+
+              <div class="keypad__grid" id="keypad-grid">
+                <button class="keypad__key" data-num="1"><span class="num">1</span><span class="letters">·</span></button>
+                <button class="keypad__key" data-num="2"><span class="num">2</span><span class="letters">abc</span></button>
+                <button class="keypad__key" data-num="3"><span class="num">3</span><span class="letters">def</span></button>
+                <button class="keypad__key" data-num="4"><span class="num">4</span><span class="letters">ghi</span></button>
+                <button class="keypad__key" data-num="5"><span class="num">5</span><span class="letters">jkl</span></button>
+                <button class="keypad__key" data-num="6"><span class="num">6</span><span class="letters">mno</span></button>
+                <button class="keypad__key" data-num="7"><span class="num">7</span><span class="letters">pqrs</span></button>
+                <button class="keypad__key" data-num="8"><span class="num">8</span><span class="letters">tuv</span></button>
+                <button class="keypad__key" data-num="9"><span class="num">9</span><span class="letters">wxyz</span></button>
+                <button class="keypad__key" data-num=""><span class="num"></span></button>
+                <button class="keypad__key" data-num="0"><span class="num">0</span><span class="letters">+</span></button>
+                <button class="keypad__key keypad__key--back" data-num="back"><span class="num">⌫</span></button>
+              </div>
+
+              <button class="btn btn--primary" data-go="setup">continue →</button>
+            </div>
+          </section>
+
+          <!-- 03 profile setup -->
+          <section class="screen" id="screen-setup">
+            <div class="screen__top">
+              <span class="mono">02 · profile</span>
+              <span class="mono signature">laik</span>
+            </div>
+            <h2 class="screen__title">tell us about you.</h2>
+            <p class="screen__sub">the basics. you'll add more later.</p>
+
+            <div class="setup__avatar">
+              <span>📸</span>
+              <span class="plus">+</span>
+            </div>
+
+            <div class="setup__field">
+              <label>your name</label>
+              <input type="text" id="setup-name" placeholder="ravindra" />
+            </div>
+
+            <div class="setup__field">
+              <label>your age</label>
+              <input type="text" id="setup-age" placeholder="25" />
+            </div>
+
+            <p class="setup__hint">we're cool. just tell us who you are.</p>
+
+            <button class="btn btn--primary" data-go="onboarding">next →</button>
+          </section>
+
+          <!-- 04 snack identity -->
+          <section class="screen" id="screen-onboarding">
+            <div class="screen__top">
+              <span class="mono">03 · snack identity</span>
+              <span class="mono signature">laik</span>
+            </div>
+            <h2 class="screen__title">what would you send?</h2>
+            <p class="screen__sub">pick 3 snacks. this becomes the first joke on your profile.</p>
+
+            <div class="onb-label">
+              <strong>you'd send</strong><span class="count" id="onb-send-count">0/3</span>
+            </div>
+            <div class="onb-grid" id="onb-send-grid"></div>
+
+            <div class="onb-label">
+              <strong>you'd love</strong><span class="count" id="onb-love-count">0/3</span>
+            </div>
+            <div class="onb-grid" id="onb-love-grid"></div>
+
+            <button class="btn btn--primary" id="onb-cta" data-go="spicy">
+              that's me →
+            </button>
+          </section>
+
+          <!-- 05 spicy mode / lust selector (18+ gate) -->
+          <section class="screen spicy-gate" id="screen-spicy">
+            <div class="screen__top">
+              <span class="mono">04 · spicy mode</span>
+              <span class="mono flag">18+ only</span>
+            </div>
+
+            <h2 class="spicy-gate__title">
+              you in?
+              <span class="script">pick your energy.</span>
+            </h2>
+
+            <p class="spicy-gate__sub">
+              <strong>spicy mode</strong> unlocks the late-night shelf, after-dark gifting between 11pm and 5am, and adult-coded conversation. you must be <strong>18+</strong>. you can change this anytime.
+            </p>
+
+            <div class="spicy-grid" id="spicy-grid">
+              <button class="spicy-tile" data-vibe="vibing">
+                <span class="emoji">💬</span>
+                <span class="label">just vibing</span>
+                <span class="hint">chat first · food maybe</span>
+              </button>
+              <button class="spicy-tile" data-vibe="flirt">
+                <span class="emoji">🌶</span>
+                <span class="label">down to flirt</span>
+                <span class="hint">sparks · paragraphs out</span>
+              </button>
+              <button class="spicy-tile" data-vibe="feral">
+                <span class="emoji">🔥</span>
+                <span class="label">feral mode</span>
+                <span class="hint">down bad · we get it</span>
+              </button>
+              <button class="spicy-tile" data-vibe="mystery">
+                <span class="emoji">🤐</span>
+                <span class="label">not telling</span>
+                <span class="hint">keep them guessing</span>
+              </button>
+            </div>
+
+            <button class="btn spicy-gate__primary" data-go="discover">i'm 18+, let me in →</button>
+            <div style="height: 8px;"></div>
+            <button class="btn spicy-gate__skip" data-go="discover">skip for now</button>
+
+            <p class="spicy-gate__legal">
+              you must be 18+ to enter spicy mode.<br />
+              we don't store anything beyond a yes/no flag.
+            </p>
+          </section>
+
+          <!-- 06 discover (with tabbar) -->
+          <section class="screen screen--with-nav" id="screen-discover">
+            <div class="discover__hi">
+              <div class="greet">
+                today's menu.
+                <span class="script">three hand-picked.</span>
+              </div>
+              <div class="discover__count">
+                <strong>3</strong>
+                served fresh
+              </div>
+            </div>
+
+            <div class="deck" id="deck"></div>
+
+            <p class="deck__hint" id="deck-hint">
+              <span class="count" id="crave-count">0</span>
+              tap the tags that caught your eye. crave needs ≥ 1.
+            </p>
+
+            <div class="deck__actions">
+              <button class="deck__btn" data-go="discover" title="skip">✕</button>
+              <button class="deck__btn drop" data-go="drop" title="drop a snack">🎁</button>
+              <button class="deck__btn crave is-disabled" id="crave-btn" data-go="match" title="crave (tap tags first)">🥟</button>
+            </div>
+          </section>
+
+          <!-- DROP · pre-match send (no step number — alt path from discover) -->
+          <section class="screen drop-screen" id="screen-drop">
+            <div class="screen__top">
+              <span class="mono">DROP · pre-match send</span>
+              <span class="mono flag">18+</span>
+            </div>
+
+            <h2 class="drop-screen__title">
+              drop on rhea?
+              <span class="script">she doesn't know yet.</span>
+            </h2>
+
+            <p class="drop-screen__sub">
+              <strong>no match needed.</strong> she gets the snack and a card. she opens laik, sees 4 mystery candidates, picks one. if she picks <strong>you</strong>, match unlocks. if not, you stay anonymous. she keeps the snack.
+            </p>
+
+            <div class="drop-shelf" id="drop-shelf"></div>
+
+            <textarea class="drop-note" id="drop-note" rows="2" placeholder="one line. she'll see it on the card."></textarea>
+
+            <button class="tonight-toggle" id="tonight-toggle">
+              <span class="moon">🌙</span>
+              <span class="label">
+                tonight mode
+                <small>after-dark · ephemeral · auto-expires in 24h</small>
+              </span>
+              <span class="switch"></span>
+            </button>
+
+            <div class="drop-summary" id="drop-summary">
+              <div class="row"><span class="k">snack</span><span class="v" id="drop-sum-snack">pick one first</span></div>
+              <div class="row"><span class="k">drop fee</span><span class="v">₹49</span></div>
+              <div class="row"><span class="k">total</span><span class="v total" id="drop-sum-total">—</span></div>
+            </div>
+
+            <button class="btn drop-screen__primary" id="drop-cta" data-go="discover">drop it 🎁</button>
+            <div style="height: 8px;"></div>
+            <button class="btn btn--ghost" data-go="discover">cancel</button>
+
+            <p class="drop-screen__legal">
+              you can only drop once per profile per week.<br />
+              she can flag · unmatch · refuse.
+            </p>
+          </section>
+
+          <!-- MYSTERY · receiver finds the sender (drenched ink) -->
+          <section class="screen mystery-screen" id="screen-mystery">
+            <div class="screen__top">
+              <span class="mono">MYSTERY · you got a drop</span>
+              <span class="mono flag">🎁 new</span>
+            </div>
+
+            <h2 class="mystery-screen__title">
+              someone dropped a snack on you.
+              <span class="script">find them.</span>
+            </h2>
+
+            <p class="mystery-screen__sub">
+              they're one of <strong>4 candidates</strong> who liked you. pick the one your gut says. get it right · match unlocks. get it wrong · they stay anonymous.
+            </p>
+
+            <div class="mystery-gift">
+              <span class="emoji">🍫</span>
+              <div>
+                <div class="name">dark chocolate · 70%</div>
+                <div class="note">"you seem like a samosa-on-rainy-days person."</div>
+              </div>
+            </div>
+
+            <div class="mystery-banner" id="mystery-banner"></div>
+
+            <div class="mystery-grid" id="mystery-grid"></div>
+
+            <button class="btn mystery-screen__skip" data-go="inbox">decide later</button>
+
+            <p class="mystery-screen__hint">
+              the snack is already at your door. nothing you pick changes that.
+            </p>
+          </section>
+
+          <!-- 06 match (drenched ink) -->
+          <section class="screen match" id="screen-match">
+            <div class="screen__top">
+              <span class="mono">05 · it's a laik</span>
+              <span class="mono signature">laik</span>
+            </div>
+
+            <h2 class="match__title">
+              well.
+              <span class="script">it's a laik!</span>
+            </h2>
+
+            <p class="match__sub">
+              <span class="name">anaya</span> liked you back. don't say "hey".
+              do something better.
+            </p>
+
+            <div class="match__row">
+              <div>
+                <div class="match__chip match__chip--mine">🥟</div>
+                <span class="match__chip-label">you'd send</span>
+              </div>
+              <span class="plus">+</span>
+              <div>
+                <div class="match__chip match__chip--theirs">🍜</div>
+                <span class="match__chip-label">they'd love</span>
+              </div>
+            </div>
+
+            <button class="btn btn--primary" data-go="snack">send them a snack →</button>
+            <div style="height: 10px;"></div>
+            <button class="btn match__ghost" data-go="chat">just say hi</button>
+          </section>
+
+          <!-- 07 snack picker -->
+          <section class="screen" id="screen-snack">
+            <div class="screen__top">
+              <span class="mono">06 · send a snack</span>
+              <span class="mono signature">laik</span>
+            </div>
+            <h2 class="screen__title">pick a snack for anaya.</h2>
+            <p class="screen__sub">curated shelves. ₹99 to ₹399. one note, one tap.</p>
+
+            <div class="tabs">
+              <button class="is-on" data-shelf="blinkit">blinkit</button>
+              <button data-shelf="instamart">instamart</button>
+              <button data-shelf="swiggy">swiggy</button>
+              <button data-shelf="spicy" class="tab--spicy">spicy 🌶</button>
+            </div>
+
+            <div class="shelf" id="shelf-grid"></div>
+
+            <textarea class="note-input" id="note-input" rows="2"
+              placeholder="write a one-line note..."></textarea>
+
+            <button class="btn btn--primary" id="send-cta" data-go="confirm">
+              pick a snack first
+            </button>
+          </section>
+
+          <!-- 08 confirm -->
+          <section class="screen" id="screen-confirm">
+            <div class="confirm__hero">
+              <span class="mono">07 · how this stays safe</span>
+              <h2>
+                you'll never see her address.
+                <span class="accent">she'll never see yours.</span>
+              </h2>
+            </div>
+
+            <p class="screen__sub" style="margin-top: 0;">
+              we route through a delivery proxy. either side can decline. one snack per match per day.
+            </p>
+
+            <div class="confirm__summary" id="confirm-summary"></div>
+
+            <div class="btn--row">
+              <button class="btn btn--ghost" data-go="snack">change snack</button>
+              <button class="btn btn--primary" data-go="chat">send it →</button>
+            </div>
+          </section>
+
+          <!-- 09 chat detail -->
+          <section class="screen chat" id="screen-chat">
+            <div class="chat__head">
+              <button class="chat__back" data-go="inbox" title="back to inbox">←</button>
+              <div class="chat__avatar">A</div>
+              <div>
+                <div class="name">anaya</div>
+                <div class="status">late-night maggi person</div>
+              </div>
+            </div>
+
+            <div class="screen__body">
+              <div class="gift" id="chat-gift"></div>
+
+              <div class="bubbles">
+                <div class="bubble bubble--them">wait what 🙃 did you just?</div>
+                <div class="bubble bubble--me">i did. saw the maggi tag, had to.</div>
+                <div class="bubble bubble--them">ok this is unfair. brb i'm boiling water</div>
+              </div>
+            </div>
+
+            <div class="chat__compose">
+              <input placeholder="say something..." />
+              <button class="send-btn" title="send">→</button>
+            </div>
+          </section>
+
+          <!-- 10 inbox (with tabbar) -->
+          <section class="screen screen--with-nav" id="screen-inbox">
+            <div class="inbox__head">
+              <h2>inbox.</h2>
+              <span class="sticker sticker--cobalt sticker--r-neg-3">2 new</span>
+            </div>
+
+            <div class="inbox__list" id="inbox-list"></div>
+          </section>
+
+          <!-- 11 sends (snacks in flight) -->
+          <section class="screen screen--with-nav" id="screen-sends">
+            <div class="sends__head">
+              <h2>
+                snacks
+                <span class="script">in flight.</span>
+              </h2>
+              <div class="sends__count">
+                <strong>1</strong>
+                en route
+              </div>
+            </div>
+
+            <div class="sends__list" id="sends-list"></div>
+          </section>
+
+          <!-- 12 me (your profile) -->
+          <section class="screen screen--with-nav" id="screen-me">
+            <div class="me__hero">
+              <div class="row">
+                <div class="avatar">R</div>
+                <h2>
+                  ravindra, 25
+                  <span class="you">that's you, fwiw.</span>
+                </h2>
+                <span class="edit">edit</span>
+              </div>
+
+              <div class="me__stats">
+                <div class="me__stat"><span class="num">12</span><span class="label">matches</span></div>
+                <div class="me__stat"><span class="num">7</span><span class="label">sent</span></div>
+                <div class="me__stat"><span class="num">5</span><span class="label">received</span></div>
+              </div>
+            </div>
+
+            <div class="me__section">
+              <h3>your snack identity · you'd send</h3>
+              <div class="me__identity">
+                <span class="sticker sticker--cream">🥟 samosa</span>
+                <span class="sticker sticker--cream">🍵 chai</span>
+                <span class="sticker sticker--cream">🍫 kit kat</span>
+              </div>
+            </div>
+
+            <div class="me__section">
+              <h3>you'd love</h3>
+              <div class="me__identity">
+                <span class="sticker sticker--soft">🍜 maggi</span>
+                <span class="sticker sticker--soft">☕ filter kaapi</span>
+                <span class="sticker sticker--soft">🍩 donut</span>
+              </div>
+            </div>
+
+            <div class="me__section">
+              <h3>settings</h3>
+              <nav class="me__settings">
+                <a>notifications<span class="arrow">→</span></a>
+                <a>safety &amp; consent<span class="arrow">→</span></a>
+                <a>delivery preferences<span class="arrow">→</span></a>
+                <a>laik+<span class="arrow">→</span></a>
+                <a>help &amp; report<span class="arrow">→</span></a>
+              </nav>
+            </div>
+          </section>
+
+          <!-- shared tabbar (toggles via JS based on active screen) -->
+          <nav class="tabbar" id="tabbar">
+            <button class="tabbar__btn" data-tab="discover"><span class="glyph">♥</span>discover</button>
+            <button class="tabbar__btn" data-tab="sends"><span class="glyph">↗</span>sends</button>
+            <button class="tabbar__btn" data-tab="inbox"><span class="glyph">✉</span>inbox</button>
+            <button class="tabbar__btn" data-tab="me"><span class="glyph">○</span>me</button>
+          </nav>
+
+        </div>
+      </div>
+
+      <aside class="stage__rail stage__rail--right">
+        <p class="blurb">
+          twelve screens. the whole pitch is <strong>four taps</strong> from match
+          to a real-world gesture.
+          <span class="script">no "hru".</span>
+        </p>
+        <a class="back" href="index.html">read the concept →</a>
+      </aside>
+    </div>
+
+    <script src="scripts.js"></script>
+  </body>
+</html>
