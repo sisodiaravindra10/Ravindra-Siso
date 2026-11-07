@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sisodia Times — All the work that's fit to ship</title>
+<meta name="description" content="The portfolio of Ravindra Sisodia, printed daily.">
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Oswald:wght@500;600&family=Caveat:wght@600&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --news:#EBE5D6;
+  --news-2:#E4DECC;
+  --ink:#1C1A15;
+  --faded:#57534A;
+  --red:#B8271B;
+  --pen:#20418F;
+  --hair:1px solid rgba(28,26,21,.75);
+  --thin:1px solid rgba(28,26,21,.3);
+  --serif:'Newsreader',serif;
+  --display:'Playfair Display',serif;
+  --black:'UnifrakturMaguntia',serif;
+  --cond:'Oswald',sans-serif;
+  --hand:'Caveat',cursive;
+  --mono:'Space Mono',monospace;
+  --ez:cubic-bezier(0.16,1,0.3,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:auto}
+body{
+  background:#B9B2A0;
+  font-family:var(--serif);
+  color:var(--ink);
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--pen);color:var(--news)}
+a{color:inherit}
+
+/* the sheet */
+.paper{
+  max-width:1180px;margin:24px auto 60px;
+  background:var(--news);
+  box-shadow:0 1px 2px rgba(30,25,15,.3),0 14px 44px rgba(30,25,15,.35);
+  padding:34px 44px 50px;
+  position:relative;
+}
+.paper::before{ /* fibers */
+  content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 0.55 0 0 0 0 0.52 0 0 0 0 0.45 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23f)'/%3E%3C/svg%3E");
+}
+.paper::after{ /* edge tone */
+  content:'';position:absolute;inset:0;pointer-events:none;
+  box-shadow:inset 0 0 90px rgba(90,80,55,.14);
+}
+
+/* ---------- top furniture ---------- */
+.earline{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding-bottom:8px;border-bottom:var(--hair)}
+.masthead{text-align:center;padding:26px 0 10px}
+.masthead h1{font-family:var(--black);font-weight:400;font-size:clamp(3rem,9vw,6.4rem);line-height:1;letter-spacing:.01em}
+.masthead h1 .t-red{color:var(--red)}
+.mastline{display:flex;justify-content:space-between;align-items:center;border-top:var(--hair);border-bottom:var(--hair);padding:6px 0;margin-top:16px;position:relative}
+.mastline::after{content:'';position:absolute;left:0;right:0;bottom:3px;border-bottom:var(--hair)}
+.mastline span{font-family:var(--cond);font-size:11px;letter-spacing:.22em;text-transform:uppercase}
+.mastline .motto{font-style:italic;font-family:var(--serif);text-transform:none;letter-spacing:.02em;font-size:14px}
+
+/* ---------- grid ---------- */
+.front{display:grid;grid-template-columns:2.1fr 1fr;gap:0;margin-top:22px}
+.lead{padding-right:28px;border-right:var(--thin)}
+.side{padding-left:28px;display:flex;flex-direction:column;gap:22px}
+
+.kicker{font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;color:var(--red);margin-bottom:8px}
+.lead h2{font-family:var(--display);font-weight:900;font-size:clamp(2.2rem,5.2vw,4.4rem);line-height:1.02;letter-spacing:-.015em;text-transform:uppercase;margin-bottom:10px}
+.deck{font-family:var(--display);font-style:italic;font-size:clamp(1.05rem,1.8vw,1.4rem);line-height:1.35;color:var(--faded);margin-bottom:14px}
+.byline{font-family:var(--cond);font-size:11px;letter-spacing:.18em;text-transform:uppercase;border-top:var(--thin);border-bottom:var(--thin);padding:5px 0;margin-bottom:14px;display:flex;justify-content:space-between}
+.body-cols{columns:2;column-gap:26px;column-rule:var(--thin);text-align:justify;hyphens:auto;font-size:15.5px;line-height:1.55}
+.body-cols p{margin-bottom:.8em;break-inside:avoid-column}
+.body-cols p.lede::first-letter{font-family:var(--display);font-weight:700;font-size:3.3em;float:left;line-height:.82;padding:.04em .1em 0 0}
+.dateline{font-weight:600;letter-spacing:.04em}
+.pull{border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);padding:12px 4px;margin:6px 0 14px;font-family:var(--display);font-style:italic;font-size:1.25rem;line-height:1.3;text-align:center;break-inside:avoid-column}
+.pull b{display:block;font-family:var(--cond);font-style:normal;font-size:10px;letter-spacing:.25em;margin-top:8px;color:var(--faded)}
+
+/* press photo */
+.photo{border:var(--hair);padding:5px;background:var(--news);margin:0 0 14px}
+.photo .frame{position:relative;overflow:hidden;background:
+  radial-gradient(circle at 50% 34%, #4A443A 0 12%, transparent 13%),
+  radial-gradient(ellipse 42% 34% at 50% 78%, #4A443A 0 60%, transparent 61%),
+  linear-gradient(180deg,#C9C2AE,#B7AF97);
+  aspect-ratio:16/9}
+.photo .frame::after{content:'';position:absolute;inset:0;
+  background-image:radial-gradient(rgba(28,26,21,.55) 1px,transparent 1.2px);
+  background-size:5px 5px;mix-blend-mode:multiply}
+.photo figcaption{font-family:var(--mono);font-size:10px;letter-spacing:.06em;padding-top:6px;color:var(--faded)}
+
+/* side boxes */
+.boxed{border:2px solid var(--ink);padding:14px 16px}
+.boxed h3{font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:.3em;text-transform:uppercase;text-align:center;border-bottom:var(--hair);padding-bottom:8px;margin-bottom:10px}
+.inside-list{list-style:none;font-size:14px}
+.inside-list li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dotted rgba(28,26,21,.35)}
+.inside-list li:last-child{border-bottom:none}
+.inside-list .pg{font-family:var(--cond);font-size:11px;letter-spacing:.1em}
+.weather p{font-size:14px;line-height:1.5}
+.weather .temp{font-family:var(--display);font-weight:900;font-size:2.6rem;line-height:1;display:block;margin-bottom:6px}
+.corrections{font-size:13.5px;font-style:italic;color:var(--faded)}
+.corrections b{font-style:normal;color:var(--ink)}
+
+/* section rule */
+.sectionbar{display:flex;align-items:center;gap:14px;margin:34px 0 20px}
+.sectionbar::before,.sectionbar::after{content:'';flex:1;border-top:var(--hair);height:3px;border-bottom:var(--hair)}
+.sectionbar span{font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.4em;text-transform:uppercase}
+
+/* story grid */
+.stories{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.story{padding:0 24px;border-right:var(--thin);position:relative;margin-bottom:26px}
+.story:nth-child(3n){border-right:none}
+.story:nth-child(3n+1){padding-left:0}
+.story h4{font-family:var(--display);font-weight:700;font-size:1.45rem;line-height:1.1;text-transform:uppercase;margin-bottom:8px}
+.story .sdeck{font-style:italic;color:var(--faded);font-size:14px;margin-bottom:8px;line-height:1.4}
+.story p{font-size:14.5px;text-align:justify;hyphens:auto;line-height:1.5}
+.story .tag{font-family:var(--cond);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+
+/* stamp */
+.stamp{
+  position:absolute;top:-8px;right:10px;z-index:3;
+  font-family:var(--cond);font-weight:600;font-size:13px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--red);border:3px double var(--red);padding:4px 10px;
+  transform:rotate(-8deg);opacity:.85;mix-blend-mode:multiply;pointer-events:none;
+  border-radius:3px;
+}
+.stamp.blue{color:var(--pen);border-color:var(--pen)}
+
+/* stop press */
+.stoppress{border:3px solid var(--red);margin:8px 0 30px;padding:14px 20px;display:flex;align-items:baseline;gap:18px;flex-wrap:wrap}
+.stoppress .sp{font-family:var(--cond);font-weight:600;letter-spacing:.3em;color:var(--news);background:var(--red);padding:4px 12px;font-size:12px;text-transform:uppercase;flex:none}
+.stoppress p{font-size:15px;font-style:italic;flex:1;min-width:220px}
+
+/* classifieds */
+.classifieds{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-top:var(--hair)}
+.ad{border-right:var(--thin);border-bottom:var(--thin);padding:14px;font-size:13px;line-height:1.45;position:relative}
+.ad:nth-child(4n){border-right:none}
+.ad h5{font-family:var(--cond);font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;margin-bottom:6px}
+.ad.contact{background:var(--ink);color:var(--news)}
+.ad.contact h5{color:var(--news)}
+.ad.contact a{color:var(--news);font-family:var(--mono);font-size:12px;word-break:break-all}
+.ad .price{font-family:var(--mono);font-size:10px;color:var(--faded);display:block;margin-top:6px}
+.ad.contact .price{color:rgba(235,229,214,.6)}
+
+/* wire ticker */
+.wire{border-top:var(--hair);border-bottom:var(--hair);margin-top:34px;padding:7px 0;overflow:hidden;white-space:nowrap}
+.wire-inner{display:inline-block;animation:wire 30s linear infinite}
+.wire span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;padding:0 26px}
+.wire b{color:var(--red)}
+@keyframes wire{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+.pagefoot{display:flex;justify-content:space-between;font-family:var(--cond);font-size:10px;letter-spacing:.24em;text-transform:uppercase;padding-top:14px;color:var(--faded)}
+
+/* pen annotations */
+.annot{position:relative;display:inline}
+.annot svg{position:absolute;inset:-9px -12px;width:calc(100% + 24px);height:calc(100% + 18px);overflow:visible;pointer-events:none}
+.annot svg *{stroke:var(--pen);fill:none;stroke-width:2.2;stroke-linecap:round}
+.note{position:absolute;font-family:var(--hand);color:var(--pen);font-size:1.35rem;line-height:1.1;transform:rotate(-4deg);pointer-events:none;z-index:4;width:130px}
+.note svg{position:absolute;overflow:visible;pointer-events:none}
+.note svg path{stroke:var(--pen);fill:none;stroke-width:2;stroke-linecap:round}
+
+.reveal{opacity:0}
+
+@media(max-width:920px){
+  .paper{margin:10px;padding:20px 18px 34px}
+  .front{grid-template-columns:1fr}
+  .lead{padding-right:0;border-right:none}
+  .side{padding-left:0;margin-top:26px}
+  .body-cols{columns:1}
+  .stories{grid-template-columns:1fr}
+  .story{padding:0;border-right:none}
+  .classifieds{grid-template-columns:1fr 1fr}
+  .ad:nth-child(2n){border-right:none}
+  .note{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .wire-inner{animation:none}
+  .reveal{opacity:1}
+}
+@media print{
+  body{background:none}
+  .paper{box-shadow:none;max-width:none;margin:0}
+  .reveal{opacity:1!important;transform:none!important}
+  .wire{display:none}
+}
+</style>
+</head>
+<body>
+
+<div class="paper">
+
+  <div class="earline">
+    <span id="today">Monday, July 6, 2026</span>
+    <span>Late Monsoon Edition</span>
+    <span>Price: Free, Forever</span>
+  </div>
+
+  <header class="masthead">
+    <h1>The Sisodia <span class="t-red">Times</span></h1>
+    <div class="mastline">
+      <span>Vol. XXVI &middot; No. 7</span>
+      <span class="motto">&ldquo;All the work that&rsquo;s fit to ship.&rdquo;</span>
+      <span>India &amp; Everywhere</span>
+    </div>
+  </header>
+
+  <main class="front">
+    <article class="lead reveal">
+      <div class="kicker">The Front Page</div>
+      <h2>Local designer ships things with <span class="annot" data-annot="ellipse">weight</span></h2>
+      <p class="deck">Interfaces reported to roll, fold, settle and pop; sources confirm nothing he makes will simply fade in.</p>
+      <div class="byline"><span>By The Sisodia Times Staff</span><span>Zop.Dev Bureau</span></div>
+
+      <figure class="photo reveal">
+        <div class="frame"></div>
+        <figcaption>R. SISODIA, pictured yesterday, refusing to use a default easing curve. (Staff halftone)</figcaption>
+      </figure>
+
+      <div class="body-cols">
+        <p class="lede"><span class="dateline">ZOP.DEV HQ —</span> A designer here has been observed, for the third consecutive year, refusing to ship anything that does not feel like a physical object. Ravindra Sisodia, who works on brand and product at cloud platform Zop.Dev, reportedly believes software should have mass, momentum and consequences.</p>
+        <p>Witnesses describe shop shutters that roll up when his laptop unlocks, pages that turn with visible paper stress, and a bubble-wrap application with audible pops. &ldquo;He kept saying the word &lsquo;thunk&rsquo; in a design review,&rdquo; said one colleague. &ldquo;We now all say it.&rdquo;</p>
+        <div class="pull">&ldquo;If you can&rsquo;t imagine the sound it makes, it isn&rsquo;t finished.&rdquo;<b>— R. Sisodia, allegedly</b></div>
+        <p>The designer&rsquo;s output spans brand systems, motion, WebGL toys and a growing settlement of small macOS creatures. Asked for comment, Mr. Sisodia opened another window instead.</p>
+        <p>Analysts warn the behaviour is likely to continue. &ldquo;There is no cure,&rdquo; one said. &ldquo;There is only more shipping.&rdquo;</p>
+      </div>
+      <span class="note" id="note-lead" style="top:16px;right:-18px">underrated, honestly
+        <svg width="60" height="46" viewBox="0 0 60 46"><path class="draw" d="M8 40 C 20 34, 30 22, 34 8 M 28 14 L 34 7 L 39 15"/></svg>
+      </span>
+    </article>
+
+    <aside class="side">
+      <div class="boxed reveal">
+        <h3>Inside</h3>
+        <ul class="inside-list">
+          <li><span>Repository grows into city overnight</span><span class="pg">A2</span></li>
+          <li><span>Creature refuses to leave notch</span><span class="pg">A3</span></li>
+          <li><span>Romance now arriving by snack</span><span class="pg">A4</span></li>
+          <li><span>Pixel workers unionise politely</span><span class="pg">A5</span></li>
+          <li><span>Classifieds &amp; situations vacant</span><span class="pg">A6</span></li>
+        </ul>
+      </div>
+      <div class="boxed weather reveal">
+        <h3>The Weather</h3>
+        <p><span class="temp">31&deg;</span>Monsoon over Goa. 100% chance of shipping, scattered bubble-pops by evening, one (1) new side project forming offshore.</p>
+      </div>
+      <div class="boxed corrections reveal">
+        <h3>Corrections</h3>
+        <p>In Friday&rsquo;s edition we reported that the designer would <b>&ldquo;rest this weekend.&rdquo;</b> The Sisodia Times regrets the error.</p>
+      </div>
+    </aside>
+  </main>
+
+  <div class="sectionbar reveal"><span>The Work Pages</span></div>
+
+  <section class="stories">
+    <article class="story reveal">
+      <span class="stamp">Shipped</span>
+      <div class="tag">Urban Affairs</div>
+      <h4>Repository grows into city overnight; residents amazed</h4>
+      <p class="sdeck">Commits observed becoming towers, contributors forming districts.</p>
+      <p><span class="dateline">GIT CITY —</span> Planning officials confirmed Tuesday that any repository pasted into Git City immediately develops a skyline, with tall towers traced to heavy committers. The mayor, a merge commit, declined to comment.</p>
+    </article>
+
+    <article class="story reveal">
+      <span class="stamp">Shipped</span>
+      <div class="tag">Wildlife</div>
+      <h4>Creature found living in MacBook notch, refuses to leave</h4>
+      <p class="sdeck">Experts say it reacts, snacks on dropped files, judges tabs.</p>
+      <p><span class="dateline">THE NOTCH —</span> A small animal has taken residence in the black area atop local displays. Named &ldquo;Notchling&rdquo; by researchers, it is described as friendly, opinionated, and impossible to evict. Owners report they no longer want to.</p>
+      <span class="note" id="note-notch" style="top:-34px;left:-8px">my favourite</span>
+    </article>
+
+    <article class="story reveal">
+      <span class="stamp">Shipped</span>
+      <div class="tag">Labour</div>
+      <h4>Pixel workers march along screen bottom, demand more tasks</h4>
+      <p class="sdeck">One sprite per running agent; squads form during long builds.</p>
+      <p><span class="dateline">DESKTOP, LOWER EDGE —</span> The Crew, a settlement of pixel-art agents, marched again Thursday, each sprite representing one live coding session. Observers say morale is high and the overheating is &ldquo;mostly decorative.&rdquo;</p>
+    </article>
+
+    <article class="story reveal">
+      <span class="stamp">Shipped</span>
+      <div class="tag">The Arts</div>
+      <h4>Artist&rsquo;s portfolio blooms into walkable 3D flower</h4>
+      <p class="sdeck">Visitors proceed petal by petal; no two leave by the same route.</p>
+      <p><span class="dateline">THE GARDEN —</span> The collected work of artist Sneha Kalita has flowered into a navigable blossom, currently in season at sneha-kalita.vercel.app. Critics called it &ldquo;a portfolio you wander,&rdquo; then went back in.</p>
+    </article>
+
+    <article class="story reveal">
+      <span class="stamp">Shipped</span>
+      <div class="tag">Business</div>
+      <h4>Cloud company receives paper-and-orange makeover</h4>
+      <p class="sdeck">Brand kit reduced to cream, ink, and exactly one square.</p>
+      <p><span class="dateline">ZOP.DEV HQ —</span> The platform&rsquo;s new identity ships with a ten-by-ten orange square, a strict voice, and no decorative noise whatsoever. Shareholders described the restraint as &ldquo;frankly unsettling, but correct.&rdquo;</p>
+    </article>
+
+    <article class="story reveal">
+      <span class="stamp blue">Concept</span>
+      <div class="tag">Society</div>
+      <h4>Romance now arriving by snack delivery, youth approve</h4>
+      <p class="sdeck">Matches on &ldquo;Laik&rdquo; open with chips, not small talk.</p>
+      <p><span class="dateline">EVERY DOORBELL —</span> A courtship protocol in which the first move is a delivered snack has been proposed by local designers. &ldquo;The conversation starts when the doorbell rings,&rdquo; the concept papers state. Parents remain confused; the youth do not.</p>
+    </article>
+  </section>
+
+  <div class="stoppress reveal">
+    <span class="sp">Stop Press</span>
+    <p>Bubble-wrap application &ldquo;Pop&rdquo; reaches its 10,000th pop; trackpad haptics described as &ldquo;dangerously satisfying.&rdquo; Story develops as fast as the bubbles refill.</p>
+  </div>
+
+  <div class="sectionbar reveal"><span>Classifieds</span></div>
+
+  <section class="classifieds reveal">
+    <div class="ad"><h5>Services — Brand</h5>Identity systems built to survive contact with real products. Kits, voice, film. Restraint included at no extra charge.<span class="price">REF: BR-01</span></div>
+    <div class="ad"><h5>Services — Motion</h5>Choreography for interfaces. Anticipation, judder, settle. Every easing curve bespoke; linear need not apply.<span class="price">REF: MO-02</span></div>
+    <div class="ad"><h5>Services — WebGL &amp; Toys</h5>Shaders, cities, blossoms, other small worlds. Paste a link, receive a place. Reasonable rates for unreasonable ideas.<span class="price">REF: GL-03</span></div>
+    <div class="ad"><h5>Services — macOS</h5>Creatures installed in notches. Sprites for your desktop. Widgets with opinions. Feeding instructions supplied.<span class="price">REF: OS-04</span></div>
+    <div class="ad"><h5>Situations Vacant</h5>WANTED: collaborators with taste and one genuinely strange idea. Timidity disqualifies. Apply within.<span class="price">REF: SV-05</span></div>
+    <div class="ad"><h5>Lost &amp; Found</h5>FOUND: several weekends, unused, still in original packaging. Owner has no plans to collect them.<span class="price">REF: LF-06</span></div>
+    <div class="ad"><h5>Public Notices</h5>The phrase &ldquo;just make it pop&rdquo; will hereafter be interpreted literally, with sound. By order of the designer.<span class="price">REF: PN-07</span></div>
+    <div class="ad contact"><h5>Write to the Editor</h5><a href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a><span class="price">Replies faster than the presses.</span></div>
+  </section>
+
+  <div class="wire" aria-hidden="true">
+    <div class="wire-inner">
+      <span><b>The Wire</b> &middot; 11 Mac apps shipped &middot; 6 web toys live &middot; 1 blossom in season &middot; shutter rolls at every unlock &middot; bubbles refill nightly &middot;</span><span><b>The Wire</b> &middot; 11 Mac apps shipped &middot; 6 web toys live &middot; 1 blossom in season &middot; shutter rolls at every unlock &middot; bubbles refill nightly &middot;</span>
+    </div>
+  </div>
+
+  <footer class="pagefoot">
+    <span>Page A1 &middot; The Sisodia Times</span>
+    <span>Printed nowhere &middot; Read everywhere</span>
+    <span>&copy; 2026 R. Sisodia</span>
+  </footer>
+
+</div>
+
+<script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script>
+gsap.registerPlugin(ScrollTrigger);
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* live dateline */
+document.getElementById('today').textContent =
+  new Date().toLocaleDateString('en-IN', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+if (!reduced) {
+  /* masthead letterpress settle */
+  gsap.from('.masthead h1', { y: 26, opacity: 0, duration: 1.1, ease: 'power4.out', delay: 0.1 });
+  gsap.from('.earline, .mastline', { opacity: 0, duration: 0.9, delay: 0.4, ease: 'power2.out' });
+  gsap.from('.mastline', { scaleX: 0.6, transformOrigin: '50% 50%', duration: 0.9, delay: 0.4, ease: 'power4.out' });
+
+  /* article reveals */
+  document.querySelectorAll('.reveal').forEach(el => {
+    gsap.fromTo(el, { opacity: 0, y: 22 }, {
+      opacity: 1, y: 0, duration: 0.9, ease: 'power3.out',
+      scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+    });
+  });
+
+  /* rubber stamps slam in */
+  document.querySelectorAll('.stamp').forEach(st => {
+    gsap.fromTo(st,
+      { scale: 2.4, opacity: 0, rotate: -20 },
+      { scale: 1, opacity: 0.85, rotate: -8, duration: 0.42, ease: 'power4.in',
+        scrollTrigger: { trigger: st.parentElement, start: 'top 72%', once: true },
+        onComplete(){ gsap.fromTo(st, { scale: 0.94 }, { scale: 1, duration: 0.3, ease: 'elastic.out(1.4,0.4)' }); }
+      });
+  });
+
+  /* blue pen: ellipse around a word */
+  document.querySelectorAll('.annot[data-annot="ellipse"]').forEach(an => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+    svg.setAttribute('viewBox','0 0 100 40');
+    svg.setAttribute('preserveAspectRatio','none');
+    const e = document.createElementNS('http://www.w3.org/2000/svg','path');
+    e.setAttribute('d','M50 3 C 88 2, 99 10, 98 20 C 97 32, 74 38, 48 37 C 20 36, 2 30, 3 19 C 4 8, 26 4, 60 4');
+    e.setAttribute('pathLength','100');
+    svg.appendChild(e); an.appendChild(svg);
+    gsap.fromTo(e, { strokeDasharray: 100, strokeDashoffset: 100 }, {
+      strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut',
+      scrollTrigger: { trigger: an, start: 'top 78%', once: true }
+    });
+  });
+
+  /* margin notes write themselves */
+  document.querySelectorAll('.note').forEach(n => {
+    gsap.fromTo(n, { opacity: 0 }, {
+      opacity: 1, duration: 0.7, ease: 'power2.out', delay: 0.5,
+      scrollTrigger: { trigger: n.parentElement, start: 'top 75%', once: true }
+    });
+    const p = n.querySelector('path');
+    if (p) {
+      p.setAttribute('pathLength','100');
+      gsap.fromTo(p, { strokeDasharray: 100, strokeDashoffset: 100 }, {
+        strokeDashoffset: 0, duration: 0.8, delay: 0.9, ease: 'power2.inOut',
+        scrollTrigger: { trigger: n.parentElement, start: 'top 75%', once: true }
+      });
+    }
+  });
+} else {
+  document.querySelectorAll('.reveal').forEach(el => el.style.opacity = 1);
+}
+</script>
+</body>
+</html>

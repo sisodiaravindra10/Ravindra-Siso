@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ravindra Sisodia — Designer</title>
+<meta name="description" content="Designer at Zop.Dev. Brands, toys and interfaces with weight.">
+<link rel="preconnect" href="https://api.fontshare.com">
+<link href="https://api.fontshare.com/v2/css?f[]=clash-display@600,700&f[]=general-sans@400,500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#0A0A0C;
+  --ground-2:#0E0E12;
+  --bone:#EDEAE3;
+  --dim:#8A877E;
+  --acid:#D9FF4B;
+  --line:rgba(237,234,227,0.09);
+  --display:'Clash Display',sans-serif;
+  --serif:'Instrument Serif',serif;
+  --body:'General Sans',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --ease-spring:cubic-bezier(0.32,0.72,0,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scrollbar-width:thin;scrollbar-color:rgba(237,234,227,.18) transparent}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+body{
+  background:var(--ground);
+  color:var(--bone);
+  font-family:var(--body);
+  font-weight:400;
+  line-height:1.6;
+  overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--acid);color:var(--ground)}
+a{color:inherit;text-decoration:none}
+canvas#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+
+/* grain */
+.grain{position:fixed;inset:-50%;width:200%;height:200%;z-index:40;pointer-events:none;opacity:.05;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation:grain 8s steps(10) infinite;
+}
+@keyframes grain{
+  0%,100%{transform:translate(0,0)}10%{transform:translate(-5%,-8%)}20%{transform:translate(-12%,3%)}
+  30%{transform:translate(6%,-10%)}40%{transform:translate(-4%,12%)}50%{transform:translate(-10%,4%)}
+  60%{transform:translate(10%,0)}70%{transform:translate(0,8%)}80%{transform:translate(3%,12%)}90%{transform:translate(-8%,2%)}
+}
+
+/* preloader */
+#preloader{position:fixed;inset:0;z-index:100;background:var(--ground-2);display:flex;align-items:flex-end;justify-content:space-between;padding:2rem 2.5rem;transform:translateY(0)}
+#preloader .pl-name{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--dim)}
+#preloader .pl-count{font-family:var(--display);font-weight:600;font-size:clamp(4rem,10vw,9rem);line-height:.85;letter-spacing:-.03em;color:var(--bone)}
+noscript ~ #preloader{display:none}
+
+/* cursor */
+.cursor-dot,.cursor-ring{position:fixed;top:0;left:0;z-index:90;pointer-events:none;border-radius:50%;display:none}
+.cursor-dot{width:6px;height:6px;background:var(--acid)}
+.cursor-ring{width:36px;height:36px;border:1px solid rgba(237,234,227,.35);transition:width .35s var(--ease-spring),height .35s var(--ease-spring),border-color .35s}
+.cursor-ring.is-hover{width:64px;height:64px;border-color:var(--acid)}
+@media(pointer:fine){.cursor-dot,.cursor-ring{display:block}}
+
+/* nav */
+header{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;justify-content:space-between;align-items:center;padding:1.6rem 2.5rem;mix-blend-mode:difference}
+header .logo{font-family:var(--display);font-weight:600;font-size:15px;letter-spacing:.02em}
+header nav{display:flex;gap:2.2rem}
+header nav a{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--bone);position:relative}
+header nav a::after{content:'';position:absolute;left:0;bottom:-4px;width:100%;height:1px;background:var(--bone);transform:scaleX(0);transform-origin:right;transition:transform .5s var(--ease-out)}
+header nav a:hover::after{transform:scaleX(1);transform-origin:left}
+
+/* scroll progress */
+.progress{position:fixed;top:0;left:0;height:2px;width:100%;z-index:60;background:var(--acid);transform:scaleX(0);transform-origin:left}
+
+main{position:relative;z-index:1}
+section{position:relative;padding:0 2.5rem}
+
+/* hero */
+.hero{min-height:100dvh;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:3rem}
+.hero-meta{position:absolute;top:7rem;left:2.5rem;right:2.5rem;display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim)}
+.hero h1{font-family:var(--display);font-weight:700;font-size:clamp(3.2rem,9.2vw,9.5rem);line-height:.86;letter-spacing:-.035em;text-transform:uppercase}
+.hero h1 .row{display:block}
+.hero h1 .row.indent{padding-left:.9em}
+.hero h1 em{font-family:var(--serif);font-style:italic;font-weight:400;text-transform:none;letter-spacing:-.01em;font-size:.62em;vertical-align:.08em;color:var(--acid)}
+.hero-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:3.4rem;gap:2rem}
+.hero-foot p{max-width:24rem;color:var(--dim);font-size:15px;line-height:1.65}
+.hero-foot p strong{color:var(--bone);font-weight:500}
+.scroll-cue{font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:.8rem;white-space:nowrap}
+.scroll-cue .tick{display:inline-block;width:1px;height:34px;background:var(--dim);animation:cue 1.8s var(--ease-out) infinite;transform-origin:top}
+@keyframes cue{0%{transform:scaleY(0);transform-origin:top}45%{transform:scaleY(1);transform-origin:top}55%{transform:scaleY(1);transform-origin:bottom}100%{transform:scaleY(0);transform-origin:bottom}}
+
+/* masks for char reveal */
+.mask{display:inline-block;overflow:hidden;vertical-align:top}
+.mask .ch{display:inline-block;will-change:transform}
+
+/* manifesto */
+.manifesto{padding-top:22vh;padding-bottom:22vh;max-width:72rem}
+.manifesto .eyebrow{margin-bottom:2.4rem}
+.eyebrow{font-family:var(--mono);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--dim);display:flex;align-items:center;gap:.9rem}
+.eyebrow::before{content:'';width:8px;height:8px;background:var(--acid)}
+.manifesto p{font-family:var(--display);font-weight:600;font-size:clamp(1.9rem,4.4vw,3.9rem);line-height:1.14;letter-spacing:-.02em}
+.manifesto p em{font-family:var(--serif);font-style:italic;font-weight:400;color:var(--acid)}
+.manifesto .word{display:inline-block;opacity:.13}
+
+/* work */
+.work{padding:0}
+.work-head{padding:0 2.5rem;display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4rem}
+.work-head h2{font-family:var(--display);font-weight:700;font-size:clamp(2.6rem,7vw,6rem);letter-spacing:-.03em;line-height:.9;text-transform:uppercase}
+.work-head .count{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--dim)}
+.work-track{display:flex;gap:1.5rem;padding:0 2.5rem;width:max-content;align-items:stretch}
+.card{width:min(30rem,78vw);border:1px solid var(--line);background:rgba(14,14,18,.55);backdrop-filter:none;padding:2.2rem;display:flex;flex-direction:column;justify-content:space-between;min-height:26rem;transition:border-color .5s var(--ease-out),background .5s var(--ease-out);will-change:transform}
+.card:hover{border-color:rgba(217,255,75,.5);background:rgba(20,21,14,.72)}
+.card .top{display:flex;justify-content:space-between;align-items:flex-start}
+.card .num{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--dim)}
+.card .motif{width:56px;height:56px;color:var(--dim);transition:color .5s var(--ease-out),transform .7s var(--ease-spring)}
+.card:hover .motif{color:var(--acid);transform:rotate(-6deg) scale(1.08)}
+.card h3{font-family:var(--display);font-weight:600;font-size:clamp(1.7rem,2.6vw,2.4rem);letter-spacing:-.02em;line-height:1;margin-top:5rem}
+.card .desc{color:var(--dim);font-size:14px;margin-top:.8rem;max-width:20rem}
+.card .tags{display:flex;gap:.6rem;margin-top:1.6rem;flex-wrap:wrap}
+.card .tags span{font-family:var(--mono);font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);padding:.35rem .7rem;border-radius:999px}
+.work-end{width:22rem;display:flex;align-items:center;justify-content:center}
+.work-end a{font-family:var(--serif);font-style:italic;font-size:1.7rem;color:var(--dim);transition:color .4s}
+.work-end a:hover{color:var(--acid)}
+
+/* capabilities */
+.caps{padding-top:24vh;padding-bottom:20vh}
+.caps .eyebrow{margin-bottom:3rem}
+.caps-row{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--line);padding:2.1rem 0;position:relative;overflow:hidden;cursor:default}
+.caps-row:last-of-type{border-bottom:1px solid var(--line)}
+.caps-row .fill{position:absolute;inset:0;background:var(--acid);transform:scaleY(0);transform-origin:bottom;transition:transform .55s var(--ease-out);z-index:0}
+.caps-row:hover .fill{transform:scaleY(1)}
+.caps-row .idx,.caps-row .cap,.caps-row .note{position:relative;z-index:1;transition:color .4s var(--ease-out)}
+.caps-row .idx{font-family:var(--mono);font-size:11px;letter-spacing:.18em;color:var(--dim);width:4rem}
+.caps-row .cap{font-family:var(--display);font-weight:600;font-size:clamp(1.6rem,3.6vw,3.2rem);letter-spacing:-.02em;flex:1}
+.caps-row .note{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);text-align:right;max-width:14rem}
+.caps-row:hover .idx,.caps-row:hover .cap,.caps-row:hover .note{color:var(--ground)}
+
+/* contact */
+.contact{min-height:92dvh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start}
+.contact .eyebrow{margin-bottom:2.5rem}
+.contact .big{font-family:var(--display);font-weight:700;font-size:clamp(3.6rem,13vw,12rem);line-height:.85;letter-spacing:-.035em;text-transform:uppercase;display:inline-block}
+.contact .big em{font-family:var(--serif);font-style:italic;font-weight:400;text-transform:none;color:var(--acid);font-size:.7em}
+.contact .email{margin-top:3rem;font-family:var(--mono);font-size:clamp(.85rem,1.8vw,1.1rem);letter-spacing:.06em;color:var(--dim);border-bottom:1px solid var(--line);padding-bottom:.5rem;transition:color .4s,border-color .4s}
+.contact .email:hover{color:var(--acid);border-color:var(--acid)}
+
+/* marquee + footer */
+.marquee{overflow:hidden;border-top:1px solid var(--line);padding:1.3rem 0;white-space:nowrap}
+.marquee-inner{display:inline-block;animation:marquee 26s linear infinite;will-change:transform}
+.marquee span{font-family:var(--mono);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);padding:0 2.4rem}
+.marquee em{color:var(--acid);font-style:normal}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+footer{display:flex;justify-content:space-between;padding:1.6rem 2.5rem 2.2rem;font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--dim);border-top:1px solid var(--line)}
+
+@media(max-width:768px){
+  header{padding:1.2rem 1.4rem}
+  section{padding:0 1.4rem}
+  .hero-meta{left:1.4rem;right:1.4rem;top:5.5rem;flex-direction:column;gap:.5rem}
+  .hero-foot{flex-direction:column;align-items:flex-start}
+  .work-track{flex-direction:column;width:auto;padding:0 1.4rem}
+  .card{width:100%;min-height:20rem}
+  .work-head{padding:0 1.4rem;flex-direction:column;gap:1rem;align-items:flex-start}
+  .caps-row .note{display:none}
+  footer{padding:1.4rem;flex-direction:column;gap:.5rem}
+}
+@media(prefers-reduced-motion:reduce){
+  .grain,.marquee-inner,.scroll-cue .tick{animation:none}
+}
+</style>
+<noscript><style>#preloader{display:none}</style></noscript>
+</head>
+<body>
+
+<div id="preloader">
+  <div class="pl-name">Ravindra Sisodia — Portfolio 2026</div>
+  <div class="pl-count">00</div>
+</div>
+
+<canvas id="gl"></canvas>
+<div class="grain"></div>
+<div class="progress"></div>
+<div class="cursor-dot"></div>
+<div class="cursor-ring"></div>
+
+<header>
+  <a class="logo" href="#" data-hover>RS&reg;</a>
+  <nav>
+    <a href="#work" data-hover>Work</a>
+    <a href="#about" data-hover>About</a>
+    <a href="#contact" data-hover>Contact</a>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-meta">
+      <span>Designer — Zop.Dev</span>
+      <span>IND — UTC+05:30</span>
+    </div>
+    <h1 aria-label="Ravindra Sisodia">
+      <span class="row" data-split>RAVINDRA</span>
+      <span class="row indent"><em data-split-em>makes</em> <span data-split>THINGS</span></span>
+      <span class="row" data-split>WITH&nbsp;WEIGHT</span>
+    </h1>
+    <div class="hero-foot">
+      <p class="reveal"><strong>Brand systems, motion, and toys.</strong> Interfaces that behave like objects: they roll, fold, settle and pop. Currently designing at Zop.Dev.</p>
+      <div class="scroll-cue"><span>Scroll</span><span class="tick"></span></div>
+    </div>
+  </section>
+
+  <section class="manifesto" id="about">
+    <div class="eyebrow reveal">Manifesto</div>
+    <p data-words>I design interfaces you can <em>almost touch.</em> Shutters that roll up, pages that turn, cities grown from git history, creatures living in the notch. Half brand studio, <em>half toy factory.</em></p>
+  </section>
+
+  <section class="work" id="work">
+    <div class="work-head">
+      <h2><span data-split>Selected</span> <em style="font-family:var(--serif);font-style:italic;font-weight:400;text-transform:none;color:var(--acid)" data-split-em>work</em></h2>
+      <span class="count reveal">06 projects — 2024/26</span>
+    </div>
+    <div class="work-track">
+
+      <article class="card" data-hover>
+        <div class="top">
+          <span class="num">01</span>
+          <svg class="motif" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="8" width="40" height="40"/><rect x="20" y="20" width="16" height="16" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div>
+          <h3>Zop.Dev</h3>
+          <p class="desc">Brand kit and homepage for a cloud platform. Cream paper, one orange square, no noise.</p>
+          <div class="tags"><span>Brand</span><span>Web</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-hover>
+        <div class="top">
+          <span class="num">02</span>
+          <svg class="motif" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="28" cy="18" r="8"/><circle cx="18" cy="31" r="8"/><circle cx="38" cy="31" r="8"/><circle cx="28" cy="30" r="3" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div>
+          <h3>Sneha Kalita</h3>
+          <p class="desc">A 3D blossom gallery — an artist's portfolio you walk through, petal by petal.</p>
+          <div class="tags"><span>WebGL</span><span>Portfolio</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-hover>
+        <div class="top">
+          <span class="num">03</span>
+          <svg class="motif" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="8" y="30" width="8" height="18"/><rect x="20" y="18" width="8" height="30"/><rect x="32" y="26" width="8" height="22"/><rect x="44" y="10" width="4" height="38"/></svg>
+        </div>
+        <div>
+          <h3>Git City</h3>
+          <p class="desc">Paste a repo, get a city. Commits become towers, contributors become districts.</p>
+          <div class="tags"><span>Generative</span><span>Toy</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-hover>
+        <div class="top">
+          <span class="num">04</span>
+          <svg class="motif" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="14" y="22" width="6" height="6" fill="currentColor" stroke="none"/><rect x="26" y="22" width="6" height="6" fill="currentColor" stroke="none"/><rect x="38" y="22" width="6" height="6" fill="currentColor" stroke="none"/><path d="M8 40h40" /><rect x="20" y="30" width="18" height="10"/></svg>
+        </div>
+        <div>
+          <h3>Crew</h3>
+          <p class="desc">Pixel-art agents marching along the bottom of your screen — one per running Claude session.</p>
+          <div class="tags"><span>macOS</span><span>Tooling</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-hover>
+        <div class="top">
+          <span class="num">05</span>
+          <svg class="motif" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M8 12h12a6 6 0 0 1 6 6v0a6 6 0 0 1-6-6"/><path d="M12 12h32v0a8 8 0 0 1-8 8H20a8 8 0 0 1-8-8Z"/><circle cx="24" cy="16" r="1.5" fill="currentColor" stroke="none"/><circle cx="32" cy="16" r="1.5" fill="currentColor" stroke="none"/></svg>
+        </div>
+        <div>
+          <h3>Notchling</h3>
+          <p class="desc">A tiny creature that lives in the MacBook notch. It reacts, snacks, and judges your tabs.</p>
+          <div class="tags"><span>macOS</span><span>Toy</span></div>
+        </div>
+      </article>
+
+      <article class="card" data-hover>
+        <div class="top">
+          <span class="num">06</span>
+          <svg class="motif" viewBox="0 0 56 56" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M28 44 12 30a9 9 0 0 1 13-12l3 3 3-3a9 9 0 0 1 13 12Z"/><path d="M23 33h10l-3 6"/></svg>
+        </div>
+        <div>
+          <h3>Laik</h3>
+          <p class="desc">A dating concept where the first move is a snack — matched, delivered, eaten together.</p>
+          <div class="tags"><span>Product</span><span>Concept</span></div>
+        </div>
+      </article>
+
+      <div class="work-end">
+        <a href="#contact" data-hover>and a shelf full of toys &rarr;</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="caps">
+    <div class="eyebrow reveal">Capabilities</div>
+    <div class="caps-row reveal" data-hover><div class="fill"></div><span class="idx">01</span><span class="cap">Brand systems</span><span class="note">Identity, kits, voice</span></div>
+    <div class="caps-row reveal" data-hover><div class="fill"></div><span class="idx">02</span><span class="cap">Motion &amp; interaction</span><span class="note">GSAP, choreography, feel</span></div>
+    <div class="caps-row reveal" data-hover><div class="fill"></div><span class="idx">03</span><span class="cap">WebGL &amp; generative</span><span class="note">Three.js, shaders, toys</span></div>
+    <div class="caps-row reveal" data-hover><div class="fill"></div><span class="idx">04</span><span class="cap">macOS widgets</span><span class="note">SwiftUI, notch, overlays</span></div>
+    <div class="caps-row reveal" data-hover><div class="fill"></div><span class="idx">05</span><span class="cap">Product design</span><span class="note">Flows, chrome, systems</span></div>
+  </section>
+
+  <section class="contact" id="contact">
+    <div class="eyebrow reveal">Contact</div>
+    <a class="big" href="mailto:sisodia.ravindra10@gmail.com" data-hover>
+      <span data-split>SAY</span> <em data-split-em>hi.</em>
+    </a>
+    <a class="email reveal" href="mailto:sisodia.ravindra10@gmail.com" data-hover>sisodia.ravindra10@gmail.com</a>
+  </section>
+</main>
+
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-inner">
+    <span>Available for select collaborations <em>&#9632;</em> Designer at Zop.Dev <em>&#9632;</em> Brands, toys, interfaces <em>&#9632;</em></span><span>Available for select collaborations <em>&#9632;</em> Designer at Zop.Dev <em>&#9632;</em> Brands, toys, interfaces <em>&#9632;</em></span>
+  </div>
+</div>
+<footer>
+  <span>&copy; 2026 Ravindra Sisodia</span>
+  <span>Built by hand. No template.</span>
+</footer>
+
+<script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+gsap.registerPlugin(ScrollTrigger);
+
+/* ---------- smooth scroll ---------- */
+let velocity = 0;
+if (!reduced) {
+  const lenis = new Lenis({ duration: 1.15, easing: t => 1 - Math.pow(1 - t, 4) });
+  lenis.on('scroll', e => { velocity = e.velocity; ScrollTrigger.update(); });
+  gsap.ticker.add(t => lenis.raf(t * 1000));
+  gsap.ticker.lagSmoothing(0);
+  window.__lenis = lenis;
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    const id = a.getAttribute('href');
+    if (id.length < 2) return;
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      lenis.scrollTo(id, { duration: 1.6 });
+    });
+  });
+}
+
+/* ---------- text splitting ---------- */
+function splitChars(el) {
+  const text = el.textContent;
+  el.textContent = '';
+  const chars = [];
+  for (const c of text) {
+    const mask = document.createElement('span');
+    mask.className = 'mask';
+    const ch = document.createElement('span');
+    ch.className = 'ch';
+    ch.innerHTML = c === ' ' ? '&nbsp;' : c;
+    mask.appendChild(ch);
+    el.appendChild(mask);
+    chars.push(ch);
+  }
+  return chars;
+}
+const heroChars = [];
+document.querySelectorAll('.hero [data-split], .hero [data-split-em]').forEach(el => heroChars.push(...splitChars(el)));
+document.querySelectorAll('.work-head [data-split], .work-head [data-split-em], .contact [data-split], .contact [data-split-em]')
+  .forEach(el => {
+    const chars = splitChars(el);
+    gsap.set(chars, { yPercent: 110 });
+    ScrollTrigger.create({
+      trigger: el, start: 'top 88%', once: true,
+      onEnter: () => gsap.to(chars, { yPercent: 0, duration: 1, stagger: 0.03, ease: 'expo.out' })
+    });
+  });
+
+/* words for manifesto scrub */
+const mp = document.querySelector('[data-words]');
+(function splitWords(node) {
+  [...node.childNodes].forEach(n => {
+    if (n.nodeType === 3) {
+      const frag = document.createDocumentFragment();
+      n.textContent.split(/\s+/).filter(Boolean).forEach(w => {
+        const s = document.createElement('span');
+        s.className = 'word';
+        s.textContent = w;
+        frag.appendChild(s);
+        frag.appendChild(document.createTextNode(' '));
+      });
+      n.replaceWith(frag);
+    } else if (n.nodeType === 1) splitWords(n);
+  });
+})(mp);
+
+/* ---------- preloader + hero intro ---------- */
+const counter = document.querySelector('.pl-count');
+const intro = gsap.timeline({ paused: true });
+gsap.set(heroChars, { yPercent: 110 });
+gsap.set('.hero-foot, .hero-meta', { opacity: 0, y: 16 });
+intro
+  .to(heroChars, { yPercent: 0, duration: 1.2, stagger: 0.028, ease: 'expo.out' })
+  .to('.hero-meta', { opacity: 1, y: 0, duration: .8, ease: 'power3.out' }, '-=0.7')
+  .to('.hero-foot', { opacity: 1, y: 0, duration: .8, ease: 'power3.out' }, '-=0.6');
+
+if (reduced) {
+  gsap.set('#preloader', { display: 'none' });
+  gsap.set(heroChars, { yPercent: 0 });
+  gsap.set('.hero-foot, .hero-meta', { opacity: 1, y: 0 });
+} else {
+  const n = { v: 0 };
+  gsap.timeline()
+    .to(n, {
+      v: 100, duration: 1.5, ease: 'power2.inOut',
+      onUpdate: () => counter.textContent = String(Math.round(n.v)).padStart(2, '0')
+    })
+    .to('#preloader', { yPercent: -100, duration: 1, ease: 'expo.inOut' }, '+=0.15')
+    .add(() => intro.play(), '-=0.45');
+}
+
+/* ---------- generic reveals ---------- */
+document.querySelectorAll('.reveal').forEach(el => {
+  gsap.from(el, {
+    opacity: 0, y: 18, duration: 1, ease: 'power3.out',
+    scrollTrigger: { trigger: el, start: 'top 88%', once: true }
+  });
+});
+
+/* manifesto word scrub */
+gsap.to('.word', {
+  opacity: 1, stagger: 0.06, ease: 'none',
+  scrollTrigger: { trigger: '.manifesto', start: 'top 72%', end: 'center 42%', scrub: true }
+});
+
+/* ---------- horizontal work gallery ---------- */
+const mm = gsap.matchMedia();
+mm.add('(min-width: 769px)', () => {
+  const track = document.querySelector('.work-track');
+  const dist = () => track.scrollWidth - innerWidth + 48;
+  gsap.to(track, {
+    x: () => -dist(), ease: 'none',
+    scrollTrigger: {
+      trigger: '.work', start: 'top 12%', end: () => '+=' + dist(),
+      scrub: 1, pin: true, invalidateOnRefresh: true
+    }
+  });
+  document.querySelectorAll('.card').forEach((card, i) => {
+    gsap.from(card, {
+      y: 60, opacity: 0, duration: 1, delay: i * 0.05, ease: 'power3.out',
+      scrollTrigger: { trigger: '.work', start: 'top 60%', once: true }
+    });
+  });
+});
+
+/* scroll progress bar */
+gsap.to('.progress', {
+  scaleX: 1, ease: 'none',
+  scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
+});
+
+/* ---------- cursor ---------- */
+if (matchMedia('(pointer:fine)').matches && !reduced) {
+  const dot = document.querySelector('.cursor-dot');
+  const ring = document.querySelector('.cursor-ring');
+  let mx = innerWidth / 2, my = innerHeight / 2, rx = mx, ry = my;
+  addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  gsap.ticker.add(() => {
+    rx += (mx - rx) * 0.16; ry += (my - ry) * 0.16;
+    dot.style.transform = `translate(${mx - 3}px,${my - 3}px)`;
+    const half = ring.offsetWidth / 2;
+    ring.style.transform = `translate(${rx - half}px,${ry - half}px)`;
+  });
+  document.querySelectorAll('[data-hover]').forEach(el => {
+    el.addEventListener('mouseenter', () => ring.classList.add('is-hover'));
+    el.addEventListener('mouseleave', () => ring.classList.remove('is-hover'));
+  });
+}
+
+/* ================= WebGL: the shard ================= */
+const canvas = document.getElementById('gl');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 1.75));
+renderer.setSize(innerWidth, innerHeight);
+const scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x0a0a0c, 0.045);
+const camera = new THREE.PerspectiveCamera(42, innerWidth / innerHeight, 0.1, 60);
+camera.position.set(0, 0, 6);
+
+const NOISE = `
+vec3 mod289(vec3 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 mod289(vec4 x){return x-floor(x*(1.0/289.0))*289.0;}
+vec4 permute(vec4 x){return mod289(((x*34.0)+10.0)*x);}
+vec4 taylorInvSqrt(vec4 r){return 1.79284291400159-0.85373472095314*r;}
+float snoise(vec3 v){
+  const vec2 C=vec2(1.0/6.0,1.0/3.0); const vec4 D=vec4(0.0,0.5,1.0,2.0);
+  vec3 i=floor(v+dot(v,C.yyy)); vec3 x0=v-i+dot(i,C.xxx);
+  vec3 g=step(x0.yzx,x0.xyz); vec3 l=1.0-g;
+  vec3 i1=min(g.xyz,l.zxy); vec3 i2=max(g.xyz,l.zxy);
+  vec3 x1=x0-i1+C.xxx; vec3 x2=x0-i2+C.yyy; vec3 x3=x0-D.yyy;
+  i=mod289(i);
+  vec4 p=permute(permute(permute(i.z+vec4(0.0,i1.z,i2.z,1.0))+i.y+vec4(0.0,i1.y,i2.y,1.0))+i.x+vec4(0.0,i1.x,i2.x,1.0));
+  float n_=0.142857142857; vec3 ns=n_*D.wyz-D.xzx;
+  vec4 j=p-49.0*floor(p*ns.z*ns.z);
+  vec4 x_=floor(j*ns.z); vec4 y_=floor(j-7.0*x_);
+  vec4 x=x_*ns.x+ns.yyyy; vec4 y=y_*ns.x+ns.yyyy;
+  vec4 h=1.0-abs(x)-abs(y);
+  vec4 b0=vec4(x.xy,y.xy); vec4 b1=vec4(x.zw,y.zw);
+  vec4 s0=floor(b0)*2.0+1.0; vec4 s1=floor(b1)*2.0+1.0;
+  vec4 sh=-step(h,vec4(0.0));
+  vec4 a0=b0.xzyw+s0.xzyw*sh.xxyy; vec4 a1=b1.xzyw+s1.xzyw*sh.zzww;
+  vec3 p0=vec3(a0.xy,h.x); vec3 p1=vec3(a0.zw,h.y); vec3 p2=vec3(a1.xy,h.z); vec3 p3=vec3(a1.zw,h.w);
+  vec4 norm=taylorInvSqrt(vec4(dot(p0,p0),dot(p1,p1),dot(p2,p2),dot(p3,p3)));
+  p0*=norm.x; p1*=norm.y; p2*=norm.z; p3*=norm.w;
+  vec4 m=max(0.5-vec4(dot(x0,x0),dot(x1,x1),dot(x2,x2),dot(x3,x3)),0.0);
+  m=m*m;
+  return 105.0*dot(m*m,vec4(dot(p0,x0),dot(p1,x1),dot(p2,x2),dot(p3,x3)));
+}`;
+
+const uniforms = {
+  uTime: { value: 0 },
+  uAmp: { value: 0.35 },
+  uAccent: { value: new THREE.Color('#D9FF4B') },
+  uBase: { value: new THREE.Color('#17171d') },
+  uGlow: { value: 0.55 }
+};
+const shard = new THREE.Mesh(
+  new THREE.IcosahedronGeometry(1.5, 96),
+  new THREE.ShaderMaterial({
+    uniforms,
+    vertexShader: NOISE + `
+      uniform float uTime; uniform float uAmp;
+      varying vec3 vN; varying vec3 vView; varying float vD;
+      void main(){
+        float n = snoise(normal*2.3 + vec3(uTime*0.22));
+        float ridged = 1.0 - abs(n);
+        float d = n*0.5 + ridged*0.18;
+        vD = d;
+        vec3 p = position + normal * d * uAmp;
+        vec4 mv = modelViewMatrix * vec4(p,1.0);
+        vN = normalize(normalMatrix * normal);
+        vView = normalize(-mv.xyz);
+        gl_Position = projectionMatrix * mv;
+      }`,
+    fragmentShader: `
+      uniform vec3 uAccent; uniform vec3 uBase; uniform float uGlow;
+      varying vec3 vN; varying vec3 vView; varying float vD;
+      void main(){
+        vec3 N = normalize(vN); vec3 V = normalize(vView);
+        float fres = pow(1.0 - abs(dot(N, V)), 2.4);
+        vec3 key = normalize(vec3(0.55, 0.7, 0.5));
+        float ndl = clamp(dot(N, key), 0.0, 1.0);
+        float back = clamp(dot(N, normalize(vec3(-0.6, -0.2, 0.4))), 0.0, 1.0);
+        vec3 col = uBase * (0.55 + ndl * 1.4);
+        col += uAccent * 0.10 * back;
+        col += uAccent * fres * uGlow;
+        col += uAccent * smoothstep(0.45, 0.9, vD) * 0.18 * ndl;
+        vec3 H = normalize(key + V);
+        col += vec3(0.93, 0.91, 0.86) * pow(clamp(dot(N, H), 0.0, 1.0), 22.0) * 0.35;
+        gl_FragColor = vec4(col, 1.0);
+      }`
+  })
+);
+scene.add(shard);
+
+/* particle dust */
+const COUNT = 500;
+const pos = new Float32Array(COUNT * 3);
+for (let i = 0; i < COUNT; i++) {
+  const r = 4 + Math.random() * 10, th = Math.random() * Math.PI * 2, ph = Math.acos(2 * Math.random() - 1);
+  pos[i * 3] = r * Math.sin(ph) * Math.cos(th);
+  pos[i * 3 + 1] = r * Math.sin(ph) * Math.sin(th);
+  pos[i * 3 + 2] = r * Math.cos(ph) - 4;
+}
+const dustGeo = new THREE.BufferGeometry();
+dustGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+const dust = new THREE.Points(dustGeo, new THREE.PointsMaterial({ color: 0xedeae3, size: 0.018, transparent: true, opacity: 0.45, sizeAttenuation: true }));
+scene.add(dust);
+
+/* scroll choreography — keyframes across the whole page */
+const KF = [
+  { p: 0.00, x: 1.7,  y: -0.35, s: 0.78, camx: 0.0,  amp: 0.3, glow: 0.7 },
+  { p: 0.18, x: -1.6, y: 0.25, s: 0.6, camx: 0.4, amp: 0.5, glow: 0.75 },
+  { p: 0.45, x: 0.0,  y: 0.9,  s: 0.40, camx: 0.0,  amp: 0.85, glow: 0.45 },
+  { p: 0.72, x: -2.1, y: -0.2, s: 0.85, camx: 0.55, amp: 0.45, glow: 0.80 },
+  { p: 1.00, x: 0.0,  y: 0.0,  s: 1.30, camx: 0.0,  amp: 1.05, glow: 1.25 }
+];
+function kfAt(p) {
+  let a = KF[0], b = KF[KF.length - 1];
+  for (let i = 0; i < KF.length - 1; i++)
+    if (p >= KF[i].p && p <= KF[i + 1].p) { a = KF[i]; b = KF[i + 1]; break; }
+  const t = b.p === a.p ? 0 : (p - a.p) / (b.p - a.p);
+  const e = t * t * (3 - 2 * t);
+  const mix = (k) => a[k] + (b[k] - a[k]) * e;
+  return { x: mix('x'), y: mix('y'), s: mix('s'), camx: mix('camx'), amp: mix('amp'), glow: mix('glow') };
+}
+let scrollP = 0;
+ScrollTrigger.create({
+  trigger: document.body, start: 'top top', end: 'bottom bottom',
+  onUpdate: s => scrollP = s.progress
+});
+
+/* mouse parallax */
+let tmx = 0, tmy = 0;
+addEventListener('mousemove', e => {
+  tmx = (e.clientX / innerWidth - 0.5) * 2;
+  tmy = (e.clientY / innerHeight - 0.5) * 2;
+});
+
+let vboost = 0;
+const clock = new THREE.Clock();
+function render() {
+  const t = clock.getElapsedTime();
+  const k = kfAt(scrollP);
+  vboost += (Math.min(Math.abs(velocity) / 25, 1) * 0.6 - vboost) * 0.06;
+  uniforms.uTime.value = t;
+  uniforms.uAmp.value = k.amp + vboost;
+  uniforms.uGlow.value = k.glow + vboost * 0.5;
+  const ax = Math.min(1, camera.aspect / 1.4);
+  shard.position.x += (k.x * ax - shard.position.x) * 0.06;
+  shard.position.y += (k.y - shard.position.y) * 0.06;
+  const s = k.s;
+  shard.scale.x += (s - shard.scale.x) * 0.06;
+  shard.scale.y = shard.scale.z = shard.scale.x;
+  shard.rotation.y = t * 0.12 + scrollP * Math.PI * 2.2;
+  shard.rotation.x = Math.sin(t * 0.1) * 0.18 + scrollP * 0.8;
+  camera.position.x += (k.camx + tmx * 0.25 - camera.position.x) * 0.05;
+  camera.position.y += (-tmy * 0.18 - camera.position.y) * 0.05;
+  camera.lookAt(shard.position.x * 0.4, shard.position.y * 0.4, 0);
+  dust.rotation.y = t * 0.015;
+  renderer.render(scene, camera);
+}
+if (reduced) { render(); }
+else { gsap.ticker.add(render); }
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+  if (reduced) render();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Films · Ravindra Sisodia</title>
+  <meta name="description" content="Films Ravindra Sisodia made in code with Remotion: MATERIAL, a GLSL type film, and launch ads for Chit, Crew and Notchling.">
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #B4B2F3;
+      --fg: #000000;
+      --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+      --serif: "Instrument Serif", "Times New Roman", Times, serif;
+      --sans: Inter, -apple-system, system-ui, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { background: var(--bg); color: var(--fg); }
+    body { margin: 0; font-family: var(--sans); -webkit-font-smoothing: antialiased; }
+    ::selection { background: var(--fg); color: var(--bg); }
+    a { color: inherit; }
+    a:focus-visible { outline: 2px solid var(--fg); outline-offset: 4px; }
+
+    .wrap { width: min(1280px, 100% - 2 * clamp(16px, 6vw, 86px)); margin: 0 auto; }
+    .top {
+      display: flex; justify-content: space-between; align-items: center;
+      height: 72px; border-bottom: 1px solid var(--fg);
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    }
+    .top a { text-decoration: none; }
+    .top a:hover { text-decoration: underline; text-underline-offset: 4px; }
+
+    .head { padding: clamp(56px, 10vw, 120px) 0 clamp(40px, 6vw, 72px); }
+    h1 {
+      font-family: var(--serif); font-weight: 400; margin: 0;
+      font-size: clamp(3rem, 8vw, 6rem); letter-spacing: -0.04em; line-height: 0.95;
+    }
+    h1 em { font-style: italic; }
+    .lede { max-width: 52ch; margin: 24px 0 0; font-size: 17px; line-height: 1.6; }
+
+    .film { padding: 40px 0 clamp(64px, 9vw, 112px); border-top: 1px solid var(--fg); scroll-margin-top: 24px; }
+    .film-head {
+      display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: baseline; margin-bottom: 24px;
+    }
+    h2 {
+      font-family: var(--serif); font-style: italic; font-weight: 400; margin: 0;
+      font-size: clamp(2.2rem, 4.6vw, 3.6rem); letter-spacing: -0.035em; line-height: 1.05; padding-bottom: 4px;
+    }
+    .meta { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; }
+    .note { grid-column: 1 / -1; max-width: 60ch; margin: 0; font-size: 15px; line-height: 1.6; }
+
+    video { display: block; width: 100%; height: auto; background: var(--fg); border: 1px solid var(--fg); }
+    .ads { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .ad figcaption {
+      display: flex; justify-content: space-between; margin-top: 12px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    }
+    figure { margin: 0; }
+
+    .foot {
+      display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      padding: 28px 0 40px; border-top: 1px solid var(--fg);
+      font-family: var(--mono); font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+    }
+
+    @media (max-width: 767px) {
+      .film-head { grid-template-columns: 1fr; }
+      .ads { grid-template-columns: 1fr; max-width: 360px; margin: 0 auto; gap: 40px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <nav class="top" aria-label="Site">
+      <a href="../../">← Ravindra Sisodia</a>
+      <span>Films</span>
+    </nav>
+
+    <header class="head">
+      <h1>Films, <em>made in code.</em></h1>
+      <p class="lede">I build films the way I build apps, in code with Remotion. Every frame is a React component, and MATERIAL's score is synthesized too.</p>
+    </header>
+
+    <section class="film" id="material">
+      <div class="film-head">
+        <h2>MATERIAL</h2>
+        <span class="meta">Film · GLSL · 1:05 · 2026</span>
+        <p class="note">A type film through four materials: light, liquid, ink and glass. GLSL shaders running inside Remotion, scored by a synth written in Node.</p>
+      </div>
+      <video controls playsinline preload="none" poster="material-poster.jpg" width="1920" height="1080">
+        <source src="material.mp4" type="video/mp4">
+      </video>
+    </section>
+
+    <section class="film" id="launch-films">
+      <div class="film-head">
+        <h2>Launch films</h2>
+        <span class="meta">Instagram · 0:15 each · 2026</span>
+        <p class="note">One 15-second ad for each of my Mac apps, cut for Reels.</p>
+      </div>
+      <div class="ads">
+        <figure class="ad">
+          <video controls playsinline preload="none" poster="chit-poster.jpg" width="1080" height="1920"><source src="chit-ad.mp4" type="video/mp4"></video>
+          <figcaption><span>Chit</span><span>0:15</span></figcaption>
+        </figure>
+        <figure class="ad">
+          <video controls playsinline preload="none" poster="crew-poster.jpg" width="1080" height="1920"><source src="crew-ad.mp4" type="video/mp4"></video>
+          <figcaption><span>Crew</span><span>0:15</span></figcaption>
+        </figure>
+        <figure class="ad">
+          <video controls playsinline preload="none" poster="notchling-poster.jpg" width="1080" height="1920"><source src="notchling-ad.mp4" type="video/mp4"></video>
+          <figcaption><span>Notchling</span><span>0:15</span></figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <a href="../../#projects">← All work</a>
+      <a href="mailto:sisodia.ravindra10@gmail.com">sisodia.ravindra10@gmail.com</a>
+    </footer>
+  </div>
+</body>
+</html>
