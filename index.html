@@ -1646,40 +1646,17 @@ let offW = 0, offH = 0;
 let imageData = null;
 let pixelBuf = null; // typed view onto imageData.data for fast writes
 
-/* Name shade: the hero name is the page colour, so wherever the photo is
-   bright the letters dissolve. Each dither row carries a luminance offset
-   that deepens the print in a feathered band behind the name. No stroke,
-   no scrim: the photo just prints darker there. */
-const NAME_SHADE = 78;       // luminance units taken off at the band's core
-let rowShade = null;         // Float32Array(offH)
-function layoutShade() {
-  if (!offH) return;
-  rowShade = new Float32Array(offH);
-  const nameEl = document.querySelector(".headline span");
-  if (!nameEl) return;
-  const top = nameEl.offsetTop / CELL_PX;
-  const bot = (nameEl.offsetTop + nameEl.offsetHeight) / CELL_PX;
-  const feather = Math.max(1, (bot - top) * 0.7);
-  for (let y = 0; y < offH; y++) {
-    const d = y < top ? top - y : y > bot ? y - bot : 0;
-    const k = Math.max(0, 1 - d / feather);
-    rowShade[y] = NAME_SHADE * k * k * (3 - 2 * k); // smoothstep falloff
-  }
-}
-if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutShade);
-
 function layoutCanvas() {
   const rect = wrap.getBoundingClientRect();
   const newW = Math.max(1, Math.floor(rect.width  / CELL_PX));
   const newH = Math.max(1, Math.floor(rect.height / CELL_PX));
-  if (newW === offW && newH === offH) { layoutShade(); return; }
+  if (newW === offW && newH === offH) return;
   offW = newW; offH = newH;
   canvas.width  = offW;
   canvas.height = offH;
   // Reallocate the ImageData buffer for direct writes.
   imageData = ctx.createImageData(offW, offH);
   pixelBuf  = imageData.data; // Uint8ClampedArray, length = offW*offH*4
-  layoutShade();
 }
 
 /* ---------- RESIZE (ResizeObserver + rAF coalesce, no window listener) ---------- */
@@ -1730,12 +1707,11 @@ function ditherFrame(pulseOffset) {
   let i = 0;
   for (let y = 0; y < offH; y++) {
     const byRow = (y & 7) << 3; // (y % 8) * 8
-    const shade = rowShade ? rowShade[y] : 0;
     for (let x = 0; x < offW; x++) {
       // Rec.709 luminance (kept as multiply-add; integer would be ~2% faster).
       let L = 0.2126 * src[i] + 0.7152 * src[i + 1] + 0.0722 * src[i + 2];
       // CONTRAST around midgray + BRIGHTNESS.
-      L = (L - 128) * CONTRAST + 128 + BRIGHTNESS - shade;
+      L = (L - 128) * CONTRAST + 128 + BRIGHTNESS;
       // Threshold from Bayer matrix + pulse.
       const t = (BAYER8[byRow + (x & 7)] + 0.5) * BAYER_SCALE + pulseOffset;
       if (L > t) {
