@@ -70,7 +70,7 @@
     }
     .nav a {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.12em;
       text-decoration: none;
       color: var(--fg);
@@ -84,7 +84,7 @@
     .nav .spacer { flex: 1; }
     .nav .meta {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.16em;
       align-self: center;
       opacity: 0.7;
@@ -160,7 +160,7 @@
       display: flex;
       gap: 28px;
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.18em;
       white-space: nowrap;
       z-index: 4;
@@ -423,7 +423,7 @@
     }
     .fold-label {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.22em;
       color: var(--fg);
       opacity: 1;
@@ -448,7 +448,7 @@
     }
     .fold-kicker {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.18em;
       opacity: 0.95;
       text-align: right;
@@ -483,7 +483,7 @@
       display: grid;
       place-items: center;
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.2em;
       color: var(--fg);
       border: 1px solid var(--fg);
@@ -508,7 +508,7 @@
     @keyframes previewIn { from { opacity: 0; } }
     .preview-label {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.18em;
       color: var(--fg);
       display: flex;
@@ -538,7 +538,7 @@
       min-height: 44px;
       padding: 0 16px;
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       white-space: nowrap;
@@ -683,7 +683,7 @@
       min-height: 44px;
       padding: 0 14px;
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.12em;
       text-transform: uppercase;
       text-decoration: none;
@@ -734,7 +734,7 @@
     }
     .build-item h3 {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       font-weight: 400;
       letter-spacing: 0.16em;
       text-transform: uppercase;
@@ -880,6 +880,7 @@
     }
     .work-row:hover .arrow { transform: translateX(6px); }
 
+
     /* ---------- 03 · ABOUT ---------- */
     .about-grid {
       display: grid;
@@ -910,7 +911,7 @@
     }
     .about-meta h3 {
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.22em;
       margin: 0 0 10px;
       opacity: 0.75;
@@ -922,7 +923,7 @@
       display: grid;
       gap: 4px;
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 0.04em;
     }
     .about-meta li {
@@ -998,14 +999,14 @@
     .contact-cell {
       padding: 22px 20px 22px 0;
       font-family: var(--mono);
-      font-size: 12px;
+      font-size: 13px;
       letter-spacing: 0.04em;
       display: grid;
       gap: 6px;
     }
     .contact-cell h4 {
       margin: 0;
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.22em;
       opacity: 0.9;
       text-transform: uppercase;
@@ -1018,7 +1019,7 @@
       gap: 12px;
       align-items: end;
       font-family: var(--mono);
-      font-size: 11px;
+      font-size: 12px;
       letter-spacing: 0.18em;
       opacity: 0.9;
     }
@@ -1313,7 +1314,7 @@
         <span class="arrow">→</span>
       </a>
       <a href="https://federate.one/" target="_blank" rel="noopener" class="work-row"
-         data-href="https://federate.one/" data-label="07 · FEDERATE / 2025">
+         data-href="https://federate.one/" data-thumb="./img/thumb-federate.jpg" data-label="07 · FEDERATE / 2025">
         <span class="num">07</span>
         <span class="title">Federate</span>
         <span class="role">Identity · Web</span>
@@ -1645,17 +1646,40 @@ let offW = 0, offH = 0;
 let imageData = null;
 let pixelBuf = null; // typed view onto imageData.data for fast writes
 
+/* Name shade: the hero name is the page colour, so wherever the photo is
+   bright the letters dissolve. Each dither row carries a luminance offset
+   that deepens the print in a feathered band behind the name. No stroke,
+   no scrim: the photo just prints darker there. */
+const NAME_SHADE = 78;       // luminance units taken off at the band's core
+let rowShade = null;         // Float32Array(offH)
+function layoutShade() {
+  if (!offH) return;
+  rowShade = new Float32Array(offH);
+  const nameEl = document.querySelector(".headline span");
+  if (!nameEl) return;
+  const top = nameEl.offsetTop / CELL_PX;
+  const bot = (nameEl.offsetTop + nameEl.offsetHeight) / CELL_PX;
+  const feather = Math.max(1, (bot - top) * 0.7);
+  for (let y = 0; y < offH; y++) {
+    const d = y < top ? top - y : y > bot ? y - bot : 0;
+    const k = Math.max(0, 1 - d / feather);
+    rowShade[y] = NAME_SHADE * k * k * (3 - 2 * k); // smoothstep falloff
+  }
+}
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(layoutShade);
+
 function layoutCanvas() {
   const rect = wrap.getBoundingClientRect();
   const newW = Math.max(1, Math.floor(rect.width  / CELL_PX));
   const newH = Math.max(1, Math.floor(rect.height / CELL_PX));
-  if (newW === offW && newH === offH) return;
+  if (newW === offW && newH === offH) { layoutShade(); return; }
   offW = newW; offH = newH;
   canvas.width  = offW;
   canvas.height = offH;
   // Reallocate the ImageData buffer for direct writes.
   imageData = ctx.createImageData(offW, offH);
   pixelBuf  = imageData.data; // Uint8ClampedArray, length = offW*offH*4
+  layoutShade();
 }
 
 /* ---------- RESIZE (ResizeObserver + rAF coalesce, no window listener) ---------- */
@@ -1706,11 +1730,12 @@ function ditherFrame(pulseOffset) {
   let i = 0;
   for (let y = 0; y < offH; y++) {
     const byRow = (y & 7) << 3; // (y % 8) * 8
+    const shade = rowShade ? rowShade[y] : 0;
     for (let x = 0; x < offW; x++) {
       // Rec.709 luminance (kept as multiply-add; integer would be ~2% faster).
       let L = 0.2126 * src[i] + 0.7152 * src[i + 1] + 0.0722 * src[i + 2];
       // CONTRAST around midgray + BRIGHTNESS.
-      L = (L - 128) * CONTRAST + 128 + BRIGHTNESS;
+      L = (L - 128) * CONTRAST + 128 + BRIGHTNESS - shade;
       // Threshold from Bayer matrix + pulse.
       const t = (BAYER8[byRow + (x & 7)] + 0.5) * BAYER_SCALE + pulseOffset;
       if (L > t) {
@@ -2420,8 +2445,8 @@ if (window.gsap && window.ScrollTrigger) {
           ease: "none",
           scrollTrigger: {
             trigger: canvas.closest(".launch, .feature-row"),
-            start: "top 90%",
-            end: "top 45%",
+            start: "top 98%",
+            end: "top 68%",
             scrub: 0.8
           }
         }
